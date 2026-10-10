@@ -442,6 +442,8 @@ html.locked .wrap{visibility:hidden}
 @media (min-width:1000px) and (min-height:520px){.rcs{max-height:calc(100vh - 330px)}}
 #gcard .gl{display:block;margin:0 auto 8px;width:min(46vw,180px);height:auto;filter:drop-shadow(0 4px 14px rgba(0,0,0,.45))}
 @media (min-width:1000px) and (min-height:520px){#gcard .gl{width:min(22vh,190px)}}
+html.view .card.tabs,html.view .dl2{display:none!important}
+html.view [data-day]{cursor:default}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -563,7 +565,7 @@ document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
 });
 const SID='1PMooyxEBlZcOpJmXH-aRkvmJWN-hnE_PvNej0K8W-0s';
 const CLIENT_ID='825840710134-jlflm38t6bnijmk66a4v2d6fauu676om.apps.googleusercontent.com';
-const SCOPE='https://www.googleapis.com/auth/spreadsheets';
+const SCOPE=window.BMP_VIEW?'https://www.googleapis.com/auth/spreadsheets.readonly':'https://www.googleapis.com/auth/spreadsheets';
 let tok=null,tokExp=0,tc=null;
 try{const t=JSON.parse(localStorage.getItem('gtok')||'null');if(t&&t.exp>Date.now()){tok=t.t;tokExp=t.exp}}catch(e){}
 function authUI(){$('gcard').style.display=(tok&&Date.now()<tokExp)?'none':'block'}
@@ -1177,7 +1179,7 @@ function forecast(){const now=todayK(),cur=info(now).ym,t0=new Date(now+'T00:00'
     if(g>0&&!entries.some(e=>e.x&&/BAS/i.test(e.cat||'')&&e.d>qe+'-28'))ev.push({d:due,t:'BAS (GST estimate)',a:-g})}));
   REM.forEach(r=>{if(r.d&&r.d>=now&&r.d<=ek)ev.push({d:r.d,t:r.n,a:0})});
   ev.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0);let bal=est(),low=null;ev.forEach(x=>{bal+=x.a;x.b=bal;if(bal<0&&!low)low=x.d});return{ev,low,end:bal}}
-const cftBar=()=>`<div class="segs four" id="cft">${[['inc','Income'],['exp','Expenses'],['pro','Profit'],['cash','Cash']].map(([k,n])=>`<button type="button" class="seg${cf===k?' on':''}" data-cf="${k}">${n}</button>`).join('')}</div>`;
+const cftBar=()=>{const L=[['inc','Income'],['exp','Expenses'],['pro','Profit'],['cash','Cash']].filter(x=>!(window.BMP_VIEW&&x[0]==='cash'));return `<div class="segs ${L.length===3?'three':'four'}" id="cft">${L.map(([k,n])=>`<button type="button" class="seg${cf===k?' on':''}" data-cf="${k}">${n}</button>`).join('')}</div>`};
 function cashView(){const now=todayK(),cur=info(now).ym,e0=est(),ms=[];for(let y=cur;y>=BIZ_YM&&ms.length<3;y=prevYm(y))ms.push(y);
   let wait=0;for(let ym=BIZ_YM;ym<=cur;ym=nextYm(ym)){const m=MF[ym]||{};if(!m.recDate&&ym<cur)wait+=mfAmt(ym)}
   const bank=`<div class="card pf"><div class="pfh">Bank balance · estimate</div><div class="pft big"><span>Estimated now</span><b class="${e0<0?'cr':''}">${A(e0)}</b></div><div class="pft"><span>Owed by Mainfreight (finished months)</span><b>${A(wait)}</b></div><div class="bkset"><input id="bk_in" type="number" inputmode="decimal" step="0.01" placeholder="Your real balance A$"><button type="button" class="mini" id="bk_set">Set</button></div><div class="pfn">Received pay + director loans − all expenses. Type your real bank balance and tap Set to correct the estimate.</div></div>`;
@@ -1187,7 +1189,7 @@ function cashView(){const now=todayK(),cur=info(now).ym,e0=est(),ms=[];for(let y
   const F=forecast(),sh=F.ev.slice(0,8);
   const fc=`<div class="card pf"><div class="pfh">Next 30 days</div>${F.low?`<div class="wn">⚠ Balance may go below A$0 on ${dAU(F.low)}</div>`:`<div class="okk">✔ Balance stays above A$0 · ends ${A(F.end)}</div>`}<div class="fcl">${sh.map(x=>`<div class="fcr"><span>${dAU(x.d)}</span><span>${esc(x.t)}</span><b class="${x.a<0?'cr':x.a>0?'cg':''}">${x.a?(x.a>0?'+':'-')+kN(Math.abs(x.a)):''}</b><small class="${x.b<0?'cr':''}">${kN(x.b)}</small></div>`).join('')||'<div class="pfn">Nothing coming up.</div>'}</div>${F.ev.length>8?`<div class="pfn">+${F.ev.length-8} more</div>`:''}</div>`;
   $('earn').innerHTML=cftBar()+banners()+bank+pay+fc}
-(function(){const r1=render;render=function(){r1();
+(function(){const r1=render;render=function(){if(window.BMP_VIEW&&cf==='cash')cf='inc';r1();
   if(cf==='cash')cashView();else{const c=$('cft');if(c)c.outerHTML=cftBar()}
   $('earn').classList.toggle('cash',cf==='cash');if(rk==='find'&&$('fr'))findPaint();fit()};window.render=render})();
 $('earn').addEventListener('click',ev=>{const t=ev.target;
@@ -1276,6 +1278,8 @@ async function pullX(){if(!okTok()||xBusy)return;xBusy=true;
   }catch(e){}finally{xBusy=false}}
 const ls0=loadSheet;loadSheet=async function(){await ls0();await pullX()};
 let lastVis=0;document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&okTok()&&Date.now()-lastVis>15000){lastVis=Date.now();autoSync().then(loadSheet)}});
+/* ===== view-only mode (view.html): Cashflow Income / Expenses / Profit only ===== */
+if(window.BMP_VIEW){banners=function(){return''};openDay=function(){};pushX=async function(){};pullX=async function(){};}
 /* laptop view helpers */
 (function(){const wide=()=>matchMedia('(min-width:1000px) and (min-height:520px)').matches;
   const r0=render;render=function(){r0();$('earn').classList.toggle('pro',cf==='pro');if(wide())document.querySelectorAll('#rep details.bk').forEach(d=>d.open=true);fit()};window.render=render;
