@@ -1168,8 +1168,18 @@ const banners0=banners;
 banners=function(){return banners0()+recDue().map(o=>{const r=RC[o.i];return `<div class="al"><span>${esc(r.n||r.cat)} ${A(+r.amt)} due ${dAU(o.d)}</span><button type="button" data-act="rec" data-i="${o.i}" data-d="${o.d}">Log</button></div>`}).join('')};
 /* cash */
 function mfCalc(ym){const a=agg(e=>info(e.d,e.nm).ym===ym);return{ex:a.I,inc:a.I+a.Ig}}
-function mfAmt(ym){const m=MF[ym]||{};return +m.invInc>0?+m.invInc:mfCalc(ym).inc}
-function est(){let b=+BK.adj||0;Object.keys(MF).forEach(k=>{const m=MF[k];if(m&&m.recDate)b+=+m.recAmt||0});entries.forEach(e=>{if(e.x)b-=e.x;else if(e.ln)b+=e.ln});return b}
+const MFD=[['dPk','Truck Parking','Parking'],['dNv','Navman','Phone & software'],['dOt','Other','Other']];
+const dedSum=m=>m?MFD.reduce((a,x)=>a+(+m[x[0]]||0),0):0;
+function dedPrev(ym){for(let y=prevYm(ym);y>=BIZ_YM;y=prevYm(y)){const m=MF[y];if(m&&dedSum(m)>0)return m}return null}
+function mfDedSync(ym,m){const d=ym+'-15';
+  MFD.forEach(([k,n,cat])=>{const note='Mainfreight deduction: '+n,amt=Math.round((+m[k]||0)*100)/100;
+    const old=entries.find(e=>e.x&&e.note===note&&info(e.d,e.nm).ym===ym);
+    if(old&&Math.abs(old.x-amt)<.005)return;
+    if(old)removeEntry(old);
+    if(amt>0)entries.push({d,del:0,pu:0,nm:false,x:amt,cat,note})});
+  persist();autoSync()}
+function mfAmt(ym){const m=MF[ym]||{};return (+m.invInc>0?+m.invInc:mfCalc(ym).inc)-dedSum(m)}
+function est(){let b=+BK.adj||0;Object.keys(MF).forEach(k=>{const m=MF[k];if(m){if(m.recDate)b+=+m.recAmt||0;b+=dedSum(m)}});entries.forEach(e=>{if(e.x)b-=e.x;else if(e.ln)b+=e.ln});return b}
 function chk(m,c){const ex=+m.invEx||0,inc=+m.invInc||0;let d;if(ex>0)d=ex-c.ex;else if(inc>0)d=inc-c.inc;else return['Tap to add invoice',''];
   return Math.abs(d)<.5?['✔ Matches invoice','cg']:d>0?['Missing '+A(d),'cr']:['Over by '+A(-d),'cr']}
 function forecast(){const now=todayK(),cur=info(now).ym,t0=new Date(now+'T00:00'),en=new Date(t0);en.setDate(en.getDate()+30);const ek=iso(en),ev=[];
@@ -1206,15 +1216,19 @@ let mfCur=null;
 document.body.insertAdjacentHTML('beforeend',`<div class="pop" id="mfm" style="display:none"><div class="popc mfb"><h3 id="mf_t"></h3>
 <label>Invoice excl GST<input id="mf_ex" type="number" inputmode="decimal" step="0.01"></label><label>Invoice incl GST<input id="mf_in" type="number" inputmode="decimal" step="0.01"></label>
 <div class="mfc" id="mf_c"></div>
+<div class="mfc" style="background:none;padding:0 2px">Deductions on this invoice (incl GST)</div><label>Truck Parking<input id="mf_dPk" type="number" inputmode="decimal" step="0.01"></label><label>Navman<input id="mf_dNv" type="number" inputmode="decimal" step="0.01"></label><label>Other<input id="mf_dOt" type="number" inputmode="decimal" step="0.01"></label>
 <label>Amount received<input id="mf_ra" type="number" inputmode="decimal" step="0.01"></label><label>Date received<input id="mf_rd" type="date"></label>
 <button type="button" class="save" id="mf_save">Save invoice</button><button type="button" class="save alt" id="mf_rec">Mark received</button><button type="button" class="save alt" id="mf_undo">Undo received</button><button type="button" class="save alt" id="mf_x">Cancel</button></div></div>`);
 function mfChk(){const g=id=>{const v=parseFloat($(id).value);return isNaN(v)?0:v},c=mfCalc(mfCur),k=chk({invEx:g('mf_ex'),invInc:g('mf_in')},c);
-  $('mf_c').innerHTML=`App total: <b>${A(c.ex)}</b> excl · <b>${A(c.inc)}</b> incl<br><span class="${k[1]}">${k[0]}</span>`}
+  const dd=MFD.reduce((a,x)=>a+g('mf_'+x[0]),0),inc=g('mf_in')||(g('mf_ex')&&CFG.gst?Math.round(g('mf_ex')*110)/100:0)||c.inc,net=Math.round((inc-dd)*100)/100;
+  $('mf_ra').placeholder=net.toFixed(2);
+  $('mf_c').innerHTML=`App total: <b>${A(c.ex)}</b> excl · <b>${A(c.inc)}</b> incl<br><span class="${k[1]}">${k[0]}</span>`+(dd>0?`<br>Expected payment: <b>${A(net)}</b> (after ${A(dd)} deductions)`:'')}
 function openMf(ym){mfCur=ym;const m=MF[ym]||{};$('mf_t').textContent='Mainfreight '+ymName(ym)+' invoice';
   $('mf_ex').value=m.invEx||'';$('mf_in').value=m.invInc||'';$('mf_ra').value=m.recAmt||'';$('mf_rd').value=m.recDate||'';
+  const pm=(m.dedSet||dedSum(m)>0)?m:(dedPrev(mfCur)||{});MFD.forEach(([k])=>{$('mf_'+k).value=pm[k]||''});
   $('mf_rec').style.display=m.recDate?'none':'';$('mf_undo').style.display=m.recDate?'':'none';mfChk();$('mfm').style.display='flex'}
 function mfRead(){const g=id=>{const v=parseFloat($(id).value);return isNaN(v)?0:v},m=MF[mfCur]=MF[mfCur]||{};
-  m.invEx=g('mf_ex');m.invInc=g('mf_in');if(m.invEx&&!m.invInc&&CFG.gst)m.invInc=Math.round(m.invEx*110)/100;return m}
+  m.invEx=g('mf_ex');m.invInc=g('mf_in');if(m.invEx&&!m.invInc&&CFG.gst)m.invInc=Math.round(m.invEx*110)/100;MFD.forEach(([k])=>{m[k]=g('mf_'+k)});m.dedSet=true;mfDedSync(mfCur,m);return m}
 $('mfm').addEventListener('input',mfChk);
 $('mfm').addEventListener('click',ev=>{const t=ev.target;if(t===$('mfm')||t.id==='mf_x'){$('mfm').style.display='none';return}
   if(t.id==='mf_save'){mfRead();}
