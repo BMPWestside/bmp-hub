@@ -542,11 +542,11 @@ function render(){
     if(k===cur.ym)mIdx=mN;mN++;monthRows+=R(MN[mm]+' '+String(yy).slice(2),E.filter(x=>x.ym===k).map(x=>x.e))}
   let yearRows='',yIdx=0;for(let y=BIZ_FY;y<=Math.max(BIZ_FY,fy)+1;y++){if(y===fy)yIdx=y-BIZ_FY;yearRows+=R('FY'+String(y).slice(2),E.filter(x=>x.y===y).map(x=>x.e))}
   const _w1=new Date(ws);_w1.setDate(ws.getDate()+6);
-  const wkV=entries.filter(e=>e.d>=iso(ws)&&e.d<=iso(_w1)).reduce((a,e)=>a+amt(e),0);
+  const wkE=entries.filter(e=>e.d>=iso(ws)&&e.d<=iso(_w1)),wkV=wkE.reduce((a,e)=>a+amt(e),0),wkD=new Set(wkE.filter(e=>!e.x&&!e.ln&&amt(e)>0).map(e=>e.d)).size,WTd=(()=>{try{return CFG.dt||1000}catch(e){return 1000}})()*Math.max(1,wkD);
   const moV=E.filter(x=>x.ym===cur.ym).reduce((a,x)=>a+amt(x.e),0);
   const tg=(l,v,t)=>{const p=Math.round(v/t*100),k=n=>'A$'+Math.round(n).toLocaleString('en-AU');
     return `<div class="tg r1${p>=100?' hit':''}"><span>${l} <b>${p}%</b></span><div class="tgb"><i style="width:${Math.min(100,p)}%"></i></div><span>${kc(v)}/${kc(t).slice(2)}</span></div>`};
-  const tgHtml=`<div class="card top tgc">${tg('Week',wkV,WT)}${tg('Month',moV,MT)}</div>`;
+  const tgHtml=`<div class="card top tgc">${tg('Week',wkV,WTd)}${tg('Month',moV,MT)}</div>`;
   const heads=X?XH:IH,kA=n=>'A$'+Math.round(n).toLocaleString('en-AU');
   const MF=['January','February','March','April','May','June','July','August','September','October','November','December'];
   let extra='';
@@ -883,7 +883,7 @@ document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList
 const PAY_START='2026-10-13';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
-let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
+let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
 let REM=jget('rem',[{n:'Registration (rego)',d:'',km:''},{n:'Truck insurance',d:'',km:''},{n:'HVIS / road user charges',d:'',km:''},{n:'Truck service',d:'',km:''}]);
 let ODO=jget('odo','');
 const saveCfg=()=>{jset('cfg',CFG);jset('rem',REM);jset('odo',ODO)};
@@ -937,6 +937,8 @@ function toolsView(){
 <label>Income I enter is<select id="c_inc"><option value="ex"${CFG.incGst==='ex'?' selected':''}>Excluding GST</option><option value="inc"${CFG.incGst==='inc'?' selected':''}>Including GST</option></select></label>
 <div class="hint">Check your Mainfreight remittance: if GST is added on top of your figures, choose Excluding. Expenses are assumed to be entered as on the receipt (including GST).</div>
 <label>Tax set-aside %<input id="c_tax" type="number" inputmode="decimal" step="0.5" value="${CFG.tax}"></label>
+<label>Target per day worked (A$)<input id="c_dt" type="number" inputmode="decimal" step="50" value="${CFG.dt||1000}"></label>
+<div class="hint">The weekly bar targets this amount for each day you have income entered (4 days = 4 x this).</div>
 <label>Weekly gross salary (A$)<input id="c_sal" type="number" inputmode="decimal" step="0.01" value="${CFG.sal}"></label>
 <label>Weekly super (A$)<input id="c_sup" type="number" inputmode="decimal" step="0.01" value="${CFG.sup}"></label>
 <div class="hint">Use gross pay (before tax). Your take-home is A$1,641, so A$505 goes to the ATO as PAYG withholding. Reminder: every Tuesday after 6:00 PM until logged.</div>
@@ -964,7 +966,7 @@ $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl
   else if(id==='b_lkoff')showLock('verify','Enter PIN to turn off lock',()=>{try{localStorage.removeItem('lk')}catch(e){}LK=null;document.documentElement.classList.remove('locked');toolsView()})});
 $('tools').addEventListener('change',ev=>{const t=ev.target,id=t.id;
   if(id==='c_gst')CFG.gst=t.value==='1';else if(id==='c_inc')CFG.incGst=t.value;
-  else if(id==='c_tax')CFG.tax=Math.max(0,Math.min(60,+t.value||0));else if(id==='c_sal')CFG.sal=+t.value||0;else if(id==='c_sup')CFG.sup=+t.value||0;
+  else if(id==='c_tax')CFG.tax=Math.max(0,Math.min(60,+t.value||0));else if(id==='c_dt')CFG.dt=Math.max(0,+t.value||1000);else if(id==='c_sal')CFG.sal=+t.value||0;else if(id==='c_sup')CFG.sup=+t.value||0;
   else if(id==='c_odo')ODO=t.value;
   else if(t.dataset.ri!==undefined)REM[+t.dataset.ri][t.dataset.f]=t.value;
   else if(id==='b_file'){impBackup(t.files[0]);t.value='';return}else return;
