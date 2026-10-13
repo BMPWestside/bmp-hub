@@ -481,6 +481,11 @@ html.view [data-day]{cursor:default}
 /* title: softer glow */
 .topwrap>.card.top:not(.top2) .ttl{filter:drop-shadow(0 1px 0 rgba(90,50,5,.7)) drop-shadow(0 0 3px rgba(247,201,100,.18))}
 .topwrap>.card.top:not(.top2) .ttl::before,.topwrap>.card.top:not(.top2) .ttl::after{opacity:.8}
+
+.tl .dmi.dme{flex-direction:column;align-items:stretch;gap:6px;padding:8px}
+.tl .mini.dmdel{background:rgba(200,40,60,.35)!important;border-color:rgba(255,120,130,.6)!important}
+html body .card.tl button.mini.dmdel{background:linear-gradient(180deg,#e0384f,#a8182f)!important;border-color:rgba(255,150,160,.7)!important;color:#fff!important}
+#tools button.mini.dmdel{background:linear-gradient(180deg,#e0384f,#a8182f)!important;border-color:rgba(255,150,160,.8)!important;box-shadow:inset 0 0 0 1.5px rgba(255,170,175,.7)!important}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1151,6 +1156,70 @@ $('tools').addEventListener('change',ev=>{const t=ev.target;
   if(t.id==='dm_pick'){dmPick=t.value;dmShown={};dmPaint()}
   else if(t.dataset&&t.dataset.dmn&&t.tagName==='SELECT'){const n=t.dataset.dmn;$('dm_n'+n).style.display=t.value==='__new'?'block':'none';dmType(+n);fit()}});
 $('tools').addEventListener('input',ev=>{const t=ev.target;if(t.dataset&&t.dataset.dmn&&t.tagName==='INPUT')dmType(+t.dataset.dmn)});
+
+/* ===== manager: edit sections / items ===== */
+let dmEdit=false,dmEditId='';
+const DM_PEN='<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>';
+const DM_BIN='<svg viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/></svg>';
+const dmItem0=dmItem;
+dmItem=function(r){
+  if(dmEdit&&dmEditId===r.id){const pw=dmIsPw(r.label)||dmIsPw(r.pwLabel);
+    return '<div class="dmi dme"><input id="dme_v" class="dmf" type="'+(pw?'password':'text')+'" value="'+esc(r.value)+'" placeholder="Value" autocomplete="off">'
+      +(r.kind==='label'?'':'<input id="dme_l" class="dmf" value="'+esc(r.label)+'" placeholder="Field label (optional)" autocomplete="off">')
+      +'<div class="two2"><button type="button" class="mini" data-dm="esave" data-id="'+r.id+'">Save</button><button type="button" class="mini" data-dm="ecancel">Cancel</button></div>'
+      +(pw?'<button type="button" class="mini" data-dm="eyein">Show / hide</button>':'')+'</div>'}
+  const h=dmItem0(r);if(!dmEdit)return h;
+  const btns='<button type="button" class="dmb" data-dm="epen" data-id="'+r.id+'" aria-label="Edit">'+DM_PEN+'</button><button type="button" class="dmb" data-dm="ebin" data-id="'+r.id+'" aria-label="Delete">'+DM_BIN+'</button>';
+  return h.indexOf('<div class="dma">')>=0?h.replace('<div class="dma">','<div class="dma">'+btns):h.replace(/<\/div>$/,'<div class="dma">'+btns+'</div></div>')};
+const dmHtml0=dmHtml;
+dmHtml=function(){let h=dmHtml0();
+  if(dmMode==='view'&&dmPick){const ctl='<div class="two2"><button type="button" class="mini" data-dm="edit">'+(dmEdit?'Finish editing':'Edit section')+'</button>'+(dmEdit?'<button type="button" class="mini" data-dm="ren">Rename section</button>':'<span></span>')+'</div>'
+      +(dmEdit?'<button type="button" class="mini dmdel" data-dm="dsec">Delete section</button>':'')+'<div class="hint" id="dm_emsg"></div>';
+    h=h.replace('</select>','</select>'+ctl)}
+  return h};
+const dmEF=t=>{const e=$('dm_emsg');if(e){e.textContent=t;setTimeout(()=>{if(e.textContent===t)e.textContent=''},2600)}};
+const dmPut=(range,vals)=>dmApi('/values/'+encodeURIComponent(range)+'?valueInputOption=RAW',{method:'PUT',body:JSON.stringify({values:vals})});
+const dmClear=ranges=>ranges.length?dmApi('/values:batchClear',{method:'POST',body:JSON.stringify({ranges})}):Promise.resolve();
+async function dmFieldRows(name){const j=await dmApi('/values/'+encodeURIComponent('Fields!A:A'));const v=j.values||[],k=name.toLowerCase(),o=[];
+  v.forEach((r,i)=>{if(i>0&&String(r&&r[0]!=null?r[0]:'').trim().toLowerCase()===k)o.push(i+1)});return{rows:o,all:v}}
+async function dmReload(){dmEditId='';dmLoaded=false;dmMsg='';await dmLoad()}
+async function dmRename(){const old=dmPick,nn=(prompt('Rename section "'+old+'" to:',old)||'').trim();
+  if(!nn||nn===old)return;
+  const exists=dmSections().find(x=>x.toLowerCase()===nn.toLowerCase()&&x.toLowerCase()!==old.toLowerCase());
+  if(exists&&!confirm('"'+exists+'" already exists. Merge "'+old+'" into it?'))return;
+  const name=exists||nn;
+  try{const rows=dmRows.filter(r=>r.section.toLowerCase()===old.toLowerCase());
+    if(rows.length)await dmApi('/values:batchUpdate',{method:'POST',body:JSON.stringify({valueInputOption:'RAW',data:rows.map(r=>({range:'Data!A'+r.id,values:[[name]]}))})});
+    const fo=await dmFieldRows(old),nx=exists||fo.all.some((r,i)=>i>0&&String(r&&r[0]!=null?r[0]:'').trim().toLowerCase()===nn.toLowerCase()&&nn.toLowerCase()!==old.toLowerCase());
+    const clr=[];fo.rows.forEach((n,i)=>{if(i===0&&!nx)return;clr.push('Fields!A'+n)});
+    if(fo.rows.length&&!nx)await dmPut('Fields!A'+fo.rows[0],[[name]]);
+    await dmClear(clr);
+    dmPick=name;await dmReload()}
+  catch(e){dmEF(dmWhy(e))}}
+async function dmDelSec(){const old=dmPick,rows=dmRows.filter(r=>r.section.toLowerCase()===old.toLowerCase());
+  if(!confirm('Delete section "'+old+'" and its '+rows.length+' item'+(rows.length===1?'':'s')+'? This cannot be undone.'))return;
+  try{const fo=await dmFieldRows(old);
+    await dmClear(rows.map(r=>'Data!A'+r.id+':C'+r.id).concat(fo.rows.map(n=>'Fields!A'+n)));
+    dmPick='';dmEdit=false;await dmReload()}
+  catch(e){dmEF(dmWhy(e))}}
+async function dmSaveItem(id){const r=dmRows.find(x=>x.id===id),v=$('dme_v');if(!r||!v)return;
+  const val=v.value.trim();if(!val){dmEF('Value cannot be empty');return}
+  const l=$('dme_l'),lab=l?l.value.trim():r.label;
+  try{await dmPut('Data!B'+id+':C'+id,[[val,lab]]);await dmReload()}catch(e){dmEF(dmWhy(e))}}
+async function dmDelItem(id){const r=dmRows.find(x=>x.id===id);if(!r)return;
+  if(!confirm('Delete this item? This cannot be undone.'+(r.kind==='label'?'\nThe item after it may stop being hidden as a password.':'')))return;
+  try{await dmClear(['Data!A'+id+':C'+id]);await dmReload()}catch(e){dmEF(dmWhy(e))}}
+$('tools').addEventListener('click',ev=>{const t=ev.target.closest('[data-dm]');if(!t)return;const a=t.dataset.dm;
+  if(a==='edit'){dmEdit=!dmEdit;dmEditId='';dmShown={};toolsView()}
+  else if(a==='epen'){dmEditId=t.dataset.id;dmPaint()}
+  else if(a==='ecancel'){dmEditId='';dmPaint()}
+  else if(a==='eyein'){const e=$('dme_v');if(e)e.type=e.type==='password'?'text':'password'}
+  else if(a==='esave')dmSaveItem(t.dataset.id);
+  else if(a==='ebin')dmDelItem(t.dataset.id);
+  else if(a==='ren')dmRename();
+  else if(a==='dsec')dmDelSec();
+  else if(a==='mode'||a==='done'){dmEdit=false;dmEditId=''}});
+$('tools').addEventListener('change',ev=>{if(ev.target.id==='dm_pick'){dmEdit=false;dmEditId='';toolsView()}});
 /* keep sub-tab bars the same visual size whatever the panel zoom is */
 (function(){const _fit=fit;fit=function(){
   try{const g=$('gcard');if(g&&g.style.display!=='none'&&!matchMedia('(min-width:1000px) and (min-height:520px)').matches){document.querySelectorAll('.panel,.panel .segs[id]').forEach(x=>x.style.zoom='');document.querySelector('.scroll').classList.remove('nofit');return}}catch(e){}
