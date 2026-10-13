@@ -6,7 +6,7 @@
 <title>BMP Hub</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@900&amp;text=BMP%20HUB&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@800&amp;text=BMP%20HUB&amp;display=swap">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
 <link rel="shortcut icon" href="favicon.ico">
@@ -465,6 +465,21 @@ html.view [data-day]{cursor:default}
 .topwrap>.card.top:not(.top2) .ttl::after{content:"";position:absolute;left:8%;right:8%;bottom:-4px;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,#f3cf86,transparent);opacity:.9}
 @media (min-width:1000px) and (min-height:520px){.topwrap>.card.top:not(.top2) .ttl{font-size:30px;letter-spacing:.14em;padding-left:.14em}}
 @media (max-width:380px){.topwrap>.card.top:not(.top2) .r.vp{font-size:13px!important}.topwrap>.card.top:not(.top2) .ttl{font-size:clamp(15px,5vw,19px);letter-spacing:.07em;padding-left:.07em}}
+/* title v3: Playfair Display + gold lines above and below */
+.topwrap>.card.top:not(.top2) .ttl{font-family:"Playfair Display","Bodoni 72",Didot,Baskerville,Georgia,serif;font-weight:900;letter-spacing:.09em;padding-left:.09em;font-size:clamp(15px,5.1vw,21px)}
+.topwrap>.card.top:not(.top2) .ttl::before{content:"";position:absolute;left:8%;right:8%;top:-5px;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,#f3cf86,transparent);opacity:.9}
+@media (min-width:1000px) and (min-height:520px){.topwrap>.card.top:not(.top2) .ttl{font-size:30px;letter-spacing:.12em;padding-left:.12em}}
+@media (max-width:380px){.topwrap>.card.top:not(.top2) .ttl{font-size:clamp(14px,4.8vw,18px);letter-spacing:.05em;padding-left:.05em}}
+/* title v4: Barlow Condensed (logo-style lettering), equal gold lines */
+.topwrap>.card.top:not(.top2) .ttl{font-family:"Barlow Condensed","Avenir Next Condensed","Arial Narrow",Oswald,sans-serif;font-weight:800;font-size:clamp(19px,6.2vw,27px);letter-spacing:.12em;padding-left:.12em;line-height:1;text-transform:uppercase;text-box:trim-both cap alphabetic}
+.topwrap>.card.top:not(.top2) .ttl::before,.topwrap>.card.top:not(.top2) .ttl::after{content:"";position:absolute;left:0;right:0;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,#f3cf86 20%,#f3cf86 80%,transparent);opacity:.9}
+.topwrap>.card.top:not(.top2) .ttl::before{top:-7px;bottom:auto}
+.topwrap>.card.top:not(.top2) .ttl::after{bottom:-7px;top:auto}
+@media (min-width:1000px) and (min-height:520px){.topwrap>.card.top:not(.top2) .ttl{font-size:36px;letter-spacing:.14em;padding-left:.14em}.topwrap>.card.top:not(.top2) .ttl::before{top:-9px}.topwrap>.card.top:not(.top2) .ttl::after{bottom:-9px}}
+@media (max-width:380px){.topwrap>.card.top:not(.top2) .ttl{font-size:clamp(17px,5.6vw,21px);letter-spacing:.08em;padding-left:.08em}}
+/* title: softer glow */
+.topwrap>.card.top:not(.top2) .ttl{filter:drop-shadow(0 1px 0 rgba(90,50,5,.7)) drop-shadow(0 0 3px rgba(247,201,100,.18))}
+.topwrap>.card.top:not(.top2) .ttl::before,.topwrap>.card.top:not(.top2) .ttl::after{opacity:.8}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
