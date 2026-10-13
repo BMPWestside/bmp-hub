@@ -6,7 +6,7 @@
 <title>BMP Hub</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@800&amp;text=BMP%20HUB&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@900&amp;text=BMP%20HUB&amp;display=swap">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
 <link rel="shortcut icon" href="favicon.ico">
@@ -458,6 +458,13 @@ html.view [data-day]{cursor:default}
   background:linear-gradient(180deg,#fff6e0 0%,#F5D6A6 50%,#c8964f 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;filter:drop-shadow(0 1px 4px rgba(245,214,166,.38))}
 @media (min-width:1000px) and (min-height:520px){.top .ttl{font-size:24px}}
 @media (max-width:999px),(max-height:519px){.top .ttl{font-size:13px;letter-spacing:.14em;padding-left:.14em}.topwrap>.card.top:not(.top2) .r.vp{font-size:14px!important;letter-spacing:-.01em}.topwrap>.card.top:not(.top2) .side{gap:4px}.topwrap>.card.top:not(.top2){column-gap:3px}}
+/* title v2: bigger, bolder gold */
+.topwrap>.card.top:not(.top2) .ttl{position:relative;font-weight:900;font-size:clamp(16px,5.6vw,22px);letter-spacing:.1em;padding-left:.1em;
+  background:linear-gradient(180deg,#fff4c9 0%,#f7d98a 38%,#e0a840 68%,#a8701f 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 1px 0 rgba(90,50,5,.85)) drop-shadow(0 0 7px rgba(247,201,100,.5))}
+.topwrap>.card.top:not(.top2) .ttl::after{content:"";position:absolute;left:8%;right:8%;bottom:-4px;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,#f3cf86,transparent);opacity:.9}
+@media (min-width:1000px) and (min-height:520px){.topwrap>.card.top:not(.top2) .ttl{font-size:30px;letter-spacing:.14em;padding-left:.14em}}
+@media (max-width:380px){.topwrap>.card.top:not(.top2) .r.vp{font-size:13px!important}.topwrap>.card.top:not(.top2) .ttl{font-size:clamp(15px,5vw,19px);letter-spacing:.07em;padding-left:.07em}}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
