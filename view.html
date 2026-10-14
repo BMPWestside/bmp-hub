@@ -921,7 +921,7 @@ document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList
 const PAY_START='2026-10-13';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
-let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
+let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
 let REM=jget('rem',[{n:'Registration (rego)',d:'',km:''},{n:'Truck insurance',d:'',km:''},{n:'HVIS / road user charges',d:'',km:''},{n:'Truck service',d:'',km:''}]);
 let ODO=jget('odo','');
 const saveCfg=()=>{jset('cfg',CFG);jset('rem',REM);jset('odo',ODO)};
@@ -978,8 +978,9 @@ function toolsView(){
 <label>Target per day worked (A$)<input id="c_dt" type="number" inputmode="decimal" step="50" value="${CFG.dt||1000}"></label>
 <div class="hint">The weekly bar targets this amount for each day you have income entered (4 days = 4 x this).</div>
 <label>Weekly gross salary (A$)<input id="c_sal" type="number" inputmode="decimal" step="0.01" value="${CFG.sal}"></label>
+<label>Weekly take-home pay (A$)<input id="c_net" type="number" inputmode="decimal" step="0.01" value="${CFG.net}"></label>
 <label>Weekly super (A$)<input id="c_sup" type="number" inputmode="decimal" step="0.01" value="${CFG.sup}"></label>
-<div class="hint">Use gross pay (before tax). Your take-home is A$1,641, so A$505 goes to the ATO as PAYG withholding. Reminder: every Tuesday after 6:00 PM until logged.</div>
+<div class="hint">Use gross pay (before tax). The difference between gross and take-home is PAYG withholding. It stays in your business account until you pay the ATO with your BAS, and the Cash tab shows it as held for the ATO. Reminder: every Tuesday after 6:00 PM until logged.</div>
 <button type="button" class="mini" id="b_payics">Add weekly pay alert to iPhone Calendar</button></div>`;
   else if(tl==='rem')b=`<div class="card tl"><label>Odometer now (km)<input id="c_odo" type="number" inputmode="numeric" value="${esc(ODO)}"></label>
 <div class="rems">${REM.map((r,i)=>`<div class="rr"><input data-ri="${i}" data-f="n" value="${esc(r.n)}" placeholder="Name"><input type="date" data-ri="${i}" data-f="d" value="${esc(r.d)}"><input type="number" inputmode="numeric" data-ri="${i}" data-f="km" value="${esc(r.km)}" placeholder="at km"><b data-del="${i}">✕</b></div>`).join('')}</div>
@@ -1004,7 +1005,7 @@ $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl
   else if(id==='b_lkoff')showLock('verify','Enter PIN to turn off lock',()=>{try{localStorage.removeItem('lk')}catch(e){}LK=null;document.documentElement.classList.remove('locked');toolsView()})});
 $('tools').addEventListener('change',ev=>{const t=ev.target,id=t.id;
   if(id==='c_gst')CFG.gst=t.value==='1';else if(id==='c_inc')CFG.incGst=t.value;
-  else if(id==='c_tax')CFG.tax=Math.max(0,Math.min(60,+t.value||0));else if(id==='c_dt')CFG.dt=Math.max(0,+t.value||1000);else if(id==='c_sal')CFG.sal=+t.value||0;else if(id==='c_sup')CFG.sup=+t.value||0;
+  else if(id==='c_tax')CFG.tax=Math.max(0,Math.min(60,+t.value||0));else if(id==='c_dt')CFG.dt=Math.max(0,+t.value||1000);else if(id==='c_sal')CFG.sal=+t.value||0;else if(id==='c_net')CFG.net=+t.value||0;else if(id==='c_sup')CFG.sup=+t.value||0;
   else if(id==='c_odo')ODO=t.value;
   else if(t.dataset.ri!==undefined)REM[+t.dataset.ri][t.dataset.f]=t.value;
   else if(id==='b_file'){impBackup(t.files[0]);t.value='';return}else return;
@@ -1282,25 +1283,33 @@ function mfDedSync(ym,m){const d=ym+'-15';
     if(amt>0)entries.push({d,del:0,pu:0,nm:false,x:amt,cat,note})});
   persist();autoSync()}
 function mfAmt(ym){const m=MF[ym]||{};return (+m.invInc>0?+m.invInc:mfCalc(ym).inc)-dedSum(m)}
-function est(){let b=+BK.adj||0;Object.keys(MF).forEach(k=>{const m=MF[k];if(m){if(m.recDate)b+=+m.recAmt||0;b+=dedSum(m)}});entries.forEach(e=>{if(e.x)b-=e.x;else if(e.ln)b+=e.ln});return b}
+const isSal=e=>!!e.x&&/^salary\b/i.test(e.cat||'');
+const whRate=()=>{const g=+CFG.sal||0,n=+CFG.net||0;return g>0&&n>0&&n<g?(g-n)/g:0};
+const whOf=e=>isSal(e)?e.x*whRate():0;
+const netOf=a=>a*(1-whRate());
+const isPayg=e=>!!e.x&&/PAYG/i.test(e.cat||'');
+function paygHeld(){return Math.max(0,entries.reduce((a,e)=>a+whOf(e)-(isPayg(e)?e.x:0),0))}
+function est(){let b=+BK.adj||0;Object.keys(MF).forEach(k=>{const m=MF[k];if(m){if(m.recDate)b+=+m.recAmt||0;b+=dedSum(m)}});entries.forEach(e=>{if(e.x){b-=e.x;b+=whOf(e)}else if(e.ln)b+=e.ln});return b}
 function chk(m,c){const ex=+m.invEx||0,inc=+m.invInc||0;let d;if(ex>0)d=ex-c.ex;else if(inc>0)d=inc-c.inc;else return['Tap to add invoice',''];
   return Math.abs(d)<.5?['✔ Matches invoice','cg']:d>0?['Missing '+A(d),'cr']:['Over by '+A(-d),'cr']}
 function forecast(){const now=todayK(),cur=info(now).ym,t0=new Date(now+'T00:00'),en=new Date(t0);en.setDate(en.getDate()+30);const ek=iso(en),ev=[];
   for(let d=new Date(t0);d<=en;d.setDate(d.getDate()+1)){const k=iso(d);if(d.getDay()===2&&k>=PAY_START&&!rcSal()){const lo=new Date(d),hi=new Date(d);lo.setDate(lo.getDate()-3);hi.setDate(hi.getDate()+3);
-    if(!entries.some(e=>e.x&&/^salary/i.test(e.cat||'')&&e.d>=iso(lo)&&e.d<=iso(hi)))ev.push({d:k,t:'Salary + super',a:-(CFG.sal+CFG.sup)})}}
+    if(!entries.some(e=>e.x&&/^salary/i.test(e.cat||'')&&e.d>=iso(lo)&&e.d<=iso(hi)))ev.push({d:k,t:'Salary + super',a:-(netOf(CFG.sal)+CFG.sup)})}}
   [cur,nextYm(cur)].forEach(m=>RC.forEach(r=>{if(r.freq==='w'||!(+r.amt)||!(+r.day)||(r.from&&m<r.from))return;const dd=m+'-'+pad2(Math.min(28,+r.day));
     if(entries.some(e=>e.x&&e.cat===r.cat&&e.d.slice(0,7)===m))return;if(dd>ek)return;if(dd<now&&m!==cur)return;ev.push({d:dd<now?now:dd,t:(r.n||r.cat)+(dd<now?' (due)':''),a:-(+r.amt)})}));
-  RC.forEach(r=>{if(r.freq!=='w'||!recOk(r))return;for(let d=new Date(t0);d<=en;d.setDate(d.getDate()+1)){const k=iso(d);if(d.getDay()!==+r.wd||(r.from&&k<r.from+'-01')||recDone(r,k))continue;ev.push({d:k,t:r.n||r.cat,a:-(+r.amt)})}});
+  RC.forEach(r=>{if(r.freq!=='w'||!recOk(r))return;for(let d=new Date(t0);d<=en;d.setDate(d.getDate()+1)){const k=iso(d);if(d.getDay()!==+r.wd||(r.from&&k<r.from+'-01')||recDone(r,k))continue;ev.push({d:k,t:r.n||r.cat,a:-(/^salary\b/i.test(r.cat||'')?netOf(+r.amt):+r.amt)})}});
   for(let ym=BIZ_YM;ym<=cur;ym=nextYm(ym)){const m=MF[ym]||{};if(m.recDate)continue;const due=dueOf(ym);if(due>ek)continue;ev.push({d:due<now?now:due,t:'Mainfreight '+ymName(ym)+(ym===cur?' (so far)':''),a:mfAmt(ym)})}
-  const Y=t0.getFullYear();[Y-1,Y,Y+1].forEach(y=>[3,6,9,12].forEach(q=>{const qe=y+'-'+pad2(q);if(qe<BIZ_YM)return;const due=nextYm(qe)+'-28';if(due<now||due>ek)return;
+  const Y=t0.getFullYear();[Y-1,Y,Y+1].forEach(y=>[3,6,9,12].forEach(q=>{const qe=y+'-'+pad2(q);if(qe<BIZ_YM)return;const due=(q===12?nextYm(nextYm(qe)):nextYm(qe))+'-28';if(due<now||due>ek)return;
     const qk=[qe,prevYm(qe),prevYm(prevYm(qe))],Q=agg(e=>qk.includes(info(e.d,e.nm).ym)),g=Q.Ig-Q.Xg;
-    if(g>0&&!entries.some(e=>e.x&&/BAS/i.test(e.cat||'')&&e.d>qe+'-28'))ev.push({d:due,t:'BAS (GST estimate)',a:-g})}));
+    if(g>0&&!entries.some(e=>e.x&&/BAS/i.test(e.cat||'')&&e.d>qe+'-28'))ev.push({d:due,t:'BAS (GST estimate)',a:-g});
+    const pg=entries.filter(e=>isSal(e)&&qk.includes(info(e.d,e.nm).ym)).reduce((a,e)=>a+whOf(e),0);
+    if(pg>0&&!entries.some(e=>isPayg(e)&&e.d>qe+'-28'))ev.push({d:due,t:'PAYG withholding (BAS)',a:-pg})}));
   REM.forEach(r=>{if(r.d&&r.d>=now&&r.d<=ek)ev.push({d:r.d,t:r.n,a:0})});
   ev.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0);let bal=est(),low=null;ev.forEach(x=>{bal+=x.a;x.b=bal;if(bal<0&&!low)low=x.d});return{ev,low,end:bal}}
 const cftBar=()=>{const L=[['inc','Income'],['exp','Expenses'],['pro','Profit'],['cash','Cash']].filter(x=>!(window.BMP_VIEW&&x[0]==='cash'));return `<div class="segs ${L.length===3?'three':'four'}" id="cft">${L.map(([k,n])=>`<button type="button" class="seg${cf===k?' on':''}" data-cf="${k}">${n}</button>`).join('')}</div>`};
 function cashView(){const now=todayK(),cur=info(now).ym,e0=est(),ms=[];for(let y=cur;y>=BIZ_YM&&ms.length<3;y=prevYm(y))ms.push(y);
   let wait=0;for(let ym=BIZ_YM;ym<=cur;ym=nextYm(ym)){const m=MF[ym]||{};if(!m.recDate&&ym<cur)wait+=mfAmt(ym)}
-  const bank=`<div class="card pf"><div class="pfh">Bank balance · estimate</div><div class="pft big"><span>Estimated now</span><b class="${e0<0?'cr':''}">${A(e0)}</b></div><div class="pft"><span>Owed by Mainfreight (finished months)</span><b>${A(wait)}</b></div><div class="bkset"><input id="bk_in" type="number" inputmode="decimal" step="0.01" placeholder="Your real balance A$"><button type="button" class="mini" id="bk_set">Set</button></div><div class="pfn">Received pay + director loans − all expenses. Type your real bank balance and tap Set to correct the estimate.</div></div>`;
+  const bank=`<div class="card pf"><div class="pfh">Bank balance · estimate</div><div class="pft big"><span>Estimated now</span><b class="${e0<0?'cr':''}">${A(e0)}</b></div><div class="pft"><span>Owed by Mainfreight (finished months)</span><b>${A(wait)}</b></div><div class="pft"><span>Held for ATO (PAYG withholding)</span><b>${A(paygHeld())}</b></div><div class="bkset"><input id="bk_in" type="number" inputmode="decimal" step="0.01" placeholder="Your real balance A$"><button type="button" class="mini" id="bk_set">Set</button></div><div class="pfn">Received pay + director loans − all expenses. Type your real bank balance and tap Set to correct the estimate.</div></div>`;
   const pay=`<div class="card pf"><div class="pfh">Mainfreight pay · due 15th · tap to check invoice</div>${ms.map(ym=>{const m=MF[ym]||{},c=mfCalc(ym),due=dueOf(ym),k=chk(m,c),
     st=m.recDate?`<small class="cg">Received ${dAU(m.recDate)}</small>`:due<now?'<small class="cr">Overdue</small>':`<small>Due ${dAU(due)}</small>`;
     return `<button type="button" class="mfr" data-mf="${ym}"><span><b>${ymName(ym)}</b><small class="${k[1]}">${k[0]}</small></span><span class="r"><b>${A(mfAmt(ym))}</b>${st}</span></button>`}).join('')}</div>`;
