@@ -505,6 +505,17 @@ html body .card.tl button.mini.dmdel{background:linear-gradient(180deg,#e0384f,#
 .dbrow{display:grid;grid-template-columns:52px 1fr auto;gap:8px;align-items:center;height:38px;padding:0 10px;font-size:13px;border-bottom:1px solid rgba(160,175,255,.15);cursor:pointer}
 .dbrow:last-child{border-bottom:0}.dbrow.sel{background:rgba(47,127,224,.25)}.dbd{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
 .dbg .dbc{margin:6px 0 0;background:rgba(0,0,0,.14)}
+
+/* debt tabs: thin individual tabs */
+.dbtabs{display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
+.dbtab{border-radius:12px;padding:4px 10px 5px;border:1px solid rgba(160,175,255,.28);background:rgba(0,45,105,.62)}
+.dbtab.tot{background:#E4002B;border-color:#ff6b83;cursor:default}
+.dbtab.tot .tgt,.dbtab.tot .tgt span:first-child,.dbtab.tot .tgt b{color:#fff}
+.dbtab.tot .tgb{background:rgba(0,0,0,.28)}.dbtab.tot .tgb i,.dbtab.tot.hit .tgb i{background:#fff;box-shadow:none}
+.dbtab.per{cursor:pointer}.dbtab.per.op{border-color:#F5D6A6;box-shadow:0 0 0 1px #F5D6A6 inset}
+.dbtab .dbpb{margin:0;padding:0}.dbtab .tgt{font-size:11px}.dbtab .tgb,.dbtab .dbb{height:5px;margin-top:3px}
+.dbbox{border:1.5px solid rgba(160,175,255,.5);border-radius:14px;padding:5px;margin-bottom:8px}
+.dbbox .dbl{margin:0}.dbbox .dbc{margin:6px 0 0}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1265,18 +1276,18 @@ ${d.s?`<div class="hint dbn">${esc(d.s)}</div>`:''}${d.c?`<div class="hint dbn">
 <div class="two2"><button type="button" class="mini" data-dedit="${i}">Edit</button><button type="button" class="mini dbx" data-ddel="${i}">Delete debt</button></div></div>`;};
   const G={},order=[];DB.forEach((d,i)=>{const k=dbKey(d.n);if(!G[k]){G[k]={n:d.n||'Debt',ix:[]};order.push(k)}G[k].ix.push(i)});
   let tl_=0,tt=0;DB.forEach(d=>{const s=dbSum(d);tl_+=s.left;tt+=s.tot});
-  let h='';
-  if(DB.length){h+=`<div class="card tl"><div class="pfh">Total Owing</div>${bar('Total owing',tl_,tt)}`;
-    order.forEach(k=>{const g=G[k],sm=g.ix.reduce((a,i)=>{const s=dbSum(DB[i]);a.l+=s.left;a.t+=s.tot;return a},{l:0,t:0}),op=dbOpen===k;
-      h+=`<div class="dbg${op?' op':''}">${bar(esc(g.n)+(op?' ▴':' ▾'),sm.l,sm.t,' data-dperson="'+esc(k)+'"')}`;
-      if(op){h+=`<div class="dbl">${g.ix.map(i=>{const d=DB[i],s=dbSum(d);return `<div class="dbrow${dbSel===i?' sel':''}" data-dsel="${i}"><span>${d.d?new Date(d.d+'T00:00').toLocaleDateString('en-AU',{day:'2-digit',month:'short'}):''}</span><span class="dbd">${esc(d.s||d.c||'')}</span><b>${m(s.left)}</b></div>`}).join('')}</div>`;
-        if(g.ix.includes(dbSel)||(dbEd>=0&&g.ix.includes(dbEd)))h+=detail(dbEd>=0&&g.ix.includes(dbEd)?dbEd:dbSel)}
-      h+=`</div>`});
-    h+=`</div>`}
+  let h='',box='';
+  if(DB.length){h+=`<div class="dbtabs"><div class="dbtab tot">${bar('Total Owing',tl_,tt)}</div>`;
+    order.forEach(k=>{const g=G[k],sm=g.ix.reduce((a,i)=>{const s=dbSum(DB[i]);a.l+=s.left;a.t+=s.tot;return a},{l:0,t:0});
+      h+=`<div class="dbtab per${dbOpen===k?' op':''}" data-dperson="${esc(k)}">${bar(esc(g.n),sm.l,sm.t)}</div>`});
+    h+=`</div>`;
+    const g=G[dbOpen];
+    if(g){box=`<div class="dbbox"><div class="dbl">${g.ix.map(i=>{const d=DB[i],s=dbSum(d);return `<div class="dbrow${dbSel===i?' sel':''}" data-dsel="${i}"><span>${d.d?new Date(d.d+'T00:00').toLocaleDateString('en-AU',{day:'2-digit',month:'short'}):''}</span><span class="dbd">${esc(d.s||d.c||'')}</span><b>${m(s.left)}</b></div>`}).join('')}</div></div>`;
+      const sel=dbEd>=0&&g.ix.includes(dbEd)?dbEd:(g.ix.includes(dbSel)?dbSel:-1);if(sel>=0)box+=detail(sel)}}
   h+=`<div class="card tl"><div class="pfh">Money I owe</div><label>Who I owe<input id="db_n" placeholder="Name"></label>
 <label>Amount owed (A$)<input id="db_a" type="number" inputmode="decimal" step="0.01"></label><label>Date borrowed<input id="db_d" type="date" value="${todayK()}"></label>
 <label>Description<input id="db_s" placeholder="What it was for"></label><label>Comments<input id="db_c" placeholder="Notes"></label>
-<button type="button" class="mini" id="db_add">+ Add debt</button></div>`;
+<button type="button" class="mini" id="db_add">+ Add debt</button></div>`+box;
   return h}
 $('tools').addEventListener('click',ev=>{const t=ev.target;let q;
   if(t.id==='db_add'){const n=$('db_n').value.trim(),a=parseFloat($('db_a').value);if(!n||!(a>0)){alert('Enter who you owe and the amount.');return}dbOpen=dbKey(n);DB.push({n,tot:a,d:$('db_d').value||todayK(),s:$('db_s').value.trim(),c:$('db_c').value.trim(),pays:[]});dbSave();toolsView();return}
