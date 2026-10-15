@@ -6,7 +6,7 @@
 <title>BMP Hub</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@800&amp;text=BMP%20HUB&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,900&amp;text=BMP%20HUB&amp;display=swap">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
 <link rel="shortcut icon" href="favicon.ico">
@@ -520,6 +520,16 @@ html body .card.tl button.mini.dmdel{background:linear-gradient(180deg,#e0384f,#
 .popc .dbc{margin:0;padding:0;background:none;border:0;box-shadow:none}
 .dbcl{cursor:pointer;font-size:18px;color:var(--muted);padding:0 4px;order:3}.dbh{gap:8px;align-items:center}.dbh b{margin-right:auto}
 .dbn{font-size:13px;color:var(--muted);margin:2px 0}.dbn b{color:#fff;font-weight:600}
+
+/* title v5: Mainfreight-style - heavy italic sans, chrome white, red + blue slivers like the M mark */
+.topwrap>.card.top:not(.top2) .ttl{font-family:"Montserrat","Avenir Next","Arial Black",Impact,sans-serif;font-style:italic;font-weight:900;font-size:clamp(15px,4.9vw,21px);letter-spacing:.05em;padding-left:0;line-height:1;text-transform:uppercase;text-box:trim-both cap alphabetic;display:inline-flex;align-items:center;gap:7px;
+  background:linear-gradient(180deg,#ffffff 0%,#e9edf5 45%,#aab4c6 52%,#f4f6fb 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;filter:drop-shadow(0 1px 0 rgba(120,0,20,.75)) drop-shadow(0 0 3px rgba(255,255,255,.18))}
+.topwrap>.card.top:not(.top2) .ttl::before{content:"";position:static;display:inline-block;flex:none;width:4px;height:.95em;border-radius:1px;background:#E4002B;transform:skewX(-18deg);box-shadow:7px 0 0 #1b5fd1;margin-right:7px;opacity:1;-webkit-text-fill-color:initial}
+.topwrap>.card.top:not(.top2) .ttl::after{content:none}
+@media (min-width:1000px) and (min-height:520px){.topwrap>.card.top:not(.top2) .ttl{font-size:30px;letter-spacing:.06em;padding-left:0}.topwrap>.card.top:not(.top2) .ttl::before{width:6px;box-shadow:10px 0 0 #1b5fd1;margin-right:10px}}
+@media (max-width:380px){.topwrap>.card.top:not(.top2) .ttl{font-size:clamp(13px,4.2vw,17px);letter-spacing:.04em;padding-left:0;gap:5px}.topwrap>.card.top:not(.top2) .ttl::before{width:3px;box-shadow:5px 0 0 #1b5fd1;margin-right:5px}}
+/* total owing: see-through like the top bar */
+.dbtab.tot{background:rgba(228,0,43,.45);border-color:rgba(245,214,166,.3);-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);box-shadow:0 8px 28px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.12)}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
