@@ -1067,7 +1067,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="pfh">App lock</div>${LK&&LK.pin?`<div class="hint">Lock is ON${LK.cred?' (Face ID + PIN)':' (PIN)'}. Locks after 1 minute away.</div><div class="two2">${LK.cred?'<span></span>':'<button type="button" class="mini" id="b_fid">Add Face ID</button>'}<button type="button" class="mini" id="b_lkoff">Turn off</button></div>`:`<button type="button" class="mini" id="b_lkon">Set up PIN / Face ID lock</button>`}</div>`}
+<div class="hint">App version: 15 Oct 2026, 19:05 (letterhead + merged debts sync)</div><div class="pfh">App lock</div>${LK&&LK.pin?`<div class="hint">Lock is ON${LK.cred?' (Face ID + PIN)':' (PIN)'}. Locks after 1 minute away.</div><div class="two2">${LK.cred?'<span></span>':'<button type="button" class="mini" id="b_fid">Add Face ID</button>'}<button type="button" class="mini" id="b_lkoff">Turn off</button></div>`:`<button type="button" class="mini" id="b_lkon">Set up PIN / Face ID lock</button>`}</div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -1362,7 +1362,7 @@ async function dbPut(v){const rg=encodeURIComponent(DBTAB+'!A1'),o={method:'PUT'
   try{await api(dbU('/values/'+rg+'?valueInputOption=RAW'),o)}
   catch(e){if(e&&e.code)throw e;await api(dbU(':batchUpdate'),{method:'POST',body:JSON.stringify({requests:[{addSheet:{properties:{title:DBTAB}}}]})});await api(dbU('/values/'+rg+'?valueInputOption=RAW'),o)}}
 async function dbSync(){if(window.BMP_VIEW||dbBusy||!okTok())return;dbBusy=true;
-  try{let r=null;try{const g=await api(dbU('/values/'+encodeURIComponent(DBTAB+'!A1')));const v=(g.values||[])[0];r=v&&v[0]?JSON.parse(v[0]):null}catch(e){if(e&&e.code)throw e;if(e instanceof TypeError)throw e}
+  try{let r=null;try{const g=await api(dbU('/values/'+encodeURIComponent(DBTAB+'!A1')));const v=(g.values||[])[0];r=v&&v[0]?JSON.parse(v[0]):null}catch(e){if(e&&e.code)throw e;if(e instanceof TypeError||e instanceof SyntaxError)throw e;if(!/Unable to parse range|not found|Requested entity/i.test((e&&e.message)||''))throw e}
     dbStamp();const rem=Array.isArray(r&&r.db)?r.db:[],rx=Array.isArray(r&&r.x)?r.x:[];
     rem.forEach(d=>{if(!d.id)d.id=dbLegacyId(d);if(!d.h){d.h=dbHash(d);d.u=d.u||0}});
     const tx=new Map();[...DX,...rx].forEach(x=>{const o=tx.get(x.id);if(!o||x.u>o.u)tx.set(x.id,x)});
