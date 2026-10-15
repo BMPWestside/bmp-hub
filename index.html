@@ -489,6 +489,16 @@ html body .card.tl button.mini.dmdel{background:linear-gradient(180deg,#e0384f,#
 /* entry form: progress bars + logo */
 #ftgw{margin-bottom:8px}#ftgw .card.top.tgc{margin:0}
 .flg{display:flex;justify-content:center;margin-top:10px}.flg img{height:66px;width:66px;object-fit:contain;display:block}
+
+.segs.six{grid-template-columns:repeat(6,1fr);margin-bottom:0}.segs.six .seg{font-size:10.5px;padding-left:0;padding-right:0}
+.dbt{display:flex;justify-content:space-between;font-size:15px}.dbt b{color:#ff7a8a}
+.dbh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}.dbh span{font-size:11px;color:var(--muted)}
+.dbb{height:10px}.dbb i{background:linear-gradient(90deg,#ff5d73,#ffb347)}
+.dbr{display:flex;justify-content:space-between;font-size:13px}.dbr b{cursor:pointer;color:#ff7a8a}
+.dbp{display:grid;grid-template-columns:1.2fr 1.3fr auto;gap:6px;margin-top:8px}
+#tools button.mini.dbx{margin-top:8px;color:#ff7a8a}
+.flg img{height:120px!important;width:120px!important}
+#db_n,#db_a,#db_d{flex:1;min-width:0;width:60%}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -975,7 +985,7 @@ $('earn').addEventListener('click',ev=>{const b=ev.target.closest('[data-act="pa
 let tl='mgr';
 const inp=(id,v,ex)=>`<input id="${id}" value="${esc(v)}" ${ex||''}>`;
 function toolsView(){
-  const seg=['mgr:Manager','set:Setup','rem:Reminders','rec:Recurring','dat:Backup'].map(s=>{const[k,n]=s.split(':');return`<button type="button" class="seg${tl===k?' on':''}" data-tl="${k}">${n}</button>`}).join('');
+  const seg=['mgr:Manager','set:Setup','rem:Reminders','rec:Recurring','debt:Debts','dat:Backup'].map(s=>{const[k,n]=s.split(':');return`<button type="button" class="seg${tl===k?' on':''}" data-tl="${k}">${n}</button>`}).join('');
   let b='';
   if(tl==='set')b=`<div class="card tl"><label>GST registered<select id="c_gst"><option value="1"${CFG.gst?' selected':''}>Yes</option><option value="0"${CFG.gst?'':' selected'}>No</option></select></label>
 <label>Income I enter is<select id="c_inc"><option value="ex"${CFG.incGst==='ex'?' selected':''}>Excluding GST</option><option value="inc"${CFG.incGst==='inc'?' selected':''}>Including GST</option></select></label>
@@ -993,13 +1003,14 @@ function toolsView(){
 <div class="hint">Add a date, a service km, or both. Items due within 30 days (or 1,000 km) show on the Cashflow tab.</div>
 <div class="two2"><button type="button" class="mini" id="b_radd">+ Add item</button><button type="button" class="mini" id="b_rics">Add to Calendar</button></div></div>`;
   else if(tl==='rec')b=recHtml();
+  else if(tl==='debt')b=debtHtml();
   else if(tl==='mgr')b=dmHtml();
   else{const fys=[];for(let y=BIZ_FY;y<=Math.max(BIZ_FY,fyOf(info(todayK()).ym));y++)fys.push(y);
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
 <div class="pfh">App lock</div>${LK&&LK.pin?`<div class="hint">Lock is ON${LK.cred?' (Face ID + PIN)':' (PIN)'}. Locks after 1 minute away.</div><div class="two2">${LK.cred?'<span></span>':'<button type="button" class="mini" id="b_fid">Add Face ID</button>'}<button type="button" class="mini" id="b_lkoff">Turn off</button></div>`:`<button type="button" class="mini" id="b_lkon">Set up PIN / Face ID lock</button>`}</div>`}
-  $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
+  $('tools').innerHTML=`<div class="segs six" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
   const id=t.id;
@@ -1030,12 +1041,12 @@ function icsRem(){const evs=REM.filter(r=>r.d).map((r,i)=>{const d=r.d.replace(/
   if(!evs.length){alert('Add a due date to at least one item first.');return}
   const nm='BMP-truck-reminders.ics';shareFile(new File([icsWrap(evs)],nm,{type:'text/calendar'}),nm)}
 /* ===== backup ===== */
-function expBackup(){const nm='BMP-backup-'+todayK()+'.json';shareFile(new File([JSON.stringify({app:'BMP',v:1,at:new Date().toISOString(),entries,cfg:CFG,rem:REM,odo:ODO,mf:MF,rc:RC,bk:BK})],nm,{type:'application/json'}),nm)}
+function expBackup(){const nm='BMP-backup-'+todayK()+'.json';shareFile(new File([JSON.stringify({app:'BMP',v:1,at:new Date().toISOString(),entries,cfg:CFG,rem:REM,odo:ODO,mf:MF,rc:RC,bk:BK,db:DB})],nm,{type:'application/json'}),nm)}
 async function impBackup(f){if(!f)return;let j;try{j=JSON.parse(await f.text())}catch(e){alert('That file is not a valid BMP backup.');return}
   if(!j||j.app!=='BMP'||!Array.isArray(j.entries)){alert('That file is not a valid BMP backup.');return}
   const have=new Set(entries.map(sig)),add=j.entries.filter(e=>e&&/^\d{4}-\d\d-\d\d$/.test(e.d)&&!have.has(sig(e)));
   if(!confirm('Import '+add.length+' new entr'+(add.length===1?'y':'ies')+' and restore settings?'))return;
-  add.forEach(e=>{e.s=false;entries.push(e)});if(j.cfg)CFG=Object.assign(CFG,j.cfg);if(Array.isArray(j.rem))REM=j.rem;if(j.odo!=null)ODO=j.odo;if(j.mf)MF=Object.assign({},j.mf,MF);if(Array.isArray(j.rc)&&j.rc.length)RC=j.rc;if(j.bk)BK=Object.assign(BK,j.bk);saveX();
+  add.forEach(e=>{e.s=false;entries.push(e)});if(j.cfg)CFG=Object.assign(CFG,j.cfg);if(Array.isArray(j.rem))REM=j.rem;if(j.odo!=null)ODO=j.odo;if(j.mf)MF=Object.assign({},j.mf,MF);if(Array.isArray(j.rc)&&j.rc.length)RC=j.rc;if(j.bk)BK=Object.assign(BK,j.bk);if(Array.isArray(j.db)&&j.db.length){DB=j.db;dbSave()}saveX();
   saveCfg();persist();render();toolsView();autoSync();alert('Backup imported.')}
 /* ===== financial year pack ===== */
 function fyData(fy){const L=entries.filter(e=>info(e.d,e.nm).y===fy);
@@ -1229,6 +1240,45 @@ $('tools').addEventListener('click',ev=>{const t=ev.target.closest('[data-dm]');
 $('tools').addEventListener('change',ev=>{if(ev.target.id==='dm_pick'){dmEdit=false;dmEditId='';toolsView()}});
 
 try{const _l=document.querySelector('.topwrap img.lg');if(_l)$('flogo').src=_l.src}catch(e){}
+
+/* ===== DEBTS: money I owe, repaid in instalments ===== */
+const dbSum=d=>{const paid=(d.pays||[]).reduce((a,p)=>a+(+p.a||0),0),tot=+d.tot||0;return{paid,tot,left:Math.max(0,tot-paid)}};
+function debtHtml(){const m=n=>'A$'+(+n).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const all=DB.reduce((a,d)=>a+dbSum(d).left,0);
+  let h=`<div class="card tl"><div class="pfh">Add money I owe</div><label>Who I owe<input id="db_n" placeholder="Name"></label>
+<label>Amount owed (A$)<input id="db_a" type="number" inputmode="decimal" step="0.01"></label><label>Date borrowed<input id="db_d" type="date" value="${todayK()}"></label>
+<button type="button" class="mini" id="db_add">+ Add debt</button></div>`;
+  if(DB.length)h+=`<div class="card tl"><div class="dbt"><span>Total still owing</span><b>${m(all)}</b></div></div>`;
+  DB.forEach((d,i)=>{const s=dbSum(d),pct=s.tot?Math.round(s.left/s.tot*100):0,done=s.left<=0.005;
+    h+=`<div class="card tl dbc"><div class="dbh"><b>${esc(d.n||'Debt')}</b><span>${d.d?new Date(d.d+'T00:00').toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'}):''}</span></div>
+<div class="tg${done?' hit':''}"><div class="tgt"><span>${done?'Paid off':'Remaining <b>'+pct+'%</b>'}</span><span>${m(s.left)} of ${m(s.tot)}</span></div><div class="tgb dbb"><i style="width:${done?100:pct}%"></i></div></div>
+<div class="hint">Paid ${m(s.paid)}</div>
+<div class="rems">${(d.pays||[]).map((p,j)=>`<div class="rr dbr"><span>${new Date(p.d+'T00:00').toLocaleDateString('en-AU',{day:'2-digit',month:'short'})}</span><span>${m(p.a)}</span><b data-dpdel="${i}:${j}">✕</b></div>`).join('')}</div>
+<div class="rr dbp"><input type="number" inputmode="decimal" step="0.01" id="dp_a${i}" placeholder="Instalment A$"><input type="date" id="dp_d${i}" value="${todayK()}"><button type="button" class="mini" data-dpay="${i}">Pay</button></div>
+<button type="button" class="mini dbx" data-ddel="${i}">Delete debt</button></div>`});
+  return h}
+$('tools').addEventListener('click',ev=>{const t=ev.target;let q;
+  if(t.id==='db_add'){const n=$('db_n').value.trim(),a=parseFloat($('db_a').value);if(!n||!(a>0)){alert('Enter who you owe and the amount.');return}DB.push({n,tot:a,d:$('db_d').value||todayK(),pays:[]});dbSave();toolsView();return}
+  if(t.dataset.dpay!==undefined){const i=+t.dataset.dpay,a=parseFloat($('dp_a'+i).value);if(!(a>0))return;const d=DB[i];d.pays=d.pays||[];d.pays.push({d:$('dp_d'+i).value||todayK(),a});d.pays.sort((x,y)=>x.d<y.d?-1:1);dbSave();toolsView();return}
+  if(t.dataset.dpdel!==undefined){q=t.dataset.dpdel.split(':');DB[+q[0]].pays.splice(+q[1],1);dbSave();toolsView();return}
+  if(t.dataset.ddel!==undefined){if(confirm('Delete this debt and its payments?')){DB.splice(+t.dataset.ddel,1);dbSave();toolsView()}}});
+
+/* private sync of debts: separate personal sheet (the Manager sheet), tab "Debts", never the business sheet */
+let DT=jget('dbt',0),dbBusy=false,dbTimer=null,dbStat='';
+const DBTAB='Data2',dbU=p=>'https://sheets.googleapis.com/v4/spreadsheets/'+DM_SHEET+p;
+function dbSave(){if(window.BMP_VIEW)return;jset('db',DB);DT=Date.now();jset('dbt',DT);clearTimeout(dbTimer);dbTimer=setTimeout(dbPush,1000)}
+async function dbPut(v){const rg=encodeURIComponent(DBTAB+'!A1'),o={method:'PUT',body:JSON.stringify({values:[[JSON.stringify(v)]]})};
+  try{await api(dbU('/values/'+rg+'?valueInputOption=RAW'),o)}
+  catch(e){if(e&&e.code)throw e;await api(dbU(':batchUpdate'),{method:'POST',body:JSON.stringify({requests:[{addSheet:{properties:{title:DBTAB}}}]})});await api(dbU('/values/'+rg+'?valueInputOption=RAW'),o)}}
+async function dbPush(){if(window.BMP_VIEW||dbBusy||!okTok())return;dbBusy=true;try{await dbPut({t:DT,db:DB});dbStat='Synced to your private sheet'}catch(e){dbStat='Not synced yet'}finally{dbBusy=false}dbPaintStat()}
+async function dbPull(){if(window.BMP_VIEW||dbBusy||!okTok())return;dbBusy=true;let r=null,ok=true;
+  try{try{const g=await api(dbU('/values/'+encodeURIComponent(DBTAB+'!A1')));const v=(g.values||[])[0];r=v&&v[0]?JSON.parse(v[0]):null}catch(e){if(e&&e.code)throw e}
+    if(!r||(+r.t||0)<DT||(!r.t&&DT)){dbBusy=false;await dbPush();return}
+    if((+r.t||0)>DT&&Array.isArray(r.db)){DB=r.db;DT=+r.t;jset('db',DB);jset('dbt',DT);if(tl==='debt'&&$('tools').classList.contains('on'))toolsView()}
+    dbStat='Synced to your private sheet'}catch(e){dbStat='Not synced yet'}finally{dbBusy=false}dbPaintStat()}
+function dbPaintStat(){}
+const ls1=loadSheet;loadSheet=async function(){await ls1();await dbPull()};
+document.addEventListener('click',ev=>{const b=ev.target.closest&&ev.target.closest('[data-tl="debt"]');if(b)setTimeout(dbPull,50)});
 /* keep sub-tab bars the same visual size whatever the panel zoom is */
 (function(){const _fit=fit;fit=function(){
   try{const g=$('gcard');if(g&&g.style.display!=='none'&&!matchMedia('(min-width:1000px) and (min-height:520px)').matches){document.querySelectorAll('.panel,.panel .segs[id]').forEach(x=>x.style.zoom='');document.querySelector('.scroll').classList.remove('nofit');return}}catch(e){}
@@ -1238,11 +1288,11 @@ try{const _l=document.querySelector('.topwrap img.lg');if(_l)$('flogo').src=_l.s
     for(let i=0;i<4&&z<1;i++){bars().forEach(b=>b.style.zoom=1/z);const o=sc.scrollHeight-sc.clientHeight;if(o<=0)break;const H=p.getBoundingClientRect().height;z=Math.max(.5,z*(H-o)/H);p.style.zoom=z}}catch(e){}
 };window.fit=fit;window.addEventListener('resize',fit)})();
 /* ===== v5: cash, invoice check, forecast, recurring, bin, trend, find ===== */
-let MF=jget('mf',{}),BK=Object.assign({adj:0},jget('bk',{})),BIN=jget('bin',[]),RC=jget('rc',null);
+let MF=jget('mf',{}),BK=Object.assign({adj:0},jget('bk',{})),BIN=jget('bin',[]),RC=jget('rc',null),DB=window.BMP_VIEW?[]:jget('db',[]);
 if(!Array.isArray(RC))RC=[{n:'Truck repayment',cat:'Truck Repayment',amt:5000,day:2,from:'2026-11'}];
 BIN=BIN.filter(b=>Date.now()-b.at<30*864e5);
 let XT=jget('xt',0);
-function saveX(q){jset('mf',MF);jset('bk',BK);jset('rc',RC);jset('bin',BIN);if(!q){XT=Date.now();jset('xt',XT);pushXsoon()}}saveX(true);
+function saveX(q){jset('mf',MF);jset('bk',BK);jset('rc',RC);jset('db',DB);jset('bin',BIN);if(!q){XT=Date.now();jset('xt',XT);pushXsoon()}}saveX(true);
 const BIZ_START='2026-09-28',A=n=>fmt(n);
 const dAU=(k,o)=>new Date(k+'T00:00').toLocaleDateString('en-AU',o||{day:'numeric',month:'short'});
 const pad2=n=>String(n).padStart(2,'0');
