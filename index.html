@@ -1332,7 +1332,7 @@ function debtHtml(){const m=n=>'A$'+(+n).toLocaleString('en-AU',{minimumFraction
   return h}
 const dbClick=ev=>{const t=ev.target;let q;
   if(t.dataset&&t.dataset.dclose!==undefined||t.id==='dbpop'){dbSel=-1;dbEd=-1;toolsView();return}
-  if(t.id==='db_add'){const n=$('db_n').value.trim(),a=parseFloat($('db_a').value);if(!n||!(a>0)){alert('Enter who you owe and the amount.');return}dbOpen=dbKey(n);DB.push({n,tot:a,d:$('db_d').value||todayK(),s:$('db_s').value.trim(),c:$('db_c').value.trim(),pays:[]});dbSave();toolsView();return}
+  if(t.id==='db_add'){const n=$('db_n').value.trim(),a=parseFloat($('db_a').value);if(!n||!(a>0)){alert('Enter who you owe and the amount.');return}dbOpen=dbKey(n);DB.push({id:'d'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),u:Date.now(),n,tot:a,d:$('db_d').value||todayK(),s:$('db_s').value.trim(),c:$('db_c').value.trim(),pays:[]});dbSave();toolsView();return}
   if(t.dataset.dpay!==undefined){const i=+t.dataset.dpay,a=parseFloat($('dp_a'+i).value);if(!(a>0))return;const d=DB[i];d.pays=d.pays||[];d.pays.push({d:$('dp_d'+i).value||todayK(),a,n:$('dp_n'+i).value.trim()});d.pays.sort((x,y)=>x.d<y.d?-1:1);dbSave();toolsView();return}
   if(t.dataset.dpdel!==undefined){q=t.dataset.dpdel.split(':');DB[+q[0]].pays.splice(+q[1],1);dbSave();toolsView();return}
   const pb=t.closest&&t.closest('[data-dperson]');if(pb){const k=pb.dataset.dperson;dbOpen=dbOpen===k?'':k;dbSel=-1;dbEd=-1;toolsView();return}
@@ -1348,22 +1348,33 @@ $('dbpop').addEventListener('click',dbClick);
 let dbPopHtml='';
 const tv0=toolsView;toolsView=function(){tv0();const o=$('dbpop');if(!o)return;if(tl==='debt'&&dbPopHtml){$('dbpc').innerHTML=dbPopHtml;o.style.display='flex'}else o.style.display='none'};
 
-/* private sync of debts: separate personal sheet (the Manager sheet), tab "Debts", never the business sheet */
-let DT=jget('dbt',0),dbBusy=false,dbTimer=null,dbStat='';
+/* private sync of debts: merged per entry (never overwrites the other device), stored in the personal Manager sheet, tab Data2 */
+let DX=jget('dbx',[]),dbBusy=false,dbTimer=null,dbStat='';
 const DBTAB='Data2',dbU=p=>'https://sheets.googleapis.com/v4/spreadsheets/'+DM_SHEET+p;
-function dbSave(){if(window.BMP_VIEW)return;jset('db',DB);DT=Date.now();jset('dbt',DT);clearTimeout(dbTimer);dbTimer=setTimeout(dbPush,1000)}
+const dbHash=d=>JSON.stringify([d.n,d.tot,d.d,d.s,d.c,d.pays]);
+const dbLegacyId=d=>{let h=5381;for(const c of [d.n,d.tot,d.d,d.s,d.c].join('|'))h=((h<<5)+h+c.charCodeAt(0))|0;return 'h'+(h>>>0).toString(36)};
+function dbStamp(){const now=Date.now(),seen=new Set();
+  DB.forEach(d=>{if(!d.id)d.id=dbLegacyId(d);const h=dbHash(d);if(!d.h){d.h=h;d.u=d.u||0}else if(d.h!==h){d.h=h;d.u=now}seen.add(d.id)});
+  jget('dbids',[]).forEach(id=>{if(!seen.has(id)&&!DX.some(x=>x.id===id))DX.push({id,u:now})});
+  jset('dbids',[...seen]);jset('dbx',DX)}
+function dbSave(){if(window.BMP_VIEW)return;dbStamp();jset('db',DB);clearTimeout(dbTimer);dbTimer=setTimeout(dbSync,900)}
 async function dbPut(v){const rg=encodeURIComponent(DBTAB+'!A1'),o={method:'PUT',body:JSON.stringify({values:[[JSON.stringify(v)]]})};
   try{await api(dbU('/values/'+rg+'?valueInputOption=RAW'),o)}
   catch(e){if(e&&e.code)throw e;await api(dbU(':batchUpdate'),{method:'POST',body:JSON.stringify({requests:[{addSheet:{properties:{title:DBTAB}}}]})});await api(dbU('/values/'+rg+'?valueInputOption=RAW'),o)}}
-async function dbPush(){if(window.BMP_VIEW||dbBusy||!okTok())return;dbBusy=true;try{await dbPut({t:DT,db:DB});dbStat='Synced to your private sheet'}catch(e){dbStat='Not synced yet'}finally{dbBusy=false}dbPaintStat()}
-async function dbPull(){if(window.BMP_VIEW||dbBusy||!okTok())return;dbBusy=true;let r=null,ok=true;
-  try{try{const g=await api(dbU('/values/'+encodeURIComponent(DBTAB+'!A1')));const v=(g.values||[])[0];r=v&&v[0]?JSON.parse(v[0]):null}catch(e){if(e&&e.code)throw e}
-    if(!r||(+r.t||0)<DT||(!r.t&&DT)){dbBusy=false;await dbPush();return}
-    if((+r.t||0)>DT&&Array.isArray(r.db)){DB=r.db;DT=+r.t;jset('db',DB);jset('dbt',DT);if(tl==='debt'&&$('tools').classList.contains('on'))toolsView()}
-    dbStat='Synced to your private sheet'}catch(e){dbStat='Not synced yet'}finally{dbBusy=false}dbPaintStat()}
-function dbPaintStat(){}
-const ls1=loadSheet;loadSheet=async function(){await ls1();await dbPull()};
-document.addEventListener('click',ev=>{const b=ev.target.closest&&ev.target.closest('[data-tl="debt"]');if(b)setTimeout(dbPull,50)});
+async function dbSync(){if(window.BMP_VIEW||dbBusy||!okTok())return;dbBusy=true;
+  try{let r=null;try{const g=await api(dbU('/values/'+encodeURIComponent(DBTAB+'!A1')));const v=(g.values||[])[0];r=v&&v[0]?JSON.parse(v[0]):null}catch(e){if(e&&e.code)throw e;if(e instanceof TypeError)throw e}
+    dbStamp();const rem=Array.isArray(r&&r.db)?r.db:[],rx=Array.isArray(r&&r.x)?r.x:[];
+    rem.forEach(d=>{if(!d.id)d.id=dbLegacyId(d);if(!d.h){d.h=dbHash(d);d.u=d.u||0}});
+    const tx=new Map();[...DX,...rx].forEach(x=>{const o=tx.get(x.id);if(!o||x.u>o.u)tx.set(x.id,x)});
+    const m=new Map();DB.forEach(d=>m.set(d.id,d));rem.forEach(d=>{const o=m.get(d.id);if(!o||(d.u||0)>(o.u||0))m.set(d.id,d)});
+    const out=[];m.forEach(d=>{const t=tx.get(d.id);if(!t||t.u<(d.u||0))out.push(d)});
+    const before=JSON.stringify(DB);DB=out;DX=[...tx.values()];jset('db',DB);jset('dbx',DX);jset('dbids',DB.map(d=>d.id));
+    if(JSON.stringify({db:out,x:DX})!==JSON.stringify({db:rem,x:rx}))await dbPut({t:Date.now(),db:DB,x:DX});
+    if(before!==JSON.stringify(DB)&&tl==='debt'&&$('tools').classList.contains('on'))toolsView();
+  }catch(e){}finally{dbBusy=false}}
+const dbPull=dbSync,dbPush=dbSync;
+const ls1=loadSheet;loadSheet=async function(){await ls1();await dbSync()};
+document.addEventListener('click',ev=>{const b=ev.target.closest&&ev.target.closest('[data-tl="debt"]');if(b)setTimeout(dbSync,50)});
 
 /* header: never let the title touch the amounts */
 function hdrFit(){try{const t=document.querySelector('.topwrap>.card.top:not(.top2) .ttl');if(!t)return;const a=document.querySelector('.topwrap>.card.top:not(.top2)>.side:first-child .r'),b=document.querySelector('.topwrap>.card.top:not(.top2)>.side:last-child .r');if(!a||!b)return;
