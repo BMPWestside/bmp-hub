@@ -517,6 +517,10 @@ html body .card.tl button.mini.dmdel{background:linear-gradient(180deg,#e0384f,#
 .dbtab .dbpb{margin:0;padding:0}.dbtab .tgt{font-size:11px}.dbtab .tgb,.dbtab .dbb{height:5px;margin-top:3px}
 .dbbox{border:1.5px solid rgba(160,175,255,.5);border-radius:14px;padding:5px;margin-bottom:8px}
 .dbbox .dbl{margin:0}.dbbox .dbc{margin:6px 0 0}
+
+.popc .dbc{margin:0;padding:0;background:none;border:0;box-shadow:none}
+.dbcl{cursor:pointer;font-size:18px;color:var(--muted);padding:0 4px;order:3}.dbh{gap:8px;align-items:center}.dbh b{margin-right:auto}
+.dbn{font-size:13px;color:var(--muted);margin:2px 0}.dbn b{color:#fff;font-weight:600}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1268,8 +1272,8 @@ function debtHtml(){const m=n=>'A$'+(+n).toLocaleString('en-AU',{minimumFraction
   bar=(lab,left,tot,at)=>{const pct=tot?Math.round(left/tot*100):0,done=left<=0.005&&tot>0;return `<div class="tg dbpb${done?' hit':''}"${at||''}><div class="tgt"><span>${lab} <b>${done?'Paid off':pct+'%'}</b></span><span>${m(left)} of ${m(tot)}</span></div><div class="tgb dbb"><i style="width:${done?100:pct}%"></i></div></div>`};
   const detail=i=>{const d=DB[i],s=dbSum(d),pct=s.tot?Math.round(s.left/s.tot*100):0,done=s.left<=0.005;
   if(dbEd===i)return `<div class="card tl dbc"><div class="pfh">Edit debt</div><label>Who I owe<input id="de_n" value="${esc(d.n)}"></label><label>Amount owed (A$)<input id="de_a" type="number" inputmode="decimal" step="0.01" value="${esc(d.tot)}"></label><label>Date borrowed<input id="de_d" type="date" value="${esc(d.d||'')}"></label><label>Description<input id="de_s" value="${esc(d.s||'')}"></label><label>Comments<input id="de_c" value="${esc(d.c||'')}"></label><div class="two2"><button type="button" class="mini" data-dsave="${i}">Save</button><button type="button" class="mini" data-dcancel="1">Cancel</button></div></div>`;
-  return `<div class="card tl dbc"><div class="dbh"><b>${esc(d.n||'Debt')}</b><span>${d.d?new Date(d.d+'T00:00').toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'}):''}</span></div>
-${d.s?`<div class="hint dbn">${esc(d.s)}</div>`:''}${d.c?`<div class="hint dbn">${esc(d.c)}</div>`:''}
+  return `<div class="card tl dbc"><div class="dbh"><b>${esc(d.n||'Debt')}</b><span class="dbcl" data-dclose="1">✕</span><span>${d.d?new Date(d.d+'T00:00').toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'}):''}</span></div>
+<div class="dbn"><b>Description:</b> ${esc(d.s||'-')}</div><div class="dbn"><b>Comments:</b> ${esc(d.c||'-')}</div>
 <div class="tg${done?' hit':''}"><div class="tgt"><span>${done?'Paid off':'Remaining <b>'+pct+'%</b>'}</span><span>${m(s.left)} of ${m(s.tot)}</span></div><div class="tgb dbb"><i style="width:${done?100:pct}%"></i></div></div>
 <div class="hint">Paid ${m(s.paid)}</div>
 <div class="rems">${(d.pays||[]).map((p,j)=>`<div class="rr dbr"><span>${new Date(p.d+'T00:00').toLocaleDateString('en-AU',{day:'2-digit',month:'short'})}</span><span>${m(p.a)}</span><b data-dpdel="${i}:${j}">✕</b></div>`).join('')}</div>
@@ -1277,30 +1281,36 @@ ${d.s?`<div class="hint dbn">${esc(d.s)}</div>`:''}${d.c?`<div class="hint dbn">
 <div class="two2"><button type="button" class="mini" data-dedit="${i}">Edit</button><button type="button" class="mini dbx" data-ddel="${i}">Delete debt</button></div></div>`;};
   const G={},order=[];DB.forEach((d,i)=>{const k=dbKey(d.n);if(!G[k]){G[k]={n:d.n||'Debt',ix:[]};order.push(k)}G[k].ix.push(i)});
   let tl_=0,tt=0;DB.forEach(d=>{const s=dbSum(d);tl_+=s.left;tt+=s.tot});
-  let h='',box='';
+  let h='',box='';dbPopHtml='';
   if(DB.length){h+=`<div class="dbtabs"><div class="dbtab tot">${bar('Total Owing',tl_,tt)}</div>`;
     order.forEach(k=>{const g=G[k],sm=g.ix.reduce((a,i)=>{const s=dbSum(DB[i]);a.l+=s.left;a.t+=s.tot;return a},{l:0,t:0});
       h+=`<div class="dbtab per${dbOpen===k?' op':''}" data-dperson="${esc(k)}">${bar(esc(g.n),sm.l,sm.t)}</div>`});
     h+=`</div>`;
     const g=G[dbOpen];
     if(g){box=`<div class="dbbox"><div class="dbl">${g.ix.map(i=>{const d=DB[i],s=dbSum(d);return `<div class="dbrow${dbSel===i?' sel':''}" data-dsel="${i}"><span>${d.d?new Date(d.d+'T00:00').toLocaleDateString('en-AU',{day:'2-digit',month:'short'}):''}</span><span class="dbd">${esc(d.s||d.c||'')}</span><b>${m(s.left)}</b></div>`}).join('')}</div></div>`;
-      const sel=dbEd>=0&&g.ix.includes(dbEd)?dbEd:(g.ix.includes(dbSel)?dbSel:-1);if(sel>=0)box+=detail(sel)}}
+      const sel=dbEd>=0&&g.ix.includes(dbEd)?dbEd:(g.ix.includes(dbSel)?dbSel:-1);dbPopHtml=sel>=0?detail(sel):''}}
   h+=`<div class="card tl"><div class="pfh">Money I owe</div><label>Who I owe<input id="db_n" placeholder="Name"></label>
 <label>Amount owed (A$)<input id="db_a" type="number" inputmode="decimal" step="0.01"></label><label>Date borrowed<input id="db_d" type="date" value="${todayK()}"></label>
 <label>Description<input id="db_s" placeholder="What it was for"></label><label>Comments<input id="db_c" placeholder="Notes"></label>
 <button type="button" class="mini" id="db_add">+ Add debt</button></div>`+box;
   return h}
-$('tools').addEventListener('click',ev=>{const t=ev.target;let q;
+const dbClick=ev=>{const t=ev.target;let q;
+  if(t.dataset&&t.dataset.dclose!==undefined||t.id==='dbpop'){dbSel=-1;dbEd=-1;toolsView();return}
   if(t.id==='db_add'){const n=$('db_n').value.trim(),a=parseFloat($('db_a').value);if(!n||!(a>0)){alert('Enter who you owe and the amount.');return}dbOpen=dbKey(n);DB.push({n,tot:a,d:$('db_d').value||todayK(),s:$('db_s').value.trim(),c:$('db_c').value.trim(),pays:[]});dbSave();toolsView();return}
   if(t.dataset.dpay!==undefined){const i=+t.dataset.dpay,a=parseFloat($('dp_a'+i).value);if(!(a>0))return;const d=DB[i];d.pays=d.pays||[];d.pays.push({d:$('dp_d'+i).value||todayK(),a});d.pays.sort((x,y)=>x.d<y.d?-1:1);dbSave();toolsView();return}
   if(t.dataset.dpdel!==undefined){q=t.dataset.dpdel.split(':');DB[+q[0]].pays.splice(+q[1],1);dbSave();toolsView();return}
   const pb=t.closest&&t.closest('[data-dperson]');if(pb){const k=pb.dataset.dperson;dbOpen=dbOpen===k?'':k;dbSel=-1;dbEd=-1;toolsView();return}
-  const rw=t.closest&&t.closest('[data-dsel]');if(rw){const i=+rw.dataset.dsel;dbSel=dbSel===i?-1:i;dbEd=-1;toolsView();return}
+  const rw=t.closest&&t.closest('[data-dsel]');if(rw){const i=+rw.dataset.dsel;dbSel=i;dbEd=-1;toolsView();return}
   if(t.dataset.dedit!==undefined){dbEd=+t.dataset.dedit;toolsView();return}
   if(t.dataset.dcancel!==undefined){dbEd=-1;toolsView();return}
   if(t.dataset.dsave!==undefined){const d=DB[+t.dataset.dsave],n=$('de_n').value.trim(),a=parseFloat($('de_a').value);if(!n||!(a>0)){alert('Enter who you owe and the amount.');return}
     d.n=n;d.tot=a;d.d=$('de_d').value||d.d;d.s=$('de_s').value.trim();d.c=$('de_c').value.trim();dbEd=-1;dbOpen=dbKey(d.n);dbSave();toolsView();return}
-  if(t.dataset.ddel!==undefined){if(confirm('Delete this debt and its payments?')){DB.splice(+t.dataset.ddel,1);dbSel=-1;dbEd=-1;dbSave();toolsView()}}});
+  if(t.dataset.ddel!==undefined){if(confirm('Delete this debt and its payments?')){DB.splice(+t.dataset.ddel,1);dbSel=-1;dbEd=-1;dbSave();toolsView()}}};
+$('tools').addEventListener('click',dbClick);
+document.body.insertAdjacentHTML('beforeend','<div class="pop" id="dbpop" style="display:none"><div class="popc" id="dbpc"></div></div>');
+$('dbpop').addEventListener('click',dbClick);
+let dbPopHtml='';
+const tv0=toolsView;toolsView=function(){tv0();const o=$('dbpop');if(!o)return;if(tl==='debt'&&dbPopHtml){$('dbpc').innerHTML=dbPopHtml;o.style.display='flex'}else o.style.display='none'};
 
 /* private sync of debts: separate personal sheet (the Manager sheet), tab "Debts", never the business sheet */
 let DT=jget('dbt',0),dbBusy=false,dbTimer=null,dbStat='';
