@@ -496,9 +496,9 @@ html body .card.tl button.mini.dmdel{background:linear-gradient(180deg,#e0384f,#
 .dbb{height:10px}.dbb i{background:linear-gradient(90deg,#ff5d73,#ffb347)}
 .dbr{display:flex;justify-content:space-between;font-size:13px}.dbr b{cursor:pointer;color:#ff7a8a}
 .dbp{display:grid;grid-template-columns:1.2fr 1.3fr auto;gap:6px;margin-top:8px}
-#tools button.mini.dbx{margin-top:8px;color:#ff7a8a}
+#tools button.mini.dbx{color:#ff7a8a}.dbc .two2{margin-top:8px}
 .flg img{height:120px!important;width:120px!important}
-#db_n,#db_a,#db_d{flex:1;min-width:0;width:60%}
+#db_n,#db_a,#db_d,#db_s,#db_c{flex:1;min-width:0;width:60%}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -985,7 +985,7 @@ $('earn').addEventListener('click',ev=>{const b=ev.target.closest('[data-act="pa
 let tl='mgr';
 const inp=(id,v,ex)=>`<input id="${id}" value="${esc(v)}" ${ex||''}>`;
 function toolsView(){
-  const seg=['mgr:Manager','set:Setup','rem:Reminders','rec:Recurring','debt:Debts','dat:Backup'].map(s=>{const[k,n]=s.split(':');return`<button type="button" class="seg${tl===k?' on':''}" data-tl="${k}">${n}</button>`}).join('');
+  const seg=['mgr:Manager','set:Setup','rec:Recurring','debt:Debts','dat:Backup'].map(s=>{const[k,n]=s.split(':');return`<button type="button" class="seg${tl===k?' on':''}" data-tl="${k}">${n}</button>`}).join('');
   let b='';
   if(tl==='set')b=`<div class="card tl"><label>GST registered<select id="c_gst"><option value="1"${CFG.gst?' selected':''}>Yes</option><option value="0"${CFG.gst?'':' selected'}>No</option></select></label>
 <label>Income I enter is<select id="c_inc"><option value="ex"${CFG.incGst==='ex'?' selected':''}>Excluding GST</option><option value="inc"${CFG.incGst==='inc'?' selected':''}>Including GST</option></select></label>
@@ -1010,7 +1010,7 @@ function toolsView(){
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
 <div class="pfh">App lock</div>${LK&&LK.pin?`<div class="hint">Lock is ON${LK.cred?' (Face ID + PIN)':' (PIN)'}. Locks after 1 minute away.</div><div class="two2">${LK.cred?'<span></span>':'<button type="button" class="mini" id="b_fid">Add Face ID</button>'}<button type="button" class="mini" id="b_lkoff">Turn off</button></div>`:`<button type="button" class="mini" id="b_lkon">Set up PIN / Face ID lock</button>`}</div>`}
-  $('tools').innerHTML=`<div class="segs six" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
+  $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
   const id=t.id;
@@ -1242,25 +1242,33 @@ $('tools').addEventListener('change',ev=>{if(ev.target.id==='dm_pick'){dmEdit=fa
 try{const _l=document.querySelector('.topwrap img.lg');if(_l)$('flogo').src=_l.src}catch(e){}
 
 /* ===== DEBTS: money I owe, repaid in instalments ===== */
+let dbEd=-1;
 const dbSum=d=>{const paid=(d.pays||[]).reduce((a,p)=>a+(+p.a||0),0),tot=+d.tot||0;return{paid,tot,left:Math.max(0,tot-paid)}};
 function debtHtml(){const m=n=>'A$'+(+n).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});
   const all=DB.reduce((a,d)=>a+dbSum(d).left,0);
-  let h=`<div class="card tl"><div class="pfh">Add money I owe</div><label>Who I owe<input id="db_n" placeholder="Name"></label>
+  let h=`<div class="card tl"><div class="pfh">Money I owe</div><label>Who I owe<input id="db_n" placeholder="Name"></label>
 <label>Amount owed (A$)<input id="db_a" type="number" inputmode="decimal" step="0.01"></label><label>Date borrowed<input id="db_d" type="date" value="${todayK()}"></label>
+<label>Description<input id="db_s" placeholder="What it was for"></label><label>Comments<input id="db_c" placeholder="Notes"></label>
 <button type="button" class="mini" id="db_add">+ Add debt</button></div>`;
   if(DB.length)h+=`<div class="card tl"><div class="dbt"><span>Total still owing</span><b>${m(all)}</b></div></div>`;
   DB.forEach((d,i)=>{const s=dbSum(d),pct=s.tot?Math.round(s.left/s.tot*100):0,done=s.left<=0.005;
+    if(dbEd===i){h+=`<div class="card tl dbc"><div class="pfh">Edit debt</div><label>Who I owe<input id="de_n" value="${esc(d.n)}"></label><label>Amount owed (A$)<input id="de_a" type="number" inputmode="decimal" step="0.01" value="${esc(d.tot)}"></label><label>Date borrowed<input id="de_d" type="date" value="${esc(d.d||'')}"></label><label>Description<input id="de_s" value="${esc(d.s||'')}"></label><label>Comments<input id="de_c" value="${esc(d.c||'')}"></label><div class="two2"><button type="button" class="mini" data-dsave="${i}">Save</button><button type="button" class="mini" data-dcancel="1">Cancel</button></div></div>`;return}
     h+=`<div class="card tl dbc"><div class="dbh"><b>${esc(d.n||'Debt')}</b><span>${d.d?new Date(d.d+'T00:00').toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'}):''}</span></div>
+${d.s?`<div class="hint dbn">${esc(d.s)}</div>`:''}${d.c?`<div class="hint dbn">${esc(d.c)}</div>`:''}
 <div class="tg${done?' hit':''}"><div class="tgt"><span>${done?'Paid off':'Remaining <b>'+pct+'%</b>'}</span><span>${m(s.left)} of ${m(s.tot)}</span></div><div class="tgb dbb"><i style="width:${done?100:pct}%"></i></div></div>
 <div class="hint">Paid ${m(s.paid)}</div>
 <div class="rems">${(d.pays||[]).map((p,j)=>`<div class="rr dbr"><span>${new Date(p.d+'T00:00').toLocaleDateString('en-AU',{day:'2-digit',month:'short'})}</span><span>${m(p.a)}</span><b data-dpdel="${i}:${j}">✕</b></div>`).join('')}</div>
 <div class="rr dbp"><input type="number" inputmode="decimal" step="0.01" id="dp_a${i}" placeholder="Instalment A$"><input type="date" id="dp_d${i}" value="${todayK()}"><button type="button" class="mini" data-dpay="${i}">Pay</button></div>
-<button type="button" class="mini dbx" data-ddel="${i}">Delete debt</button></div>`});
+<div class="two2"><button type="button" class="mini" data-dedit="${i}">Edit</button><button type="button" class="mini dbx" data-ddel="${i}">Delete debt</button></div></div>`});
   return h}
 $('tools').addEventListener('click',ev=>{const t=ev.target;let q;
-  if(t.id==='db_add'){const n=$('db_n').value.trim(),a=parseFloat($('db_a').value);if(!n||!(a>0)){alert('Enter who you owe and the amount.');return}DB.push({n,tot:a,d:$('db_d').value||todayK(),pays:[]});dbSave();toolsView();return}
+  if(t.id==='db_add'){const n=$('db_n').value.trim(),a=parseFloat($('db_a').value);if(!n||!(a>0)){alert('Enter who you owe and the amount.');return}DB.push({n,tot:a,d:$('db_d').value||todayK(),s:$('db_s').value.trim(),c:$('db_c').value.trim(),pays:[]});dbSave();toolsView();return}
   if(t.dataset.dpay!==undefined){const i=+t.dataset.dpay,a=parseFloat($('dp_a'+i).value);if(!(a>0))return;const d=DB[i];d.pays=d.pays||[];d.pays.push({d:$('dp_d'+i).value||todayK(),a});d.pays.sort((x,y)=>x.d<y.d?-1:1);dbSave();toolsView();return}
   if(t.dataset.dpdel!==undefined){q=t.dataset.dpdel.split(':');DB[+q[0]].pays.splice(+q[1],1);dbSave();toolsView();return}
+  if(t.dataset.dedit!==undefined){dbEd=+t.dataset.dedit;toolsView();return}
+  if(t.dataset.dcancel!==undefined){dbEd=-1;toolsView();return}
+  if(t.dataset.dsave!==undefined){const d=DB[+t.dataset.dsave],n=$('de_n').value.trim(),a=parseFloat($('de_a').value);if(!n||!(a>0)){alert('Enter who you owe and the amount.');return}
+    d.n=n;d.tot=a;d.d=$('de_d').value||d.d;d.s=$('de_s').value.trim();d.c=$('de_c').value.trim();dbEd=-1;dbSave();toolsView();return}
   if(t.dataset.ddel!==undefined){if(confirm('Delete this debt and its payments?')){DB.splice(+t.dataset.ddel,1);dbSave();toolsView()}}});
 
 /* private sync of debts: separate personal sheet (the Manager sheet), tab "Debts", never the business sheet */
