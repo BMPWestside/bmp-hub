@@ -107,7 +107,7 @@ body{background:radial-gradient(circle at 15% 10%,rgba(0,76,149,.9) 0,transparen
 .tab.on{background:rgba(245,214,166,.25);color:#fff}
 .hd.h{color:#fff}
 .top .r,.col b,.cf.t{color:#F5D6A6}
-button.save{background:#E4002B;color:#fff}
+button.save{background:#E4002B;color:#fff}button.save.inc{background:linear-gradient(180deg,#4f9fff,#2467d6);box-shadow:inset 0 0 0 1.5px rgba(245,214,166,.85)}
 button.save.alt{background:rgba(60,130,215,.22);color:var(--text)}
 .top{border-radius:34px;padding:6px 14px 6px 10px}
 .side{display:flex;align-items:center;gap:10px}
@@ -554,6 +554,7 @@ html body .card.tl button.mini.dmdel{background:linear-gradient(180deg,#e0384f,#
 
 .popc button.dbxb{font:inherit;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(180deg,#4f9fff,#2467d6);box-shadow:inset 0 0 0 1.5px rgba(245,214,166,.85);border:0;border-radius:999px;padding:11px 18px;cursor:pointer;width:100%}
 .popc button.dbxcan{background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.3)}
+select.dbxs{width:100%;padding:11px;margin:6px 0 8px;border-radius:10px;font-size:16px}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -596,7 +597,7 @@ html body .card.tl button.mini.dmdel{background:linear-gradient(180deg,#e0384f,#
         <label>Note (optional)<input id="lnn" type="text" maxlength="60" placeholder="e.g. Transfer to business account"></label>
       </div>
       <label id="cml">Counts toward<select id="cm"><option value="">This month</option><option value="nm">1st week of next month</option></select></label>
-      <button class="save" type="submit" id="sv">Save Entry</button>
+      <button class="save inc" type="submit" id="sv">Save Entry</button>
       <button class="save alt" type="button" id="cn" style="display:none">Cancel edit</button>
       <div class="msg" id="msg"></div>
       <div class="flg"><img id="flogo" alt="BMP Westside"></div>
@@ -791,7 +792,7 @@ setInterval(()=>{autoSync()},45000);
 
 let editing=null,fm='inc';
 const showTab=t=>document.querySelector('.tab[data-t='+t+']').click();
-function setMode(m){fm=m;$('incf').style.display=m==='inc'?'flex':'none';$('expf').style.display=m==='exp'?'flex':'none';$('lnf').style.display=m==='loan'?'flex':'none';$('cml').style.display=m==='loan'?'none':'';
+function setMode(m){fm=m;$('sv').classList.toggle('inc',m==='inc');$('incf').style.display=m==='inc'?'flex':'none';$('expf').style.display=m==='exp'?'flex':'none';$('lnf').style.display=m==='loan'?'flex':'none';$('cml').style.display=m==='loan'?'none':'';
   document.querySelectorAll('#ftabs .seg').forEach(b=>b.classList.toggle('on',b.dataset.m===m));fit()}
 $('ftabs').onclick=ev=>{const b=ev.target.closest('[data-m]');if(b&&!editing)setMode(b.dataset.m)};
 function setEdit(e){editing=e;$('sv').textContent=e?'Update Entry':'Save Entry';$('cn').style.display=e?'block':'none';$('ftabs').classList.toggle('lock',!!e)}
@@ -1068,7 +1069,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 15 Oct 2026, 19:05 (letterhead + merged debts sync)</div><div class="pfh">App lock</div>${LK&&LK.pin?`<div class="hint">Lock is ON${LK.cred?' (Face ID + PIN)':' (PIN)'}. Locks after 1 minute away.</div><div class="two2">${LK.cred?'<span></span>':'<button type="button" class="mini" id="b_fid">Add Face ID</button>'}<button type="button" class="mini" id="b_lkoff">Turn off</button></div>`:`<button type="button" class="mini" id="b_lkon">Set up PIN / Face ID lock</button>`}</div>`}
+<div class="hint">App version: 15 Oct 2026, 20:10 (debt PDF colours + export list)</div><div class="pfh">App lock</div>${LK&&LK.pin?`<div class="hint">Lock is ON${LK.cred?' (Face ID + PIN)':' (PIN)'}. Locks after 1 minute away.</div><div class="two2">${LK.cred?'<span></span>':'<button type="button" class="mini" id="b_fid">Add Face ID</button>'}<button type="button" class="mini" id="b_lkoff">Turn off</button></div>`:`<button type="button" class="mini" id="b_lkon">Set up PIN / Face ID lock</button>`}</div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -1387,11 +1388,11 @@ window.addEventListener('resize',hdrFit);window.addEventListener('load',hdrFit);
 /* ===== debts: PDF report (total or one person) ===== */
 document.body.insertAdjacentHTML('beforeend','<div class="pop" id="dbxp" style="display:none"><div class="popc" id="dbxc"></div></div>');
 function dbxOpen(){const keys=[],names={};DB.forEach(d=>{const k=dbKey(d.n);if(!names[k]){names[k]=d.n||'Debt';keys.push(k)}});
-  $('dbxc').innerHTML='<div class="pfh">Export PDF report</div><button type="button" class="mini dbxb" data-dx="*all">Total (everyone)</button>'+keys.map(k=>'<button type="button" class="mini dbxb" data-dx="'+esc(k)+'">'+esc(names[k])+'</button>').join('')+'<button type="button" class="mini dbxb dbxcan" data-dx="*cancel">Cancel</button>';
+  $('dbxc').innerHTML='<div class="pfh">Export PDF report</div><select id="dbx_sel" class="dbxs"><option value="*all">Total (everyone)</option>'+keys.map(k=>'<option value="'+esc(k)+'">'+esc(names[k])+'</option>').join('')+'</select><button type="button" class="mini dbxb" data-dx="*go">Create PDF</button><button type="button" class="mini dbxb dbxcan" data-dx="*cancel">Cancel</button>';
   $('dbxp').style.display='flex'}
 $('dbxp').addEventListener('click',ev=>{const t=ev.target,b=t.closest&&t.closest('[data-dx]');
   if(t.id==='dbxp'||(b&&b.dataset.dx==='*cancel')){$('dbxp').style.display='none';return}
-  if(b){const k=b.dataset.dx;$('dbxp').style.display='none';dbPdf(k==='*all'?null:k)}});
+  if(b&&b.dataset.dx==='*go'){const k=$('dbx_sel').value;$('dbxp').style.display='none';dbPdf(k==='*all'?null:k)}});
 $('tools').addEventListener('click',ev=>{if(ev.target.id==='db_exp')dbxOpen()});
 async function dbPdf(key){const J=window.jspdf;if(!J){alert('PDF tool is still loading. Check your internet and try again.');return}
   const m=n=>'A$'+(+n).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2}),dd=x=>x?new Date(x+'T00:00').toLocaleDateString('en-AU'):'';
@@ -1404,12 +1405,12 @@ async function dbPdf(key){const J=window.jspdf;if(!J){alert('PDF tool is still l
   doc.setFont('helvetica','bold');doc.setFontSize(17);doc.text('BMP Debt Report',15,y);y+=7;
   doc.setFont('helvetica','normal');doc.setFontSize(10);doc.text((key?grp[names[0]].n:'Total - all people')+'  |  Generated '+new Date().toLocaleDateString('en-AU'),15,y);y+=4;doc.line(15,y,195,y);y+=7;
   cols(['Person','Borrowed','Paid','Remaining'],true);doc.line(15,y-3,195,y-3);
-  names.forEach(k=>{const t=sum(grp[k].a);cols([grp[k].n,m(t.t),m(t.p),m(t.l)])});
+  names.forEach(k=>{const t=sum(grp[k].a);cols([grp[k].n,m(t.t),m(t.p),m(t.l)])});doc.setTextColor(0,0,0);
   if(names.length>1){const t=sum(list.map(o=>o.d));doc.line(15,y-3,195,y-3);cols(['Total',m(t.t),m(t.p),m(t.l)],true)}y+=4;
   names.forEach(k=>{pg(14);y+=2;line(grp[k].n,15,true,12);y+=7;
-    grp[k].a.slice().sort((a,b)=>(a.d||'')<(b.d||'')?-1:1).forEach(d=>{const s=dbSum(d);pg(16);doc.setFont('helvetica','bold');doc.setFontSize(10);doc.text(dd(d.d)+'  Borrowed '+m(d.tot),15,y);doc.text('Remaining '+m(s.left),195,y,{align:'right'});y+=5;
+    grp[k].a.slice().sort((a,b)=>(a.d||'')<(b.d||'')?-1:1).forEach(d=>{const s=dbSum(d);pg(16);doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(0,0,0);doc.text(dd(d.d)+'  Borrowed ',15,y);const bw=doc.getTextWidth(dd(d.d)+'  Borrowed ');doc.setTextColor(200,0,30);doc.text(m(d.tot),15+bw,y);doc.setTextColor(0,0,0);doc.text('Remaining '+m(s.left),195,y,{align:'right'});y+=5;
       [d.s&&('Description: '+d.s),d.c&&('Comments: '+d.c)].filter(Boolean).forEach(t=>{doc.setFont('helvetica','normal');doc.setFontSize(9);doc.splitTextToSize(t,175).forEach(l=>{pg(5);doc.text(l,19,y);y+=4.5})});
-      (d.pays||[]).forEach(p=>{doc.setFont('helvetica','normal');doc.setFontSize(9);const ls=doc.splitTextToSize(p.n||'Payment',100);pg(5*ls.length+1);doc.text(dd(p.d),19,y);doc.text(ls,45,y);doc.text(m(p.a),195,y,{align:'right'});y+=4.8*ls.length});
+      (d.pays||[]).forEach(p=>{doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(0,0,0);const ls=doc.splitTextToSize(p.n||'Payment',100);pg(5.5*ls.length+1);doc.text(dd(p.d),19,y);doc.text(ls,45,y);doc.setTextColor(0,140,60);doc.text(m(p.a),195,y,{align:'right'});doc.setTextColor(0,0,0);y+=5.2*ls.length});
       if(!(d.pays||[]).length){doc.setFont('helvetica','italic');doc.setFontSize(9);pg(5);doc.text('No payments yet',19,y);y+=4.8}
       y+=3});y+=2});
   lhFoot(doc);const nm='BMP-Debts-'+(key?grp[names[0]].n.replace(/[^\w-]+/g,'_'):'Total')+'-'+todayK()+'.pdf';await shareFile(new File([doc.output('blob')],nm,{type:'application/pdf'}),nm)}
