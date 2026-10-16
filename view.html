@@ -558,6 +558,8 @@ select.dbxs{width:100%;padding:11px;margin:6px 0 8px;border-radius:10px;font-siz
 #cvb{margin:2px 0 6px}#earn .cf.zq{opacity:.35;font-weight:400}#earn .al{padding:5px 10px;font-size:12px}#earn .c3 .hd{font-size:10px;letter-spacing:0}#earn .c3 .cf{font-size:12.5px}
 #earn .bd>.dg.qd{border-bottom:2px solid rgba(245,214,166,.6)!important;padding-bottom:5px!important;margin-bottom:4px}
 .seg.on[data-cf="exp"],.seg.on[data-k="exp"],.seg.on[data-m="exp"],#earn.xm .seg.on,#rep.xrd .seg.on,#earn .seg.on[data-cf="exp"],#rep .seg.on[data-k="exp"],#form .seg.on[data-m="exp"]{background:linear-gradient(180deg,#ff4d6d,#c4001f)!important;box-shadow:inset 0 0 0 1.5px rgba(245,214,166,.85),0 2px 10px rgba(228,0,43,.55)!important}
+.lockov #lkf{font-size:20px;font-weight:700;padding:16px 34px;border-radius:16px;text-decoration:none;background:linear-gradient(180deg,#4f9fff,#2467d6);box-shadow:inset 0 0 0 1.5px rgba(245,214,166,.85),0 4px 16px rgba(60,140,255,.5);min-height:0}
+.lockov #lkpin{opacity:.85}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1067,10 +1069,11 @@ $('earn').addEventListener('click',ev=>{const b=ev.target.closest('[data-act="pa
 /* ===== TOOLS tab ===== */
 let tl='mgr';
 const inp=(id,v,ex)=>`<input id="${id}" value="${esc(v)}" ${ex||''}>`;
+const lockHtml=()=>`<div class="pfh">App lock</div>${LK&&LK.pin?`<div class="hint">Lock is ON${LK.cred?' with Face ID (your PIN is the backup)':' (PIN only)'}. Locks after 1 minute away.</div><div class="two2">${LK.cred?'<span></span>':'<button type="button" class="mini" id="b_fid">Turn on Face ID</button>'}<button type="button" class="mini" id="b_lkoff">Turn off</button></div>`:`<button type="button" class="mini" id="b_lkon">Set up Face ID lock</button><div class="hint">You will choose a 4-digit PIN as a backup, then Face ID is turned on.</div>`}`;
 function toolsView(){
   const seg=['mgr:Manager','set:Setup','rec:Recurring','debt:Debts','dat:Backup'].map(s=>{const[k,n]=s.split(':');return`<button type="button" class="seg${tl===k?' on':''}" data-tl="${k}">${n}</button>`}).join('');
   let b='';
-  if(tl==='set')b=`<div class="card tl"><label>GST registered<select id="c_gst"><option value="1"${CFG.gst?' selected':''}>Yes</option><option value="0"${CFG.gst?'':' selected'}>No</option></select></label>
+  if(tl==='set')b=`<div class="card tl">${lockHtml()}<label>GST registered<select id="c_gst"><option value="1"${CFG.gst?' selected':''}>Yes</option><option value="0"${CFG.gst?'':' selected'}>No</option></select></label>
 <label>Income I enter is<select id="c_inc"><option value="ex"${CFG.incGst==='ex'?' selected':''}>Excluding GST</option><option value="inc"${CFG.incGst==='inc'?' selected':''}>Including GST</option></select></label>
 <div class="hint">Check your Mainfreight remittance: if GST is added on top of your figures, choose Excluding. Expenses are assumed to be entered as on the receipt (including GST).</div>
 <label>Tax set-aside %<input id="c_tax" type="number" inputmode="decimal" step="0.5" value="${CFG.tax}"></label>
@@ -1092,7 +1095,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 16 Oct 2026, 22:05 (quarter dividers + red Expenses tabs)</div><div class="pfh">App lock</div>${LK&&LK.pin?`<div class="hint">Lock is ON${LK.cred?' (Face ID + PIN)':' (PIN)'}. Locks after 1 minute away.</div><div class="two2">${LK.cred?'<span></span>':'<button type="button" class="mini" id="b_fid">Add Face ID</button>'}<button type="button" class="mini" id="b_lkoff">Turn off</button></div>`:`<button type="button" class="mini" id="b_lkon">Set up PIN / Face ID lock</button>`}</div>`}
+<div class="hint">App version: 17 Oct 2026, 10:50 (Face ID lock in Setup)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -1100,7 +1103,7 @@ $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl
   if(id==='b_radd'){REM.push({n:'',d:'',km:''});saveCfg();toolsView();return}
   if(id==='b_payics')icsPay();else if(id==='b_rics')icsRem();else if(id==='b_exp')expBackup();else if(id==='b_imp')$('b_file').click();
   else if(id==='b_fypdf')fyPdf(+$('c_fy').value);else if(id==='b_fycsv')fyCsv(+$('c_fy').value);
-  else if(id==='b_lkon')showLock('new','Choose a 4-digit PIN',()=>{LK=jget('lk',null);if(window.PublicKeyCredential&&confirm('Also use Face ID to unlock?'))enrollFid().then(toolsView);else toolsView()});
+  else if(id==='b_lkon')showLock('new','Choose a 4-digit PIN (backup)',()=>{LK=jget('lk',null);if(window.PublicKeyCredential)enrollFid().then(toolsView);else toolsView()});
   else if(id==='b_fid')enrollFid().then(toolsView);
   else if(id==='b_lkoff')showLock('verify','Enter PIN to turn off lock',()=>{try{localStorage.removeItem('lk')}catch(e){}LK=null;document.documentElement.classList.remove('locked');toolsView()})});
 $('tools').addEventListener('change',ev=>{const t=ev.target,id=t.id;
@@ -1167,23 +1170,29 @@ async function fyPdf(fy){const J=window.jspdf;if(!J){alert('PDF tool is still lo
 let LK=jget('lk',null),lkMode='unlock',lkBuf='',lkTmp='',lkCb=null,hiddenAt=0;
 async function hashPin(p){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('bmp:'+p));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){let h=5381;for(const c of 'bmp:'+p)h=((h<<5)+h+c.charCodeAt(0))|0;return'x'+h}}
 const b64=u=>btoa(String.fromCharCode(...new Uint8Array(u))),unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
-document.body.insertAdjacentHTML('beforeend','<div class="lockov" id="lockov"><h2 id="lkt"></h2><div class="dots" id="lkd"></div><div class="lm" id="lkm"></div><div class="pad" id="lkp">'+[1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(k=>k===''?'<span></span>':'<button type="button" data-k="'+k+'">'+k+'</button>').join('')+'</div><button type="button" class="lk2" id="lkf" style="display:none">Unlock with Face ID</button><button type="button" class="lk2" id="lkc" style="display:none">Cancel</button></div>');
+document.body.insertAdjacentHTML('beforeend','<div class="lockov" id="lockov"><h2 id="lkt"></h2><div class="dots" id="lkd"></div><div class="lm" id="lkm"></div><div class="pad" id="lkp">'+[1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(k=>k===''?'<span></span>':'<button type="button" data-k="'+k+'">'+k+'</button>').join('')+'</div><button type="button" class="lk2" id="lkf" style="display:none">Unlock with Face ID</button><button type="button" class="lk2" id="lkpin" style="display:none">Use PIN instead</button><button type="button" class="lk2" id="lkc" style="display:none">Cancel</button></div>');
 function lkDraw(){$('lkd').innerHTML=[0,1,2,3].map(i=>'<i class="'+(i<lkBuf.length?'f':'')+'"></i>').join('')}
 function showLock(mode,title,cb){lkMode=mode;lkBuf='';lkTmp='';lkCb=cb||null;$('lkt').textContent=title||'Enter PIN';$('lkm').textContent='';lkDraw();
-  $('lkf').style.display=(mode==='unlock'&&LK&&LK.cred&&window.PublicKeyCredential)?'block':'none';$('lkc').style.display=mode==='unlock'?'none':'block';$('lockov').style.display='flex'}
+  const fid=mode==='unlock'&&LK&&LK.cred&&window.PublicKeyCredential;
+  if(fid)$('lkt').textContent='BMP Hub is locked';
+  $('lkf').style.display=fid?'block':'none';$('lkpin').style.display=fid?'block':'none';$('lkp').style.display=fid?'none':'';$('lkd').style.display=fid?'none':'';
+  $('lkc').style.display=mode==='unlock'?'none':'block';$('lockov').style.display='flex';
+  if(fid)setTimeout(()=>{try{lkFid()}catch(e){}},350)}
 const hideLock=()=>{$('lockov').style.display='none';document.documentElement.classList.remove('locked')};
 $('lkc').onclick=()=>{$('lockov').style.display='none'};
 $('lkp').onclick=async ev=>{const b=ev.target.closest('[data-k]');if(!b)return;const k=b.dataset.k;
   if(k==='⌫')lkBuf=lkBuf.slice(0,-1);else if(lkBuf.length<4)lkBuf+=k;lkDraw();if(lkBuf.length<4)return;
   const h=await hashPin(lkBuf),pin=lkBuf;lkBuf='';
   if(lkMode==='new'){lkTmp=pin;lkMode='new2';$('lkt').textContent='Confirm PIN';lkDraw();return}
-  if(lkMode==='new2'){if(pin!==lkTmp){lkMode='new';$('lkt').textContent='Choose a 4-digit PIN';$('lkm').textContent='PINs did not match. Try again.';lkDraw();return}
+  if(lkMode==='new2'){if(pin!==lkTmp){lkMode='new';$('lkt').textContent='Choose a 4-digit PIN (backup)';$('lkm').textContent='PINs did not match. Try again.';lkDraw();return}
     LK={pin:h,cred:null};jset('lk',LK);hideLock();const cb=lkCb;if(cb)cb();return}
   if(h!==(LK&&LK.pin)){$('lkm').textContent='Wrong PIN';lkDraw();return}
   hideLock();if(lkCb)lkCb()};
 async function enrollFid(){try{const c=await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),rp:{name:'BMP Hub'},user:{id:crypto.getRandomValues(new Uint8Array(16)),name:'owner',displayName:'BMP owner'},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},timeout:60000}});
   if(c){LK.cred=b64(c.rawId);jset('lk',LK)}}catch(e){alert('Face ID could not be set up on this device. Your PIN lock still works.')}}
-$('lkf').onclick=async()=>{try{await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{type:'public-key',id:unb64(LK.cred)}],userVerification:'required',timeout:60000}});hideLock()}catch(e){$('lkm').textContent='Face ID failed. Use your PIN.'}};
+$('lkpin').onclick=()=>{$('lkp').style.display='';$('lkd').style.display='';$('lkpin').style.display='none';$('lkm').textContent=''};
+let lkFb=false;async function lkFid(){if(lkFb)return;lkFb=true;try{await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{type:'public-key',id:unb64(LK.cred)}],userVerification:'required',timeout:60000}});hideLock()}catch(e){$('lkm').textContent='Face ID did not work. Tap the button to try again, or use your PIN.'}lkFb=false}
+$('lkf').onclick=()=>lkFid();
 document.addEventListener('visibilitychange',()=>{if(document.hidden)hiddenAt=Date.now();else if(LK&&LK.pin&&hiddenAt&&Date.now()-hiddenAt>60000&&$('lockov').style.display!=='flex'){document.documentElement.classList.add('locked');showLock('unlock','Enter PIN')}});
 if(LK&&LK.pin)showLock('unlock','Enter PIN');else document.documentElement.classList.remove('locked');
 /* ===== BMP Data Manager (merged into Tools > Manager) ===== */
