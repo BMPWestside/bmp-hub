@@ -556,6 +556,8 @@ html body .card.tl button.mini.dmdel{background:linear-gradient(180deg,#e0384f,#
 .popc button.dbxcan{background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.3)}
 select.dbxs{width:100%;padding:11px;margin:6px 0 8px;border-radius:10px;font-size:16px}
 #cvb{margin:2px 0 6px}#earn .cf.zq{opacity:.35;font-weight:400}#earn .al{padding:5px 10px;font-size:12px}#earn .c3 .hd{font-size:10px;letter-spacing:0}#earn .c3 .cf{font-size:12.5px}
+#earn .bd>.dg.qd{border-bottom:2px solid rgba(245,214,166,.6)!important;padding-bottom:5px!important;margin-bottom:4px}
+.seg.on[data-cf="exp"],.seg.on[data-k="exp"],.seg.on[data-m="exp"],#earn.xm .seg.on,#rep.xrd .seg.on,#earn .seg.on[data-cf="exp"],#rep .seg.on[data-k="exp"],#form .seg.on[data-m="exp"]{background:linear-gradient(180deg,#ff4d6d,#c4001f)!important;box-shadow:inset 0 0 0 1.5px rgba(245,214,166,.85),0 2px 10px rgba(228,0,43,.55)!important}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1090,7 +1092,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 16 Oct 2026, 21:35 (Add / Money tabs + simpler Money view)</div><div class="pfh">App lock</div>${LK&&LK.pin?`<div class="hint">Lock is ON${LK.cred?' (Face ID + PIN)':' (PIN)'}. Locks after 1 minute away.</div><div class="two2">${LK.cred?'<span></span>':'<button type="button" class="mini" id="b_fid">Add Face ID</button>'}<button type="button" class="mini" id="b_lkoff">Turn off</button></div>`:`<button type="button" class="mini" id="b_lkon">Set up PIN / Face ID lock</button>`}</div>`}
+<div class="hint">App version: 16 Oct 2026, 22:05 (quarter dividers + red Expenses tabs)</div><div class="pfh">App lock</div>${LK&&LK.pin?`<div class="hint">Lock is ON${LK.cred?' (Face ID + PIN)':' (PIN)'}. Locks after 1 minute away.</div><div class="two2">${LK.cred?'<span></span>':'<button type="button" class="mini" id="b_fid">Add Face ID</button>'}<button type="button" class="mini" id="b_lkoff">Turn off</button></div>`:`<button type="button" class="mini" id="b_lkon">Set up PIN / Face ID lock</button>`}</div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -1633,13 +1635,14 @@ if(window.BMP_VIEW){document.querySelector('.tab[data-t=earn]').click();banners=
 let CV='day';try{CV=localStorage.getItem('cv')||'day'}catch(e){}
 (function(){const wide=()=>matchMedia('(min-width:1000px) and (min-height:520px)').matches;
   const r0=render;render=function(){r0();
-    try{const E=$('earn');if(cf==='inc'||cf==='exp'){
+    try{const E=$('earn');E.classList.toggle('xm',cf==='exp');E.querySelectorAll('.bd.sc.m>.dg').forEach(g=>{const n=g.querySelector('.dn');if(n&&/^(Sep|Dec|Mar)\b/.test(n.textContent.trim()))g.classList.add('qd')});if(cf==='inc'||cf==='exp'){
       E.querySelectorAll('.cf').forEach(c=>{if(c.textContent==='A$0.00'){c.classList.add('zq');c.textContent='–'}});
       if(!wide()){const T=[...E.children].filter(c=>c.classList.contains('card')&&c.querySelector('.dg')&&c.querySelector('.bd'));
         if(T.length===4){const K=['day','week','month','year'],L=['Day','Week','Month','Year'];if(!K.includes(CV))CV='day';
           T.forEach((t,i)=>{t.style.display=K[i]===CV?'':'none';const b=t.querySelector('.bd.sc');if(b)b.style.maxHeight=K[i]===CV?'none':''});
           T[0].insertAdjacentHTML('beforebegin','<div class="segs four" id="cvb">'+K.map((k,i)=>'<button type="button" class="seg'+(k===CV?' on':'')+'" data-cv="'+k+'">'+L[i]+'</button>').join('')+'</div>')}}}
     }catch(e){}fit()};window.render=render;
+  const rr2=renderRep;renderRep=function(){rr2();try{$('rep').classList.toggle('xrd',rk==='exp')}catch(e){}};
   $('earn').addEventListener('click',ev=>{const b=ev.target.closest('[data-cv]');if(!b)return;CV=b.dataset.cv;try{localStorage.setItem('cv',CV)}catch(e){}render()})})();
 render();
 </script>
