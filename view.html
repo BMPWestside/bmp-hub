@@ -564,6 +564,9 @@ select.dbxs{width:100%;padding:11px;margin:6px 0 8px;border-radius:10px;font-siz
 .lkrow{display:none;justify-content:center;padding:4px 0 10px}html.view .lkrow{display:flex}.lkrow .mini{max-width:200px}
 .lkrow .mini,#lkc2 .mini:not(.dbxb){font:inherit;font-weight:700;font-size:14px;color:#fff;border:0;border-radius:12px;padding:10px 16px;width:100%;background:linear-gradient(180deg,#4f9fff,#2467d6);box-shadow:inset 0 0 0 1.5px rgba(245,214,166,.85)}#lkc2 .two2{display:grid;grid-template-columns:1fr 1fr;gap:8px}#lkc2 .hint{font-size:12.5px;color:var(--muted);margin:6px 0}
 .mlg{display:flex;justify-content:center;padding:10px 0 4px}.mlg img{height:66px;width:66px;object-fit:contain}.lkrow img.vlg{height:66px;width:66px;object-fit:contain;cursor:pointer}
+.dbtab.tot .tgb i,.dbtab.tot.hit .tgb i{background:linear-gradient(90deg,#e8590c,#ff8c00)!important;box-shadow:0 0 6px rgba(255,140,0,.6)!important}
+.dbper{display:flex;flex-direction:column;gap:5px;max-height:var(--dbph,110px);overflow-y:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}.dbper::-webkit-scrollbar{display:none}
+.dbtab.per.hit .tgb i{background:#fff!important;box-shadow:0 0 5px rgba(255,255,255,.5)!important}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1099,7 +1102,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 17 Oct 2026, 21:25 (lock only via BMP logo)</div></div>`}
+<div class="hint">App version: 18 Oct 2026, 20:50 (debt bars sorted, orange total)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -1356,8 +1359,9 @@ function debtHtml(){const m=n=>'A$'+(+n).toLocaleString('en-AU',{minimumFraction
   let tl_=0,tt=0;DB.forEach(d=>{const s=dbSum(d);tl_+=s.left;tt+=s.tot});
   let h='',box='';dbPopHtml='';
   if(DB.length){h+=`<div class="dbtabs"><div class="dbtab tot">${bar('Total Owing',tl_,tt)}</div>`;
-    order.forEach(k=>{const g=G[k],sm=g.ix.reduce((a,i)=>{const s=dbSum(DB[i]);a.l+=s.left;a.t+=s.tot;return a},{l:0,t:0});
-      h+=`<div class="dbtab per${dbOpen===k?' op':''}" data-dperson="${esc(k)}">${bar(esc(g.n),sm.l,sm.t)}</div>`});
+    const PS=order.map(k=>{const g=G[k],sm=g.ix.reduce((a,i)=>{const s=dbSum(DB[i]);a.l+=s.left;a.t+=s.tot;return a},{l:0,t:0});return{k,g,sm,done:sm.l<=0.005&&sm.t>0}});
+    PS.sort((a,b)=>(a.done-b.done)||(a.done?a.sm.t-b.sm.t:a.sm.l-b.sm.l));
+    h+=`<div class="dbper">`+PS.map(o=>`<div class="dbtab per${o.done?' hit':''}${dbOpen===o.k?' op':''}" data-dperson="${esc(o.k)}">${bar(esc(o.g.n),o.sm.l,o.sm.t)}</div>`).join('')+`</div>`;
     h+=`</div><button type="button" class="mini dbexp" id="db_exp">Export PDF</button>`;
     const g=G[dbOpen];
     if(g){box=`<div class="dbbox"><div class="dbl">${g.ix.map(i=>{const d=DB[i],s=dbSum(d);return `<div class="dbrow${dbSel===i?' sel':''}" data-dsel="${i}"><span>${d.d?new Date(d.d+'T00:00').toLocaleDateString('en-AU',{day:'2-digit',month:'short'}):''}</span><span class="dbd">${esc(d.s||d.c||'')}</span><b>${m(s.left)}</b></div>`}).join('')}</div></div>`;
