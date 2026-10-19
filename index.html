@@ -675,9 +675,9 @@ function render(){
   if(!X){
     extra=tgHtml;
   }else{
-    const loan=TRUCK.price-TRUCK.deposit,paid=entries.filter(e=>e.x&&/^truck repayment/i.test(e.cat||'')).reduce((a,e)=>a+e.x,0),left=Math.max(0,loan-paid),pc=Math.round(paid/loan*100);
+    const loan=28118.52,paid=entries.filter(e=>e.x&&/^car repayment/i.test(e.cat||'')).reduce((a,e)=>a+e.x,0),left=Math.max(0,loan-paid),pc=Math.round(paid/loan*100);
     const lb=entries.reduce((a,e)=>a+(e.ln||0),0);
-    extra=`<div class="card top tgc"><div class="tg r1${left<=0?' hit':''}"><span>Truck loan <b>${pc}%</b></span><div class="tgb"><i style="width:${Math.min(100,pc)}%"></i></div><span><b>${kc(left)}</b> left</span></div><div class="tg r1 ln${lb<0?' bad':''}"><span>Director loan</span><div></div><span><b>${kA(Math.abs(lb))}</b></span></div></div>`}
+    extra=`<div class="card top tgc"><div class="tg r1${left<=0?' hit':''}"><span>Car loan <b>${pc}%</b></span><div class="tgb"><i style="width:${Math.min(100,pc)}%"></i></div><span><b>${kc(left)}</b> left</span></div><div class="tg r1 ln${lb<0?' bad':''}"><span>Director loan</span><div></div><span><b>${kA(Math.abs(lb))}</b></span></div></div>`}
   const sub=`<div class="segs three" id="cft"><button type="button" class="seg${X?'':' on'}" data-cf="inc">Income</button><button type="button" class="seg${X?' on':''}" data-cf="exp">Expenses</button><button type="button" class="seg" data-cf="pro">Profit</button></div>`;
   $('earn').innerHTML=sub+extra+table('Day',dayRows,'',heads)+table('Week',weekRows,'sc w',heads)+table('Month',monthRows,'sc m',heads)+table('Year',yearRows,'sc y',heads);
   const scr=(sel,idx)=>{const el=$('earn').querySelector(sel);if(el&&el.children.length>idx&&idx>0){const k=Math.max(0,idx-1);el.scrollTop=el.children[k].offsetTop-el.children[0].offsetTop}};
@@ -1102,7 +1102,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 18 Oct 2026, 21:15 (tighter Add page + top gap)</div></div>`}
+<div class="hint">App version: 20 Oct 2026, 08:20 (Car loan bar on Money Expenses)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
