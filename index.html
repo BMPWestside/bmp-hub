@@ -568,6 +568,20 @@ select.dbxs{width:100%;padding:11px;margin:6px 0 8px;border-radius:10px;font-siz
 .dbper{display:flex;flex-direction:column;gap:5px;max-height:var(--dbph,110px);overflow-y:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}.dbper::-webkit-scrollbar{display:none}
 .dbtab.per.hit .tgb i{background:#fff!important;box-shadow:0 0 5px rgba(255,255,255,.5)!important}
 #incf{flex-direction:row!important;flex-wrap:wrap;gap:8px 12px}#incf>label{flex:1 1 calc(50% - 6px);min-width:0}#incf>label.oth{flex-basis:100%}
+/* alignment pass: equal columns and equal field widths */
+#f .row2,#f .row2.dtr{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:12px!important}
+#f .fg{gap:8px 12px!important}
+#f input,#f select{box-sizing:border-box;min-width:0}
+#earn .card.c2 .dg{grid-template-columns:46px 1px minmax(0,1fr) minmax(0,1fr) 1px minmax(0,1fr)!important;gap:4px!important}
+#earn .card.c3 .dg{grid-template-columns:46px 1px repeat(3,minmax(0,1fr)) 1px minmax(0,1fr)!important;gap:3px!important}
+#earn .card.c3 .dg>i.vd+.cf.t,#earn .card.c3 .cf{font-size:10px!important;letter-spacing:-.2px}
+#earn .card.c3 .hd.h{font-size:8.5px!important;padding-left:0!important;padding-right:0!important}
+#earn .card.c3 .dn{font-size:10px!important}
+.card.tl>label{display:grid!important;grid-template-columns:minmax(0,1fr) 170px;gap:10px;align-items:center}
+.card.tl>label input,.card.tl>label select,.card.tl>label input[type=number]{width:100%!important;max-width:none!important;box-sizing:border-box;text-align:left!important;height:36px;padding:6px 10px}
+.card.tl>.two2>button,.card.tl .two2 button{height:38px}
+.rcr label.f2:first-child{padding-right:0!important}.rcr b{top:-6px!important;right:-2px!important;background:rgba(10,15,60,.9);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;line-height:1}
+.rcr input,.rcr select{height:38px}.rcr input[type=number]{text-align:left!important}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -598,7 +612,7 @@ select.dbxs{width:100%;padding:11px;margin:6px 0 8px;border-radius:10px;font-siz
       <div class="fg" id="incf">
         <label>Deliveries<div class="cur"><span>A$</span><input id="del" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00"></div></label>
         <label>Pickups<div class="cur"><span>A$</span><input id="pu" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00"></div></label>
-        <label class="oth">Other:<div class="row2"><select id="othk"><option value="del">Delivery</option><option value="pu">Pickups</option></select><div class="cur"><span>A$</span><input id="oth" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00"></div></div></label>
+        <label class="oth">Other<div class="row2"><select id="othk"><option value="del">Delivery</option><option value="pu">Pickups</option></select><div class="cur"><span>A$</span><input id="oth" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00"></div></div></label>
       </div>
       <div class="fg" id="expf" style="display:none">
         <label>Expense amount<div class="cur"><span>A$</span><input id="ex" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00"></div></label>
@@ -1105,7 +1119,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 20 Oct 2026, 16:30 (swipe weeks + Other field)</div></div>`}
+<div class="hint">App version: 20 Oct 2026, 17:00 (aligned fields and columns)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
