@@ -567,6 +567,7 @@ select.dbxs{width:100%;padding:11px;margin:6px 0 8px;border-radius:10px;font-siz
 .dbtab.tot .tgb i,.dbtab.tot.hit .tgb i{background:linear-gradient(90deg,#e8590c,#ff8c00)!important;box-shadow:0 0 6px rgba(255,140,0,.6)!important}
 .dbper{display:flex;flex-direction:column;gap:5px;max-height:var(--dbph,110px);overflow-y:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}.dbper::-webkit-scrollbar{display:none}
 .dbtab.per.hit .tgb i{background:#fff!important;box-shadow:0 0 5px rgba(255,255,255,.5)!important}
+#incf{flex-direction:row!important;flex-wrap:wrap;gap:8px 12px}#incf>label{flex:1 1 calc(50% - 6px);min-width:0}#incf>label.oth{flex-basis:100%}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -597,6 +598,7 @@ select.dbxs{width:100%;padding:11px;margin:6px 0 8px;border-radius:10px;font-siz
       <div class="fg" id="incf">
         <label>Deliveries<div class="cur"><span>A$</span><input id="del" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00"></div></label>
         <label>Pickups<div class="cur"><span>A$</span><input id="pu" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00"></div></label>
+        <label class="oth">Other:<div class="row2"><select id="othk"><option value="del">Delivery</option><option value="pu">Pickups</option></select><div class="cur"><span>A$</span><input id="oth" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00"></div></div></label>
       </div>
       <div class="fg" id="expf" style="display:none">
         <label>Expense amount<div class="cur"><span>A$</span><input id="ex" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00"></div></label>
@@ -808,7 +810,7 @@ function setMode(m){fm=m;$('sv').classList.toggle('inc',m==='inc');$('incf').sty
   document.querySelectorAll('#ftabs .seg').forEach(b=>b.classList.toggle('on',b.dataset.m===m));fit()}
 $('ftabs').onclick=ev=>{const b=ev.target.closest('[data-m]');if(b&&!editing)setMode(b.dataset.m)};
 function setEdit(e){editing=e;$('sv').textContent=e?'Update Entry':'Save Entry';$('cn').style.display=e?'block':'none';$('ftabs').classList.toggle('lock',!!e)}
-function clearForm(){['del','pu','ex','note','lna','lnn'].forEach(i=>$(i).value='');$('lnd').value='in';$('cm').value='';$('cat').selectedIndex=0;setMode('inc')}
+function clearForm(){['del','pu','oth','ex','note','lna','lnn'].forEach(i=>$(i).value='');$('othk').value='del';$('lnd').value='in';$('cm').value='';$('cat').selectedIndex=0;setMode('inc')}
 function startEdit(e){
   clearForm();setEdit(e);$('date').value=e.d;setDay();
   if(e.x){setMode('exp');$('ex').value=e.x;
@@ -830,8 +832,9 @@ $('f').onsubmit=ev=>{
     en={d,del:0,pu:0,nm:false,ln:$('lnd').value==='out'?-a:a,note:$('lnn').value.trim()}}
   else if(fm==='exp'){const x=parseFloat($('ex').value)||0;if(!(x>0)){say('Enter an expense amount.');return}
     en={d,del:0,pu:0,nm,x,cat:$('cat').value,note:$('note').value.trim()}}
-  else{if($('del').value===''&&$('pu').value===''){say('Enter deliveries or pickups.');return}
-    en={d,del:parseFloat($('del').value)||0,pu:parseFloat($('pu').value)||0,nm}}
+  else{if($('del').value===''&&$('pu').value===''&&$('oth').value===''){say('Enter deliveries or pickups.');return}
+    const o=parseFloat($('oth').value)||0,ok=$('othk').value;
+    en={d,del:(parseFloat($('del').value)||0)+(ok==='del'?o:0),pu:(parseFloat($('pu').value)||0)+(ok==='pu'?o:0),nm}}
   const was=!!editing;if(editing)removeEntry(editing);
   entries.push(en);persist();
   sel=d;const keepMode=fm;clearForm();setEdit(null);if(!was)setMode(keepMode);say('');
@@ -1102,7 +1105,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 20 Oct 2026, 08:20 (Car loan bar on Money Expenses)</div></div>`}
+<div class="hint">App version: 20 Oct 2026, 16:30 (swipe weeks + Other field)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -1680,6 +1683,16 @@ if(window.BMP_VIEW){
   document.querySelector('.scroll').insertAdjacentHTML('beforeend','<div class="lkrow"><img id="lk_open" class="vlg" alt="BMP Westside"></div>');
   $('lk_open').src=bmpLogoSrc();
   $('lk_open').addEventListener('click',()=>{if($('earn').classList.contains('on'))openLockPop()})}
+
+/* swipe the Day table: down = previous week, up = next week (never past the current week) */
+(function(){let y0=0,x0=0,on=false;const E=$('earn');
+E.addEventListener('touchstart',ev=>{const c=ev.target.closest&&ev.target.closest('.card.sec');const h=c&&c.querySelector('.hd.l');on=!!(h&&h.textContent.trim()==='Day');if(on){y0=ev.touches[0].clientY;x0=ev.touches[0].clientX}},{passive:true});
+E.addEventListener('touchend',ev=>{if(!on)return;on=false;const t=ev.changedTouches[0],dy=t.clientY-y0,dx=t.clientX-x0;if(Math.abs(dy)<45||Math.abs(dy)<Math.abs(dx)*1.5)return;
+ const base=sel?new Date(sel+'T00:00'):new Date();base.setHours(0,0,0,0);const td=new Date();td.setHours(0,0,0,0);
+ const ws=d=>{const w=new Date(d);w.setDate(d.getDate()-((d.getDay()+6)%7));return w.getTime()};
+ const n=new Date(base);n.setDate(base.getDate()+(dy>0?-7:7));
+ if(ws(n)>ws(td))return;
+ sel=ws(n)===ws(td)?null:iso(n);render()},{passive:true});})();
 render();
 </script>
 </body>
