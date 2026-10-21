@@ -714,17 +714,28 @@ try{const t=JSON.parse(localStorage.getItem('gtok')||'null');if(t&&t.exp>Date.no
 function authUI(){$('gcard').style.display=(tok&&Date.now()<tokExp)?'none':'block'}
 function signIn(){
   if(!window.google||!google.accounts){say('Google sign-in is still loading. Try again in a moment.');return}
-  if(!tc)tc=google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:SCOPE,callback:r=>{
-    if(r&&r.access_token){tok=r.access_token;tokExp=Date.now()+(r.expires_in-60)*1000;
-      try{localStorage.setItem('gtok',JSON.stringify({t:tok,exp:tokExp}))}catch(e){}
-      authUI();autoSync().then(loadSheet)}
-    else say('Google sign-in failed. Try again.')}});
+  if(!tc)tc=mkTc();
   tc.requestAccessToken({prompt:''});
 }
+let silentBusy=false;
+function mkTc(){return google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:SCOPE,callback:r=>{
+    silentBusy=false;
+    if(r&&r.access_token){tok=r.access_token;tokExp=Date.now()+(r.expires_in-60)*1000;
+      try{localStorage.setItem('gtok',JSON.stringify({t:tok,exp:tokExp}));localStorage.setItem('gever','1')}catch(e){}
+      authUI();autoSync().then(loadSheet)}
+    else if(!r||!r.error||r.error!=='popup_closed')say('Google sign-in failed. Try again.')},
+    error_callback:()=>{silentBusy=false}})}
+/* quiet re-sign-in: if you have signed in before and the token has run out, ask Google for a new one without a button tap (works when Google allows it; otherwise the Sign in button stays) */
+function silentSign(){
+  try{if(silentBusy||(tok&&Date.now()<tokExp-120000)||localStorage.getItem('gever')!=='1')return;
+    if(!window.google||!google.accounts||!google.accounts.oauth2)return;
+    if(!tc)tc=mkTc();silentBusy=true;setTimeout(()=>{silentBusy=false},15000);
+    tc.requestAccessToken({prompt:'none'})}catch(e){silentBusy=false}
+}
 async function api(url,opt){
-  if(!tok||Date.now()>tokExp){tok=null;authUI();throw {code:'needs_reauth'}}
+  if(!tok||Date.now()>tokExp){tok=null;authUI();silentSign();throw {code:'needs_reauth'}}
   const r=await fetch(url,Object.assign({headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'}},opt||{}));
-  if(r.status===401){tok=null;authUI();throw {code:'needs_reauth'}}
+  if(r.status===401){tok=null;authUI();silentSign();throw {code:'needs_reauth'}}
   if(!r.ok)throw {message:(await r.text()).slice(0,120)};
   return r.json();
 }
@@ -1120,7 +1131,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 20 Oct 2026, 17:00 (aligned fields and columns)</div></div>`}
+<div class="hint">App version: 22 Oct 2026, 07:50 (quiet re-sign-in)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -1708,6 +1719,13 @@ E.addEventListener('touchend',ev=>{if(!on)return;on=false;const t=ev.changedTouc
  const n=new Date(base);n.setDate(base.getDate()+(dy>0?-7:7));
  if(ws(n)>ws(td))return;
  sel=ws(n)===ws(td)?null:iso(n);render()},{passive:true});})();
+
+/* silent token refresh: on open, on return to the app, and every few minutes */
+(function(){try{localStorage.getItem('gtok')&&localStorage.getItem('gever')!=='1'&&localStorage.setItem('gever','1')}catch(e){}
+const go=()=>{try{if(!tok||Date.now()>tokExp-300000)silentSign()}catch(e){}};
+window.addEventListener('load',()=>setTimeout(go,1500));
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(go,400)});
+setInterval(go,240000);})();
 render();
 </script>
 </body>
