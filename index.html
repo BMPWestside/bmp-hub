@@ -620,6 +620,15 @@ select.dbxs{width:100%;padding:11px;margin:6px 0 8px;border-radius:10px;font-siz
 .ib .ict{max-width:0;opacity:0;margin-left:0;overflow:hidden;white-space:nowrap;transition:max-width .32s,opacity .18s,margin-left .32s}
 .ib .on .ict{max-width:120px;opacity:1;margin-left:7px}
 .ib .bdg{position:absolute;top:-5px;right:-3px;margin:0;z-index:2}
+
+/* compact icon tabs */
+.ib{gap:5px;justify-content:center}
+.ib>.seg,.ib>.tab{flex-basis:32px!important;height:32px;font-size:12px!important}
+.card.tabs.ib>.tab{height:34px;flex-basis:34px!important}
+.ib>.on{max-width:140px}
+.ib .ico{width:17px;height:17px}
+.ib .on .ict{margin-left:5px;max-width:100px}
+.ib .bdg{top:-6px;right:-4px;min-width:15px;height:15px;line-height:15px;font-size:9px;padding:0 3px}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1168,7 +1177,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 24 Oct 2026, 01:10 (Icon tabs)</div></div>`}
+<div class="hint">App version: 24 Oct 2026, 01:40 (Compact tabs)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
