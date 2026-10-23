@@ -1206,7 +1206,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 24 Oct 2026, 05:40 (Tabs icon + name)</div></div>`}
+<div class="hint">App version: 24 Oct 2026, 06:00 (Dash for zero)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -1998,6 +1998,8 @@ let q=false;function sch(){if(q)return;q=true;Promise.resolve().then(()=>{q=fals
 new MutationObserver(sch).observe(document.body,{childList:true,subtree:true});
 deco();
 })();
+
+(function(){const r0=renderRep;renderRep=function(){r0.apply(this,arguments);try{document.querySelectorAll('#rep details.bk .cf').forEach(c=>{if(c.textContent.trim()==='A$0.00'){c.classList.add('zq');c.textContent='–'}})}catch(e){}}})();
 render();
 </script>
 </body>
