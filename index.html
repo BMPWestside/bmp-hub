@@ -582,6 +582,11 @@ select.dbxs{width:100%;padding:11px;margin:6px 0 8px;border-radius:10px;font-siz
 .card.tl>.two2>button,.card.tl .two2 button{height:38px}
 .rcr label.f2:first-child{padding-right:0!important}.rcr b{top:-6px!important;right:-2px!important;background:rgba(10,15,60,.9);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;line-height:1}
 .rcr input,.rcr select{height:38px}.rcr input[type=number]{text-align:left!important}
+.inbx .pfh{margin-bottom:4px}.inbx .ibr{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px solid var(--edge)}
+.inbx .ibd{min-width:0;font-size:12.5px;line-height:1.4;color:#fff}.inbx .ibd b{font-weight:700}.inbx .ibw{display:block;color:#ffcf8a;font-size:11px;line-height:1.3}
+.inbx .ibb{display:flex;gap:6px;flex:none}.inbx .ibb button,.inbx .iba{height:34px;min-width:60px;padding:0 10px;border-radius:10px;font:inherit;font-weight:700;font-size:13px;color:#fff;border:1px solid var(--edge);background:rgba(10,15,60,.55)}
+.inbx .ibb button.go,.inbx .iba{background:linear-gradient(180deg,#4f9fff,#2467d6);box-shadow:inset 0 0 0 1px rgba(245,214,166,.85);border-color:transparent}
+.inbx .iba{width:100%;margin-top:6px}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -591,7 +596,7 @@ select.dbxs{width:100%;padding:11px;margin:6px 0 8px;border-radius:10px;font-siz
 
   <div class="card tabs">
     <button class="tab on" data-t="form">Add<span class="bdg" id="bdg" style="display:none"></span></button>
-    <button class="tab" data-t="earn">Money</button>
+    <button class="tab" data-t="earn">Money<span class="bdg" id="ebdg" style="display:none"></span></button>
     <button class="tab" data-t="rep">Reports</button>
     <button class="tab" data-t="tools">Tools</button>
   </div>
@@ -1130,7 +1135,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 22 Oct 2026, 07:50 (quiet re-sign-in)</div></div>`}
+<div class="hint">App version: 23 Oct 2026, 22:00 (email invoices)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -1725,6 +1730,59 @@ const go=()=>{try{if(!tok||Date.now()>tokExp-300000)silentSign()}catch(e){}};
 window.addEventListener('load',()=>setTimeout(go,1500));
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(go,400)});
 setInterval(go,240000);})();
+
+/* ===== Invoices from email: the Google script lists them on the "Inbox" tab, you confirm them here ===== */
+let INBX=[];
+const ibSig=x=>x.d+'|'+r2(x.del)+'|'+r2(x.pu);
+const ibDone=()=>{try{return JSON.parse(localStorage.getItem('ibd')||'{}')}catch(e){return{}}};
+const ibSave=o=>{try{localStorage.setItem('ibd',JSON.stringify(o))}catch(e){}};
+async function ibMark(x,status){
+  const r=await mcp.callTool('Google Sheets','get_values',{spreadsheetId:SID,range:'Inbox!A2:H500'});
+  const v=(r.payload&&r.payload.values)||[];
+  const i=v.findIndex(q=>String(q[0])===x.d&&/^(new|check)$/i.test(String(q[3]||''))&&r2(num(q[1]))===r2(x.del)&&r2(num(q[2]))===r2(x.pu));
+  if(i<0)return true;
+  await mcp.callTool('Google Sheets','update_values',{spreadsheetId:SID,range:'Inbox!D'+(i+2),values:[[status]]});
+  return true}
+let ibBusy=false;
+async function loadInbox(){
+  if(window.BMP_VIEW||ibBusy)return;
+  if(!(tok&&Date.now()<tokExp))return;
+  ibBusy=true;
+  try{
+    const r=await mcp.callTool('Google Sheets','get_values',{spreadsheetId:SID,range:'Inbox!A2:H500'});
+    const all=((r.payload&&r.payload.values)||[]).map(v=>({d:String(v[0]||''),del:num(v[1]),pu:num(v[2]),st:String(v[3]||'').toLowerCase(),dn:v[5]||'',pn:v[6]||'',note:String(v[7]||'')}))
+      .filter(x=>/^\d{4}-\d\d-\d\d$/.test(x.d)&&(x.st==='new'||x.st==='check'));
+    const dn=ibDone();INBX=[];
+    for(const x of all){const k=ibSig(x);if(dn[k]){try{await ibMark(x,dn[k])}catch(e){}}else INBX.push(x)}
+  }catch(e){INBX=[]}
+  finally{ibBusy=false}
+  paintInbox()}
+function paintInbox(){
+  const old=$('inbx');if(old)old.remove();
+  const eb=$('ebdg');if(eb){eb.textContent=INBX.length||'';eb.style.display=INBX.length&&!window.BMP_VIEW?'inline-block':'none'}
+  if(window.BMP_VIEW||!INBX.length||cf!=='inc')return;
+  const cft=$('cft');if(!cft)return;
+  const has=x=>entries.filter(e=>e.d===x.d&&!e.x&&!e.ln).reduce((a,e)=>a+amt(e),0);
+  const lab=d=>new Date(d+'T00:00').toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
+  const clean=INBX.every(x=>x.st==='new'&&!has(x));
+  const rows=INBX.map((x,i)=>{const h=has(x),w=x.st==='check'?'Does not add up. Check the PDF before adding.':(h>0?'You already entered '+fmt(h)+' for this day.':'');
+    return `<div class="ibr"><div class="ibd"><b>${lab(x.d)}</b><br>Deliveries <b>${fmt(x.del)}</b>${x.dn?' ('+esc(x.dn)+')':''}<br>Pickups <b>${fmt(x.pu)}</b>${x.pn?' ('+esc(x.pn)+')':''}${w?`<span class="ibw">${esc(w)}</span>`:''}</div><div class="ibb"><button type="button" class="go" data-ib="add" data-i="${i}">${w?'Add anyway':'Add'}</button><button type="button" data-ib="skip" data-i="${i}">Skip</button></div></div>`}).join('');
+  const el=document.createElement('div');el.className='card tl inbx';el.id='inbx';
+  el.innerHTML=`<div class="pfh">From email · ${INBX.length} new</div>${rows}${INBX.length>1&&clean?'<button type="button" class="iba" data-ib="all">Add all '+INBX.length+'</button>':''}`;
+  cft.after(el)}
+async function ibAct(i,act){
+  const x=INBX[i];if(!x)return;
+  const st=act==='add'?'added':'skipped',dn=ibDone();dn[ibSig(x)]=st;ibSave(dn);
+  if(act==='add'){entries.push({d:x.d,del:x.del,pu:x.pu,nm:false});persist();autoSync()}
+  INBX.splice(i,1);render();paintInbox();
+  try{await ibMark(x,st)}catch(e){}}
+document.addEventListener('click',ev=>{const b=ev.target.closest&&ev.target.closest('[data-ib]');if(!b)return;
+  if(b.dataset.ib==='all'){const L=INBX.slice();(async()=>{for(const x of L){const i=INBX.indexOf(x);if(i>=0)await ibAct(i,'add')}})()}
+  else ibAct(+b.dataset.i,b.dataset.ib)});
+(function(){const _r=render;render=function(){const r=_r.apply(this,arguments);try{paintInbox()}catch(e){}return r};
+  const _l=loadSheet;loadSheet=async function(){const r=await _l.apply(this,arguments);loadInbox();return r};
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(loadInbox,800)});
+  setInterval(loadInbox,300000);})();
 render();
 </script>
 </body>
