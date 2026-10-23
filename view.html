@@ -588,6 +588,28 @@ select.dbxs{width:100%;padding:11px;margin:6px 0 8px;border-radius:10px;font-siz
 .inbx .ibb{display:flex;gap:6px;flex:none}.inbx .ibb button,.inbx .iba{height:34px;min-width:60px;padding:0 10px;border-radius:10px;font:inherit;font-weight:700;font-size:13px;color:#fff;border:1px solid var(--edge);background:rgba(10,15,60,.55)}
 .inbx .ibb button.go,.inbx .iba{background:linear-gradient(180deg,#4f9fff,#2467d6);box-shadow:inset 0 0 0 1px rgba(245,214,166,.85);border-color:transparent}
 .inbx .iba{width:100%;margin-top:6px}
+#tlt.six .seg{font-size:10.5px;padding-left:0;padding-right:0}
+.bls .blst{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:8px 0}
+.bls .blst>div{background:rgba(70,130,215,.16);border:1px solid var(--edge);border-radius:12px;padding:8px 8px;min-width:0}
+.bls .blst b{display:block;font-size:17px;line-height:1.15;color:#fff}.bls .blst b.gd{color:#F5D6A6}.bls .blst span{font-size:11px;color:var(--muted)}
+.bls .blh{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:12px 0 6px}
+.bls .blg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.bls .blt{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px 8px;border-radius:14px;background:rgba(70,130,215,.14);border:1px solid var(--edge);color:#fff;font:inherit;cursor:pointer;min-width:0}
+.bls .blt.on{box-shadow:inset 0 0 0 1.5px rgba(245,214,166,.85)}.bls .blt.pd{opacity:.6}
+.bls .bli{position:relative;width:46px;height:46px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#1b3b7a;font-weight:800;font-size:20px}
+.bls .bli img{position:absolute;inset:4px;width:38px;height:38px;object-fit:contain;background:#fff}
+.bls .blt b.nm{font-size:12px;font-weight:700;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bls .blt small{font-size:11px;color:var(--muted)}.bls .blt small.or,.bls .blr small.or{color:#ffb454;font-weight:700}.bls .blt small.rd,.bls .blr small.rd{color:#ff7a8a;font-weight:700}
+.bls .blt i.cnt{position:absolute;top:-5px;right:-4px;min-width:20px;height:20px;line-height:20px;border-radius:999px;background:#E4002B;color:#fff;font-size:11px;font-weight:700;font-style:normal;text-align:center;padding:0 4px}
+.bls .bll{display:flex;align-items:center;gap:10px;padding:9px 10px;margin-bottom:6px;border-radius:12px;background:rgba(70,130,215,.12);border:1px solid var(--edge);border-left:3px solid #ffb454;font-size:12.5px}
+.bls .blr{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--edge)}
+.bls .blr .blm{flex:1;min-width:0;font-size:12.5px;line-height:1.35;color:#fff}.bls .blr small{display:block;font-size:11px;color:var(--muted)}
+.bls .blr .bli{width:38px;height:38px;font-size:16px;flex:none}.bls .blr .bli img{inset:3px;width:32px;height:32px}
+.bls .blb{display:flex;gap:6px;flex:none;flex-wrap:wrap;justify-content:flex-end}
+.bls .blb button,.bls .blb a{height:32px;line-height:30px;padding:0 10px;border-radius:10px;font:inherit;font-size:12px;font-weight:700;color:#fff;border:1px solid var(--edge);background:rgba(10,15,60,.55);text-decoration:none;box-sizing:border-box}
+.bls .blb button.go{background:linear-gradient(180deg,#4f9fff,#2467d6);box-shadow:inset 0 0 0 1px rgba(245,214,166,.85);border-color:transparent}
+.bls .bldt{margin-top:10px;padding:8px 10px;border-radius:14px;background:rgba(10,15,60,.4);border:1px solid var(--edge)}
+.bls .bldt .pfh{margin-bottom:2px}.bls .blmt{font-size:12px;color:var(--muted);padding:12px 2px}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -599,7 +621,7 @@ select.dbxs{width:100%;padding:11px;margin:6px 0 8px;border-radius:10px;font-siz
     <button class="tab on" data-t="form">Add<span class="bdg" id="bdg" style="display:none"></span></button>
     <button class="tab" data-t="earn">Money<span class="bdg" id="ebdg" style="display:none"></span></button>
     <button class="tab" data-t="rep">Reports</button>
-    <button class="tab" data-t="tools">Tools</button>
+    <button class="tab" data-t="tools">Tools<span class="bdg" id="tbdg" style="display:none"></span></button>
   </div>
 
   <div class="scroll">
@@ -1112,7 +1134,7 @@ let tl='mgr';
 const inp=(id,v,ex)=>`<input id="${id}" value="${esc(v)}" ${ex||''}>`;
 const lockHtml=()=>`<div class="pfh">App lock</div>${LK&&LK.pin?`<div class="hint">Lock is ON${LK.cred?' with Face ID (your PIN is the backup)':' (PIN only)'}. Locks after 1 minute away.</div><div class="two2">${LK.cred?'<span></span>':'<button type="button" class="mini" id="b_fid">Turn on Face ID</button>'}<button type="button" class="mini" id="b_lkoff">Turn off</button></div>`:`<button type="button" class="mini" id="b_lkon">Set up Face ID lock</button><div class="hint">You will choose a 4-digit PIN as a backup, then Face ID is turned on.</div>`}`;
 function toolsView(){
-  const seg=['mgr:Manager','set:Setup','rec:Recurring','debt:Debts','dat:Backup'].map(s=>{const[k,n]=s.split(':');return`<button type="button" class="seg${tl===k?' on':''}" data-tl="${k}">${n}</button>`}).join('');
+  const seg=['mgr:Manager','set:Setup','rec:Recurring','debt:Debts','dat:Backup','bill:Bills'].map(s=>{const[k,n]=s.split(':');return`<button type="button" class="seg${tl===k?' on':''}" data-tl="${k}">${n}</button>`}).join('');
   let b='';
   if(tl==='set')b=`<div class="card tl"><label>GST registered<select id="c_gst"><option value="1"${CFG.gst?' selected':''}>Yes</option><option value="0"${CFG.gst?'':' selected'}>No</option></select></label>
 <label>Income I enter is<select id="c_inc"><option value="ex"${CFG.incGst==='ex'?' selected':''}>Excluding GST</option><option value="inc"${CFG.incGst==='inc'?' selected':''}>Including GST</option></select></label>
@@ -1131,13 +1153,14 @@ function toolsView(){
 <div class="two2"><button type="button" class="mini" id="b_radd">+ Add item</button><button type="button" class="mini" id="b_rics">Add to Calendar</button></div></div>`;
   else if(tl==='rec')b=recHtml();
   else if(tl==='debt')b=debtHtml();
+  else if(tl==='bill')b=billsHtml();
   else if(tl==='mgr')b=dmHtml();
   else{const fys=[];for(let y=BIZ_FY;y<=Math.max(BIZ_FY,fyOf(info(todayK()).ym));y++)fys.push(y);
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 23 Oct 2026, 22:00 (email invoices)</div></div>`}
-  $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
+<div class="hint">App version: 24 Oct 2026, 00:10 (Bills tab)</div></div>`}
+  $('tools').innerHTML=`<div class="segs six" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
   const id=t.id;
@@ -1784,6 +1807,94 @@ document.addEventListener('click',ev=>{const b=ev.target.closest&&ev.target.clos
   const _l=loadSheet;loadSheet=async function(){const r=await _l.apply(this,arguments);loadInbox();return r};
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(loadInbox,800)});
   setInterval(loadInbox,300000);})();
+
+/* ===== BILLS tab: bills, Beakon courses due, Beakon documents expiring (read from the private "Bills" tab) ===== */
+let BILLS=[],blSel=null,blTab='b',blBusy=false;
+try{BILLS=JSON.parse(localStorage.getItem('bls')||'[]')}catch(e){BILLS=[]}
+const blLoc=()=>{try{return JSON.parse(localStorage.getItem('bld')||'{}')}catch(e){return{}}};
+const blLocSave=o=>{try{localStorage.setItem('bld',JSON.stringify(o))}catch(e){}};
+const blCache=()=>{try{localStorage.setItem('bls',JSON.stringify(BILLS))}catch(e){}};
+const blLeft=due=>{if(!/^\d{4}-\d\d-\d\d$/.test(due))return null;const a=new Date(due+'T00:00'),b=new Date();b.setHours(0,0,0,0);return Math.round((a-b)/864e5)};
+const blLab=(n,k)=>n===null?'':n<0?(k==='doc'?'expired ':'')+(-n)+(-n===1?' day':' days')+(k==='doc'?' ago':k==='course'?' overdue':' late'):n===0?'today':n===1?'tomorrow':'in '+n+' days';
+const blCls=n=>n===null?'':n<0?'rd':n<=3?'or':'';
+const blDate=d=>/^\d{4}-\d\d-\d\d$/.test(d)?new Date(d+'T00:00').toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'}):'';
+const blIcon=(p,dom)=>`<div class="bli"><span>${esc((p||'?').replace(/^Beakon\s+/i,'B').trim().charAt(0).toUpperCase())}</span>${dom?`<img alt="" src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(dom)}&sz=128" onerror="this.remove()" onload="if(this.naturalWidth<32)this.remove()">`:''}</div>`;
+function blBadge(){
+  const eb=$('tbdg');if(!eb)return;
+  const n=window.BMP_VIEW?0:BILLS.filter(x=>x.st==='open'&&(x2=>x2!==null&&x2<=7)(blLeft(x.due))).length;
+  eb.textContent=n||'';eb.style.display=n?'inline-block':'none'}
+function blLate(){
+  const by={};BILLS.filter(x=>x.k==='bill'&&x.rec&&x.rc).forEach(x=>(by[x.p]=by[x.p]||[]).push(x));
+  return Object.keys(by).map(p=>{const L=by[p].map(x=>x.rc.slice(0,10)).sort();if(L.length<3)return null;
+    const g=[];for(let i=1;i<L.length;i++)g.push((new Date(L[i])-new Date(L[i-1]))/864e5);
+    const avg=g.reduce((a,b)=>a+b,0)/g.length,last=new Date(L[L.length-1]+'T00:00'),late=Math.floor((Date.now()-last)/864e5-avg);
+    return late>=3&&!by[p].some(x=>x.st==='open')?{p,late,avg:Math.round(avg),last:L[L.length-1],dom:by[p][0].dom}:null}).filter(Boolean)}
+function blRow(x){
+  const n=blLeft(x.due),open=x.st==='open',kk=encodeURIComponent(x.key),dd=esc(x.due);
+  const meta=x.k==='bill'?`${open?'Due '+blDate(x.due)+' · ':'Invoice '+blDate(x.due)+' · '}<b>${fmt(x.a)}</b>${x.au&&open?' · Auto-debit':''}${!open?' · '+(/already paid/i.test(x.nt)?'Paid at the time':x.st):''}`:`${x.k==='course'?'Due':'Expires'} ${blDate(x.due)||'(no date)'}`;
+  const btn=open?(x.k==='bill'?`<button type="button" class="go" data-bl="paid" data-bk="${kk}" data-bd="${dd}">Paid</button><button type="button" data-bl="dismissed" data-bk="${kk}" data-bd="${dd}">Dismiss</button>`
+      :`<button type="button" class="go" data-bl="done" data-bk="${kk}" data-bd="${dd}">Done</button><button type="button" data-bl="dismissed" data-bk="${kk}" data-bd="${dd}">Dismiss</button>`)
+    :(x.k==='bill'&&/already paid/i.test(x.nt)&&!/expensed/i.test(x.nt)&&x.a>0?`<button type="button" class="go" data-bl="exp" data-bk="${kk}" data-bd="${dd}">Add to Expenses</button>`:'');
+  const lk=x.lk?`<a href="${esc(x.lk)}" target="_blank" rel="noopener">Email</a>`:'';
+  return `<div class="blr">${x.k==='bill'?'':blIcon(x.p,x.dom)}<div class="blm"><b>${esc(x.dt||x.p)}</b><small class="${open?blCls(n):''}">${meta}${open&&n!==null?' · '+blLab(n,x.k):''}</small></div><div class="blb">${btn}${lk}</div></div>`}
+function billsHtml(){
+  const open=BILLS.filter(x=>x.st==='open'),cnt=k=>open.filter(x=>x.k===k&&(n=>n!==null&&n<=7)(blLeft(x.due))).length;
+  const tab=(k,t)=>`<button type="button" class="seg${blTab===k?' on':''}" data-bt="${k}">${t}${cnt(k==='b'?'bill':k==='c'?'course':'doc')?`<span class="bdg">${cnt(k==='b'?'bill':k==='c'?'course':'doc')}</span>`:''}</button>`;
+  let h=`<div class="card tl bls"><div class="segs three" id="blt" style="margin-bottom:0">${tab('b','Bills')}${tab('c','Courses')}${tab('d','Documents')}</div>`;
+  if(blTab==='b'){
+    const bl=open.filter(x=>x.k==='bill'),tot=bl.reduce((a,x)=>a+x.a,0),soon=bl.filter(x=>(n=>n!==null&&n<=7)(blLeft(x.due))).length;
+    h+=`<div class="blst"><div><b>${bl.length}</b><span>unpaid bills</span></div><div><b class="gd">${fmt(tot)}</b><span>total to pay</span></div><div><b>${soon}</b><span>due in 7 days</span></div></div>`;
+    const late=blLate();
+    if(late.length)h+=`<div class="blh">Hasn't arrived</div>`+late.map(l=>`<div class="bll">${blIcon(l.p,l.dom)}<div><b>${esc(l.p)}</b> is ${l.late} days late<br><small style="color:var(--muted)">Usually every ~${l.avg} days · last one ${blDate(l.last)}</small></div></div>`).join('');
+    const group=list=>{const g={};list.forEach(x=>(g[x.p]=g[x.p]||[]).push(x));return Object.keys(g).map(p=>({p,L:g[p],dom:g[p][0].dom}))};
+    const tp=group(bl).sort((a,b)=>Math.min(...a.L.map(x=>blLeft(x.due)??9999))-Math.min(...b.L.map(x=>blLeft(x.due)??9999)));
+    h+=`<div class="blh">To pay</div>`;
+    h+=tp.length?`<div class="blg">`+tp.map(g=>{const n=Math.min(...g.L.map(x=>blLeft(x.due)??9999));return `<button type="button" class="blt${blSel===g.p?' on':''}" data-bs="${encodeURIComponent(g.p)}">${blIcon(g.p,g.dom)}<i class="cnt">${g.L.length}</i><b class="nm">${esc(g.p)}</b><small class="${blCls(n)}">${n===9999?'':blLab(n,'bill')}</small></button>`}).join('')+`</div>`:`<div class="blmt">Nothing to pay. New bills from your email appear here.</div>`;
+    const pd=group(BILLS.filter(x=>x.k==='bill'&&x.st==='paid'));
+    if(pd.length)h+=`<div class="blh">Paid</div><div class="blg">`+pd.map(g=>`<button type="button" class="blt pd${blSel===g.p?' on':''}" data-bs="${encodeURIComponent(g.p)}">${blIcon(g.p,g.dom)}<b class="nm">${esc(g.p)}</b><small>${g.L.length} paid</small></button>`).join('')+`</div>`;
+    if(blSel){const L=BILLS.filter(x=>x.k==='bill'&&x.p===blSel).sort((a,b)=>(a.st==='open'?0:1)-(b.st==='open'?0:1)||(a.st==='open'?a.due.localeCompare(b.due):b.due.localeCompare(a.due))).slice(0,12);
+      if(L.length)h+=`<div class="bldt"><div class="pfh">${esc(blSel)}</div>${L.map(blRow).join('')}</div>`}
+  }else{
+    const k=blTab==='c'?'course':'doc',L=open.filter(x=>x.k===k).sort((a,b)=>(a.due||'9').localeCompare(b.due||'9'));
+    h+=L.length?`<div style="margin-top:6px">`+L.map(blRow).join('')+`</div>`:`<div class="blmt">${k==='course'?'No courses due.':'No documents expiring.'} New Beakon emails appear here.</div>`;
+  }
+  return h+'</div>'}
+async function blWrite(key,due,st,nt){
+  const r=await mcp.callTool('Google Sheets','get_values',{spreadsheetId:SID,range:'Bills!A2:M500'});
+  const v=(r.payload&&r.payload.values)||[],i=v.findIndex(q=>String(q[1])===key&&String(q[5]||'')===due);
+  if(i<0)return;
+  await mcp.callTool('Google Sheets','update_values',{spreadsheetId:SID,range:'Bills!G'+(i+2),values:[[st]]});
+  if(nt)await mcp.callTool('Google Sheets','update_values',{spreadsheetId:SID,range:'Bills!L'+(i+2),values:[[nt]]})}
+async function blMark(key,due,st,nt){
+  const x=BILLS.find(q=>q.key===key&&q.due===due);if(x){x.st=st;if(nt)x.nt=nt}
+  const d=blLoc();d[key+'|'+due]={st,nt:nt||''};blLocSave(d);blCache();if($('tools').classList.contains('on')&&tl==='bill')toolsView();blBadge();
+  try{await blWrite(key,due,st,nt);const e=blLoc();delete e[key+'|'+due];blLocSave(e)}catch(e){}}
+async function loadBills(){
+  if(window.BMP_VIEW||blBusy)return;
+  if(!(tok&&Date.now()<tokExp)){blBadge();return}
+  blBusy=true;
+  try{
+    const r=await mcp.callTool('Google Sheets','get_values',{spreadsheetId:SID,range:'Bills!A2:M500'});
+    BILLS=((r.payload&&r.payload.values)||[]).map(v=>({k:String(v[0]||''),key:String(v[1]||''),p:String(v[2]||''),dt:String(v[3]||''),a:num(v[4]),due:String(v[5]||''),st:String(v[6]||'open').toLowerCase(),au:String(v[7]||'')==='Y',dom:String(v[8]||''),rc:String(v[9]||''),lk:String(v[10]||''),nt:String(v[11]||''),rec:String(v[12]||'')==='Y'})).filter(x=>x.key&&/^(bill|course|doc)$/.test(x.k));
+    const d=blLoc();let ch=false;
+    for(const x of BILLS){const m=d[x.key+'|'+x.due];if(!m)continue;
+      if(x.st==='open'){x.st=m.st;if(m.nt)x.nt=m.nt;try{await blWrite(x.key,x.due,m.st,m.nt);delete d[x.key+'|'+x.due];ch=true}catch(e){}}
+      else{delete d[x.key+'|'+x.due];ch=true}}
+    if(ch)blLocSave(d);blCache();
+  }catch(e){}
+  finally{blBusy=false}
+  blBadge();if($('tools').classList.contains('on')&&tl==='bill')toolsView()}
+document.addEventListener('click',ev=>{const t=ev.target.closest&&ev.target.closest('[data-bt],[data-bs],[data-bl]');if(!t||!$('tools').contains(t))return;
+  if(t.dataset.bt){blTab=t.dataset.bt;blSel=null;toolsView();return}
+  if(t.dataset.bs){const p=decodeURIComponent(t.dataset.bs);blSel=blSel===p?null:p;toolsView();return}
+  const key=decodeURIComponent(t.dataset.bk||''),due=t.dataset.bd||'',a=t.dataset.bl;
+  if(a==='exp'){const x=BILLS.find(q=>q.key===key&&q.due===due);if(!x)return;
+    entries.push({d:x.due,del:0,pu:0,nm:false,x:x.a,cat:'Maintenance & repairs',note:(x.p.replace(/ Pty Ltd/i,'')+' '+x.dt).slice(0,60)});persist();render();autoSync();
+    blMark(key,due,'paid','Already paid · Expensed');return}
+  blMark(key,due,a,'')});
+(function(){const _l=loadSheet;loadSheet=async function(){const r=await _l.apply(this,arguments);loadBills();return r};
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(loadBills,900)});
+  setInterval(loadBills,300000);setTimeout(blBadge,600);})();
 render();
 </script>
 </body>
