@@ -687,6 +687,12 @@ button.save:not(.inc):not(.alt):not(.del),#gcard button,.dmb.red{background:line
 body::before{opacity:.42;background-size:min(130vw,860px)}
 .tab.on,.seg.on,.card.tabs .tab.on,button.save.inc{box-shadow:inset 0 0 0 2px rgba(245,214,166,.95),inset 0 1px 0 rgba(255,255,255,.55),0 0 14px rgba(245,214,166,.35)!important}
 .seg.on[data-cf="exp"],.seg.on[data-k="exp"],.seg.on[data-m="exp"],#earn.xm .seg.on,#rep.xrd .seg.on{box-shadow:inset 0 0 0 2px rgba(255,214,220,.95),inset 0 1px 0 rgba(255,255,255,.55),0 0 14px rgba(255,90,115,.4)!important}
+
+/* final: ring on every selected tab, stronger red, smaller fainter watermark */
+body::before{opacity:.2;background-size:min(75vw,480px);background-position:center 60%}
+.tab.on,.seg.on,#earn .seg.on,#rep .seg.on,#tools .seg.on,#form .seg.on,.card.tabs .tab.on,button.save.inc{box-shadow:inset 0 0 0 2px rgba(245,214,166,.98),inset 0 1px 0 rgba(255,255,255,.55),0 0 14px rgba(245,214,166,.4)!important}
+.seg.on[data-cf="exp"],.seg.on[data-k="exp"],.seg.on[data-m="exp"],#earn.xm .seg.on,#rep.xrd .seg.on,#earn .seg.on[data-cf="exp"],#rep .seg.on[data-k="exp"],#form .seg.on[data-m="exp"]{background:linear-gradient(180deg,rgba(255,75,105,.88),rgba(200,0,35,.7))!important;border:1px solid rgba(255,215,220,.9)!important;box-shadow:inset 0 0 0 2px rgba(255,225,230,.98),inset 0 1px 0 rgba(255,255,255,.5),0 0 16px rgba(255,40,70,.55)!important;color:#fff!important}
+button.save:not(.inc):not(.alt):not(.del),#gcard button,.dmb.red{background:linear-gradient(180deg,rgba(255,75,105,.8),rgba(200,0,35,.6))!important;border:1px solid rgba(255,215,220,.85)!important}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1235,7 +1241,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 24 Oct 2026, 07:30 (Rings)</div></div>`}
+<div class="hint">App version: 24 Oct 2026, 08:00 (Rings all, red)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
