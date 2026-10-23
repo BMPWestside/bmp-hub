@@ -621,7 +621,7 @@ select.dbxs{width:100%;padding:11px;margin:6px 0 8px;border-radius:10px;font-siz
     <button class="tab on" data-t="form">Add<span class="bdg" id="bdg" style="display:none"></span></button>
     <button class="tab" data-t="earn">Money<span class="bdg" id="ebdg" style="display:none"></span></button>
     <button class="tab" data-t="rep">Reports</button>
-    <button class="tab" data-t="tools">Tools<span class="bdg" id="tbdg" style="display:none"></span></button>
+    <button class="tab" data-t="tools">Tools</button>
   </div>
 
   <div class="scroll">
@@ -1134,7 +1134,7 @@ let tl='mgr';
 const inp=(id,v,ex)=>`<input id="${id}" value="${esc(v)}" ${ex||''}>`;
 const lockHtml=()=>`<div class="pfh">App lock</div>${LK&&LK.pin?`<div class="hint">Lock is ON${LK.cred?' with Face ID (your PIN is the backup)':' (PIN only)'}. Locks after 1 minute away.</div><div class="two2">${LK.cred?'<span></span>':'<button type="button" class="mini" id="b_fid">Turn on Face ID</button>'}<button type="button" class="mini" id="b_lkoff">Turn off</button></div>`:`<button type="button" class="mini" id="b_lkon">Set up Face ID lock</button><div class="hint">You will choose a 4-digit PIN as a backup, then Face ID is turned on.</div>`}`;
 function toolsView(){
-  const seg=['mgr:Manager','set:Setup','rec:Recurring','debt:Debts','dat:Backup','bill:Bills'].map(s=>{const[k,n]=s.split(':');return`<button type="button" class="seg${tl===k?' on':''}" data-tl="${k}">${n}</button>`}).join('');
+  const seg=['mgr:Manager','set:Setup','rec:Recurring','debt:Debts','dat:Backup'].map(s=>{const[k,n]=s.split(':');return`<button type="button" class="seg${tl===k?' on':''}" data-tl="${k}">${n}</button>`}).join('');
   let b='';
   if(tl==='set')b=`<div class="card tl"><label>GST registered<select id="c_gst"><option value="1"${CFG.gst?' selected':''}>Yes</option><option value="0"${CFG.gst?'':' selected'}>No</option></select></label>
 <label>Income I enter is<select id="c_inc"><option value="ex"${CFG.incGst==='ex'?' selected':''}>Excluding GST</option><option value="inc"${CFG.incGst==='inc'?' selected':''}>Including GST</option></select></label>
@@ -1153,14 +1153,13 @@ function toolsView(){
 <div class="two2"><button type="button" class="mini" id="b_radd">+ Add item</button><button type="button" class="mini" id="b_rics">Add to Calendar</button></div></div>`;
   else if(tl==='rec')b=recHtml();
   else if(tl==='debt')b=debtHtml();
-  else if(tl==='bill')b=billsHtml();
   else if(tl==='mgr')b=dmHtml();
   else{const fys=[];for(let y=BIZ_FY;y<=Math.max(BIZ_FY,fyOf(info(todayK()).ym));y++)fys.push(y);
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 24 Oct 2026, 00:10 (Bills tab)</div></div>`}
-  $('tools').innerHTML=`<div class="segs six" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
+<div class="hint">App version: 24 Oct 2026, 00:25 (Bills moved to Money)</div></div>`}
+  $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
   const id=t.id;
@@ -1594,7 +1593,7 @@ function forecast(){const now=todayK(),cur=info(now).ym,t0=new Date(now+'T00:00'
     if(pg>0&&!entries.some(e=>isPayg(e)&&e.d>qe+'-28'))ev.push({d:due,t:'PAYG withholding (BAS)',a:-pg})}));
   REM.forEach(r=>{if(r.d&&r.d>=now&&r.d<=ek)ev.push({d:r.d,t:r.n,a:0})});
   ev.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0);let bal=est(),low=null;ev.forEach(x=>{bal+=x.a;x.b=bal;if(bal<0&&!low)low=x.d});return{ev,low,end:bal}}
-const cftBar=()=>{const L=[['inc','Income'],['exp','Expenses'],['pro','Profit'],['cash','Cash']].filter(x=>!(window.BMP_VIEW&&x[0]==='cash'));return `<div class="segs ${L.length===3?'three':'four'}" id="cft">${L.map(([k,n])=>`<button type="button" class="seg${cf===k?' on':''}" data-cf="${k}">${n}</button>`).join('')}</div>`};
+const cftBar=()=>{const L=[['inc','Income'],['exp','Expenses'],['pro','Profit'],['cash','Cash'],['bills','Bills']].filter(x=>!(window.BMP_VIEW&&(x[0]==='cash'||x[0]==='bills')));return `<div class="segs ${L.length===3?'three':L.length===4?'four':'five'}" id="cft">${L.map(([k,n])=>{const c=k==='bills'&&typeof blSoonCount==='function'?blSoonCount():0;return `<button type="button" class="seg${cf===k?' on':''}" data-cf="${k}">${n}${c?`<span class="bdg">${c}</span>`:''}</button>`}).join('')}</div>`};
 function cashView(){const now=todayK(),cur=info(now).ym,e0=est(),ms=[];for(let y=cur;y>=BIZ_YM&&ms.length<3;y=prevYm(y))ms.push(y);
   let wait=0;for(let ym=BIZ_YM;ym<=cur;ym=nextYm(ym)){const m=MF[ym]||{};if(!m.recDate&&ym<cur)wait+=mfAmt(ym)}
   const bank=`<div class="card pf"><div class="pfh">Bank balance · estimate</div><div class="pft big"><span>Estimated now</span><b class="${e0<0?'cr':''}">${A(e0)}</b></div><div class="pft"><span>Owed by Mainfreight (finished months)</span><b>${A(wait)}</b></div><div class="pft"><span>Held for ATO (PAYG withholding)</span><b>${A(paygHeld())}</b></div><div class="bkset"><input id="bk_in" type="number" inputmode="decimal" step="0.01" placeholder="Your real balance A$"><button type="button" class="mini" id="bk_set">Set</button></div><div class="pfn">Received pay + director loans − all expenses. Type your real bank balance and tap Set to correct the estimate.</div></div>`;
@@ -1604,8 +1603,8 @@ function cashView(){const now=todayK(),cur=info(now).ym,e0=est(),ms=[];for(let y
   const F=forecast(),sh=F.ev.slice(0,8);
   const fc=`<div class="card pf"><div class="pfh">Next 30 days</div>${F.low?`<div class="wn">⚠ Balance may go below A$0 on ${dAU(F.low)}</div>`:`<div class="okk">✔ Balance stays above A$0 · ends ${A(F.end)}</div>`}<div class="fcl">${sh.map(x=>`<div class="fcr"><span>${dAU(x.d)}</span><span>${esc(x.t)}</span><b class="${x.a<0?'cr':x.a>0?'cg':''}">${x.a?(x.a>0?'+':'-')+kN(Math.abs(x.a)):''}</b><small class="${x.b<0?'cr':''}">${kN(x.b)}</small></div>`).join('')||'<div class="pfn">Nothing coming up.</div>'}</div>${F.ev.length>8?`<div class="pfn">+${F.ev.length-8} more</div>`:''}</div>`;
   $('earn').innerHTML=cftBar()+banners()+bank+pay+fc}
-(function(){const r1=render;render=function(){if(window.BMP_VIEW&&cf==='cash')cf='inc';r1();
-  if(cf==='cash')cashView();else{const c=$('cft');if(c)c.outerHTML=cftBar()}
+(function(){const r1=render;render=function(){if(window.BMP_VIEW&&(cf==='cash'||cf==='bills'))cf='inc';r1();
+  if(cf==='cash')cashView();else if(cf==='bills')$('earn').innerHTML=cftBar()+billsHtml();else{const c=$('cft');if(c)c.outerHTML=cftBar()}
   $('earn').classList.toggle('cash',cf==='cash');if(rk==='find'&&$('fr'))findPaint();fit()};window.render=render})();
 $('earn').addEventListener('click',ev=>{const t=ev.target;
   const b=t.closest('[data-act="rec"]');if(b){const r=RC[+b.dataset.i];if(r){entries.push({d:b.dataset.d,del:0,pu:0,nm:false,x:+r.amt,cat:r.cat,note:r.n||''});persist();render();autoSync()}return}
@@ -1781,9 +1780,10 @@ async function loadInbox(){
   }catch(e){INBX=[]}
   finally{ibBusy=false}
   paintInbox()}
+function mBadge(){const eb=$('ebdg');if(!eb)return;const n=window.BMP_VIEW?0:(INBX.length||0)+(typeof blSoonCount==='function'?blSoonCount():0);eb.textContent=n||'';eb.style.display=n?'inline-block':'none'}
 function paintInbox(){
   const old=$('inbx');if(old)old.remove();
-  const eb=$('ebdg');if(eb){eb.textContent=INBX.length||'';eb.style.display=INBX.length&&!window.BMP_VIEW?'inline-block':'none'}
+  mBadge();
   if(window.BMP_VIEW||!INBX.length||cf!=='inc')return;
   const cft=$('cft');if(!cft)return;
   const has=x=>entries.filter(e=>e.d===x.d&&!e.x&&!e.ln).reduce((a,e)=>a+amt(e),0);
@@ -1819,10 +1819,9 @@ const blLab=(n,k)=>n===null?'':n<0?(k==='doc'?'expired ':'')+(-n)+(-n===1?' day'
 const blCls=n=>n===null?'':n<0?'rd':n<=3?'or':'';
 const blDate=d=>/^\d{4}-\d\d-\d\d$/.test(d)?new Date(d+'T00:00').toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'}):'';
 const blIcon=(p,dom)=>`<div class="bli"><span>${esc((p||'?').replace(/^Beakon\s+/i,'B').trim().charAt(0).toUpperCase())}</span>${dom?`<img alt="" src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(dom)}&sz=128" onerror="this.remove()" onload="if(this.naturalWidth<32)this.remove()">`:''}</div>`;
-function blBadge(){
-  const eb=$('tbdg');if(!eb)return;
-  const n=window.BMP_VIEW?0:BILLS.filter(x=>x.st==='open'&&(x2=>x2!==null&&x2<=7)(blLeft(x.due))).length;
-  eb.textContent=n||'';eb.style.display=n?'inline-block':'none'}
+const blSoonCount=()=>window.BMP_VIEW?0:BILLS.filter(x=>x.st==='open'&&(n=>n!==null&&n<=7)(blLeft(x.due))).length;
+function blBadge(){mBadge();if(cf==='bills'&&$('earn').classList.contains('on'))render()}
+function blRefresh(){if(cf==='bills'&&$('earn').classList.contains('on'))render()}
 function blLate(){
   const by={};BILLS.filter(x=>x.k==='bill'&&x.rec&&x.rc).forEach(x=>(by[x.p]=by[x.p]||[]).push(x));
   return Object.keys(by).map(p=>{const L=by[p].map(x=>x.rc.slice(0,10)).sort();if(L.length<3)return null;
@@ -1834,9 +1833,8 @@ function blRow(x){
   const meta=x.k==='bill'?`${open?'Due '+blDate(x.due)+' · ':'Invoice '+blDate(x.due)+' · '}<b>${fmt(x.a)}</b>${x.au&&open?' · Auto-debit':''}${!open?' · '+(/already paid/i.test(x.nt)?'Paid at the time':x.st):''}`:`${x.k==='course'?'Due':'Expires'} ${blDate(x.due)||'(no date)'}`;
   const btn=open?(x.k==='bill'?`<button type="button" class="go" data-bl="paid" data-bk="${kk}" data-bd="${dd}">Paid</button><button type="button" data-bl="dismissed" data-bk="${kk}" data-bd="${dd}">Dismiss</button>`
       :`<button type="button" class="go" data-bl="done" data-bk="${kk}" data-bd="${dd}">Done</button><button type="button" data-bl="dismissed" data-bk="${kk}" data-bd="${dd}">Dismiss</button>`)
-    :(x.k==='bill'&&/already paid/i.test(x.nt)&&!/expensed/i.test(x.nt)&&x.a>0?`<button type="button" class="go" data-bl="exp" data-bk="${kk}" data-bd="${dd}">Add to Expenses</button>`:'');
-  const lk=x.lk?`<a href="${esc(x.lk)}" target="_blank" rel="noopener">Email</a>`:'';
-  return `<div class="blr">${x.k==='bill'?'':blIcon(x.p,x.dom)}<div class="blm"><b>${esc(x.dt||x.p)}</b><small class="${open?blCls(n):''}">${meta}${open&&n!==null?' · '+blLab(n,x.k):''}</small></div><div class="blb">${btn}${lk}</div></div>`}
+    :(x.k==='bill'&&/already paid/i.test(x.nt)&&!/expensed/i.test(x.nt)&&x.a>0?`<button type="button" class="go" data-bl="exp" data-bk="${kk}" data-bd="${dd}">Add to Expenses</button><button type="button" data-bl="dismissed" data-bk="${kk}" data-bd="${dd}">Ignore</button>`:'');
+  return `<div class="blr">${x.k==='bill'?'':blIcon(x.p,x.dom)}<div class="blm"><b>${esc(x.dt||x.p)}</b><small class="${open?blCls(n):''}">${meta}${open&&n!==null?' · '+blLab(n,x.k):''}</small></div><div class="blb">${btn}</div></div>`}
 function billsHtml(){
   const open=BILLS.filter(x=>x.st==='open'),cnt=k=>open.filter(x=>x.k===k&&(n=>n!==null&&n<=7)(blLeft(x.due))).length;
   const tab=(k,t)=>`<button type="button" class="seg${blTab===k?' on':''}" data-bt="${k}">${t}${cnt(k==='b'?'bill':k==='c'?'course':'doc')?`<span class="bdg">${cnt(k==='b'?'bill':k==='c'?'course':'doc')}</span>`:''}</button>`;
@@ -1867,7 +1865,7 @@ async function blWrite(key,due,st,nt){
   if(nt)await mcp.callTool('Google Sheets','update_values',{spreadsheetId:SID,range:'Bills!L'+(i+2),values:[[nt]]})}
 async function blMark(key,due,st,nt){
   const x=BILLS.find(q=>q.key===key&&q.due===due);if(x){x.st=st;if(nt)x.nt=nt}
-  const d=blLoc();d[key+'|'+due]={st,nt:nt||''};blLocSave(d);blCache();if($('tools').classList.contains('on')&&tl==='bill')toolsView();blBadge();
+  const d=blLoc();d[key+'|'+due]={st,nt:nt||''};blLocSave(d);blCache();blBadge();
   try{await blWrite(key,due,st,nt);const e=blLoc();delete e[key+'|'+due];blLocSave(e)}catch(e){}}
 async function loadBills(){
   if(window.BMP_VIEW||blBusy)return;
@@ -1883,10 +1881,10 @@ async function loadBills(){
     if(ch)blLocSave(d);blCache();
   }catch(e){}
   finally{blBusy=false}
-  blBadge();if($('tools').classList.contains('on')&&tl==='bill')toolsView()}
-document.addEventListener('click',ev=>{const t=ev.target.closest&&ev.target.closest('[data-bt],[data-bs],[data-bl]');if(!t||!$('tools').contains(t))return;
-  if(t.dataset.bt){blTab=t.dataset.bt;blSel=null;toolsView();return}
-  if(t.dataset.bs){const p=decodeURIComponent(t.dataset.bs);blSel=blSel===p?null:p;toolsView();return}
+  blBadge()}
+document.addEventListener('click',ev=>{const t=ev.target.closest&&ev.target.closest('[data-bt],[data-bs],[data-bl]');if(!t||!$('earn').contains(t))return;
+  if(t.dataset.bt){blTab=t.dataset.bt;blSel=null;blRefresh();return}
+  if(t.dataset.bs){const p=decodeURIComponent(t.dataset.bs);blSel=blSel===p?null:p;blRefresh();return}
   const key=decodeURIComponent(t.dataset.bk||''),due=t.dataset.bd||'',a=t.dataset.bl;
   if(a==='exp'){const x=BILLS.find(q=>q.key===key&&q.due===due);if(!x)return;
     entries.push({d:x.due,del:0,pu:0,nm:false,x:x.a,cat:'Maintenance & repairs',note:(x.p.replace(/ Pty Ltd/i,'')+' '+x.dt).slice(0,60)});persist();render();autoSync();
