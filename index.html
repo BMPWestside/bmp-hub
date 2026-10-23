@@ -682,6 +682,11 @@ input,select,textarea{background:linear-gradient(180deg,rgba(255,255,255,.08),rg
 .tab.on,.seg.on,#earn .seg.on,#rep .seg.on,#tools .seg.on,#form .seg.on,.card.tabs .tab.on,button.save.inc{background:linear-gradient(180deg,rgba(130,190,255,.5),rgba(36,103,214,.2))!important;border:1px solid rgba(200,228,255,.8)!important}
 .seg.on[data-cf="exp"],.seg.on[data-k="exp"],.seg.on[data-m="exp"],#earn.xm .seg.on,#rep.xrd .seg.on,#earn .seg.on[data-cf="exp"],#rep .seg.on[data-k="exp"],#form .seg.on[data-m="exp"]{background:linear-gradient(180deg,rgba(255,120,145,.5),rgba(196,0,31,.2))!important;border:1px solid rgba(255,205,212,.8)!important}
 button.save:not(.inc):not(.alt):not(.del),#gcard button,.dmb.red{background:linear-gradient(180deg,rgba(255,120,145,.48),rgba(228,0,43,.2))!important;border:1px solid rgba(255,205,212,.75)!important}
+
+/* ring on selected + stronger watermark */
+body::before{opacity:.42;background-size:min(130vw,860px)}
+.tab.on,.seg.on,.card.tabs .tab.on,button.save.inc{box-shadow:inset 0 0 0 2px rgba(245,214,166,.95),inset 0 1px 0 rgba(255,255,255,.55),0 0 14px rgba(245,214,166,.35)!important}
+.seg.on[data-cf="exp"],.seg.on[data-k="exp"],.seg.on[data-m="exp"],#earn.xm .seg.on,#rep.xrd .seg.on{box-shadow:inset 0 0 0 2px rgba(255,214,220,.95),inset 0 1px 0 rgba(255,255,255,.55),0 0 14px rgba(255,90,115,.4)!important}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1230,7 +1235,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 24 Oct 2026, 07:00 (Full glass)</div></div>`}
+<div class="hint">App version: 24 Oct 2026, 07:30 (Rings)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -1992,9 +1997,10 @@ add:'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
 money:'<path d="M3 7a2 2 0 0 1 2-2h13v3"/><path d="M3 7v11a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H5a2 2 0 0 1-2-2z"/><circle cx="16.5" cy="14" r="1.1"/>',
 rep:'<path d="M5 20V11M11 20V4M17 20v-6"/><path d="M3 20h18"/>',
 tools:'<path d="M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.5 2.5-2.4-.6-.6-2.4z"/>'};
+Object.assign(P,{view:'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',single:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',multi:'<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>'});
 const MAP=[['.tab[data-t]','t',{form:'add',earn:'money',rep:'rep',tools:'tools'}],
 ['.seg[data-m]','m',{}],['.seg[data-cf]','cf',{}],['.seg[data-cv]','cv',{}],['.seg[data-k]','k',{}],
-['.seg[data-r]','r',{quarter:'qtr'}],['.seg[data-tl]','tl',{dat:'bak'}],['.seg[data-bt]','bt',{b:'bills',c:'course',d:'doc'}]];
+['.seg[data-r]','r',{quarter:'qtr'}],['.seg[data-tl]','tl',{dat:'bak'}],['.seg[data-bt]','bt',{b:'bills',c:'course',d:'doc'}],['.seg[data-dm="mode"]','v',{new:'add'}],['.seg[data-dm="single"]','v',{'1':'single','0':'multi'}],['.seg[data-tm]','tm',{w:'week',m:'month'}]];
 const SEL=MAP.map(x=>x[0]+':not([data-ic])').join(',');
 const LAST={},BKEY=el=>{const f=el.querySelector('[data-ic],button');if(!f)return'';const d=Object.keys(f.dataset).filter(k=>k!=='ic')[0]||'';return (el.id||el.className.replace(/\b(ib|on)\b/g,'').trim())+'|'+d+'|'+el.children.length};
 function deco(){
