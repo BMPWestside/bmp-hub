@@ -630,6 +630,11 @@ select.dbxs{width:100%;padding:11px;margin:6px 0 8px;border-radius:10px;font-siz
 .ib .ico{width:17px;height:17px}
 .ib .on .ict{margin-left:5px;max-width:100px}
 .ib .bdg{top:-6px;right:-4px;min-width:15px;height:15px;line-height:15px;font-size:9px;padding:0 3px}
+
+/* stable icon tabs */
+.ib{justify-content:space-between}
+.ib>.on{max-width:none}
+@media(min-width:700px){.segs.ib{max-width:460px;margin-left:auto;margin-right:auto}}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1178,7 +1183,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 24 Oct 2026, 01:40 (Compact tabs)</div></div>`}
+<div class="hint">App version: 24 Oct 2026, 02:00 (Tab animation)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -1944,7 +1949,15 @@ const MAP=[['.tab[data-t]','t',{form:'add',earn:'money',rep:'rep',tools:'tools'}
 ['.seg[data-m]','m',{}],['.seg[data-cf]','cf',{}],['.seg[data-cv]','cv',{}],['.seg[data-k]','k',{}],
 ['.seg[data-r]','r',{quarter:'qtr'}],['.seg[data-tl]','tl',{dat:'bak'}],['.seg[data-bt]','bt',{b:'bills',c:'course',d:'doc'}]];
 const SEL=MAP.map(x=>x[0]+':not([data-ic])').join(',');
+const LAST={},BKEY=el=>{const f=el.querySelector('[data-ic],button');if(!f)return'';const d=Object.keys(f.dataset).filter(k=>k!=='ic')[0]||'';return (el.id||el.className.replace(/\b(ib|on)\b/g,'').trim())+'|'+d+'|'+el.children.length};
 function deco(){
+  const bars=new Set();document.querySelectorAll(SEL).forEach(b=>bars.add(b.parentNode));
+  const fix=[];
+  bars.forEach(p=>p.classList.add('ib'));
+  bars.forEach(p=>{const bs=[...p.children].filter(x=>x.tagName==='BUTTON');const key=BKEY(p);const prev=LAST[key];const cur=bs.findIndex(x=>x.classList.contains('on'));
+    if(prev!==undefined&&prev!==cur&&bs[prev]&&cur>=0){bs[cur].classList.remove('on');bs[prev].classList.add('on');fix.push([bs[cur],bs[prev]]);}
+    LAST[key]=cur>=0?cur:prev;p.__k=key});
+  if(fix.length){fix.forEach(([a,b])=>a.parentNode.offsetWidth);requestAnimationFrame(()=>requestAnimationFrame(()=>{fix.forEach(([a,b])=>{b.classList.remove('on');a.classList.add('on')})}))}
   document.querySelectorAll(SEL).forEach(b=>{
     for(const [q,a,m] of MAP){ if(!b.matches(q))continue;
       const v=b.dataset[a],k=m[v]||v; if(!P[k])return;
