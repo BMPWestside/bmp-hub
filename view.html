@@ -646,6 +646,18 @@ select.dbxs{width:100%;padding:11px;margin:6px 0 8px;border-radius:10px;font-siz
 .ib.ant>.seg,.ib.ant>.tab{transition:flex-basis .28s cubic-bezier(.3,.8,.2,1),background .2s,box-shadow .2s!important}
 .ib.ant .ict{transition:max-width .28s,opacity .18s,margin-left .28s}
 .ib .on .ict{max-width:90px}
+
+/* always show icon + name */
+.ib{justify-content:stretch!important;gap:4px}
+.ib>.seg,.ib>.tab,.ib>.on,.card.tabs.ib>.tab,.card.tabs.ib>.tab.on{flex:1 1 0!important;width:auto!important;max-width:none!important;min-width:0;height:auto;flex-direction:column;gap:1px;padding:4px 1px!important;border-radius:14px!important;font-size:10.5px!important;line-height:1.1;transition:background .2s,box-shadow .2s!important}
+.card.tabs.ib>.tab,.card.tabs.ib>.tab.on{flex-direction:row;gap:6px;height:36px;padding:0!important;border-radius:999px!important;font-size:13px!important}
+.ib .ict,.ib .on .ict{max-width:100%!important;opacity:1!important;margin:0!important;overflow:hidden;text-overflow:ellipsis}
+.ib .ico{width:16px;height:16px}
+.card.tabs.ib .ico{width:18px;height:18px}
+.ib .bdg{top:-4px;right:4px}
+.card.tabs.ib .bdg{top:-5px;right:6px}
+@media(max-width:380px){.card.tabs.ib>.tab,.card.tabs.ib>.tab.on{font-size:11px!important;gap:3px}.card.tabs.ib .ico{width:15px;height:15px}}
+@media(max-width:380px){.ib>.seg{font-size:9.5px!important;letter-spacing:-.2px}}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1194,7 +1206,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 24 Oct 2026, 05:20 (Tab fixed width)</div></div>`}
+<div class="hint">App version: 24 Oct 2026, 05:40 (Tabs icon + name)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -1966,7 +1978,7 @@ function deco(){
   const fix=[];
   bars.forEach(p=>p.classList.add('ib'));
   bars.forEach(p=>{const bs=[...p.children].filter(x=>x.tagName==='BUTTON');const key=BKEY(p);const prev=LAST[key];const cur=bs.findIndex(x=>x.classList.contains('on'));
-    if(prev!==undefined&&prev!==cur&&bs[prev]&&cur>=0){bs[cur].classList.remove('on');bs[prev].classList.add('on');fix.push([bs[cur],bs[prev]]);}
+    if(false&&prev!==undefined&&prev!==cur&&bs[prev]&&cur>=0){bs[cur].classList.remove('on');bs[prev].classList.add('on');fix.push([bs[cur],bs[prev]]);}
     LAST[key]=cur>=0?cur:prev;p.__k=key});
   if(fix.length){fix.forEach(([a,b])=>a.parentNode.offsetWidth);requestAnimationFrame(()=>requestAnimationFrame(()=>{fix.forEach(([a,b])=>{const p=a.parentNode;p.classList.add('ant');b.classList.remove('on');a.classList.add('on');setTimeout(()=>p.classList.remove('ant'),450)})}))}
   document.querySelectorAll(SEL).forEach(b=>{
