@@ -1157,7 +1157,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 24 Oct 2026, 00:25 (Bills moved to Money)</div></div>`}
+<div class="hint">App version: 24 Oct 2026, 00:40 (Ignore fix)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -1849,7 +1849,8 @@ function billsHtml(){
     h+=tp.length?`<div class="blg">`+tp.map(g=>{const n=Math.min(...g.L.map(x=>blLeft(x.due)??9999));return `<button type="button" class="blt${blSel===g.p?' on':''}" data-bs="${encodeURIComponent(g.p)}">${blIcon(g.p,g.dom)}<i class="cnt">${g.L.length}</i><b class="nm">${esc(g.p)}</b><small class="${blCls(n)}">${n===9999?'':blLab(n,'bill')}</small></button>`}).join('')+`</div>`:`<div class="blmt">Nothing to pay. New bills from your email appear here.</div>`;
     const pd=group(BILLS.filter(x=>x.k==='bill'&&x.st==='paid'));
     if(pd.length)h+=`<div class="blh">Paid</div><div class="blg">`+pd.map(g=>`<button type="button" class="blt pd${blSel===g.p?' on':''}" data-bs="${encodeURIComponent(g.p)}">${blIcon(g.p,g.dom)}<b class="nm">${esc(g.p)}</b><small>${g.L.length} paid</small></button>`).join('')+`</div>`;
-    if(blSel){const L=BILLS.filter(x=>x.k==='bill'&&x.p===blSel).sort((a,b)=>(a.st==='open'?0:1)-(b.st==='open'?0:1)||(a.st==='open'?a.due.localeCompare(b.due):b.due.localeCompare(a.due))).slice(0,12);
+    if(blSel&&!BILLS.some(x=>x.k==='bill'&&x.p===blSel&&x.st!=='dismissed'))blSel=null;
+    if(blSel){const L=BILLS.filter(x=>x.k==='bill'&&x.p===blSel&&x.st!=='dismissed').sort((a,b)=>(a.st==='open'?0:1)-(b.st==='open'?0:1)||(a.st==='open'?a.due.localeCompare(b.due):b.due.localeCompare(a.due))).slice(0,12);
       if(L.length)h+=`<div class="bldt"><div class="pfh">${esc(blSel)}</div>${L.map(blRow).join('')}</div>`}
   }else{
     const k=blTab==='c'?'course':'doc',L=open.filter(x=>x.k===k).sort((a,b)=>(a.due||'9').localeCompare(b.due||'9'));
