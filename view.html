@@ -635,6 +635,17 @@ select.dbxs{width:100%;padding:11px;margin:6px 0 8px;border-radius:10px;font-siz
 .ib{justify-content:space-between}
 .ib>.on{max-width:none}
 @media(min-width:700px){.segs.ib{max-width:460px;margin-left:auto;margin-right:auto}}
+
+/* fixed-width icon tabs, animate only on user selection */
+.ib{justify-content:center!important}
+.ib>.seg,.ib>.tab{flex:0 0 32px!important;width:32px;transition:none!important}
+.ib>.on{flex:0 0 118px!important;width:118px;max-width:none}
+.card.tabs.ib>.tab{flex-basis:34px!important;width:34px}
+.card.tabs.ib>.tab.on{flex-basis:108px!important;width:108px}
+.ib .ict{transition:none}
+.ib.ant>.seg,.ib.ant>.tab{transition:flex-basis .28s cubic-bezier(.3,.8,.2,1),background .2s,box-shadow .2s!important}
+.ib.ant .ict{transition:max-width .28s,opacity .18s,margin-left .28s}
+.ib .on .ict{max-width:90px}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1183,7 +1194,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 24 Oct 2026, 02:00 (Tab animation)</div></div>`}
+<div class="hint">App version: 24 Oct 2026, 05:20 (Tab fixed width)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -1957,7 +1968,7 @@ function deco(){
   bars.forEach(p=>{const bs=[...p.children].filter(x=>x.tagName==='BUTTON');const key=BKEY(p);const prev=LAST[key];const cur=bs.findIndex(x=>x.classList.contains('on'));
     if(prev!==undefined&&prev!==cur&&bs[prev]&&cur>=0){bs[cur].classList.remove('on');bs[prev].classList.add('on');fix.push([bs[cur],bs[prev]]);}
     LAST[key]=cur>=0?cur:prev;p.__k=key});
-  if(fix.length){fix.forEach(([a,b])=>a.parentNode.offsetWidth);requestAnimationFrame(()=>requestAnimationFrame(()=>{fix.forEach(([a,b])=>{b.classList.remove('on');a.classList.add('on')})}))}
+  if(fix.length){fix.forEach(([a,b])=>a.parentNode.offsetWidth);requestAnimationFrame(()=>requestAnimationFrame(()=>{fix.forEach(([a,b])=>{const p=a.parentNode;p.classList.add('ant');b.classList.remove('on');a.classList.add('on');setTimeout(()=>p.classList.remove('ant'),450)})}))}
   document.querySelectorAll(SEL).forEach(b=>{
     for(const [q,a,m] of MAP){ if(!b.matches(q))continue;
       const v=b.dataset[a],k=m[v]||v; if(!P[k])return;
