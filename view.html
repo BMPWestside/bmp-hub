@@ -699,6 +699,12 @@ button.save:not(.inc):not(.alt):not(.del),#gcard button,.dmb.red{background:line
 .seg:not(.on){background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.015))!important;border:1px solid rgba(255,255,255,.38)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.4)!important;-webkit-backdrop-filter:blur(18px) saturate(180%);backdrop-filter:blur(18px) saturate(180%)}
 .seg.on,#earn .seg.on,#rep .seg.on,#tools .seg.on,#form .seg.on{background:linear-gradient(180deg,rgba(150,200,255,.3),rgba(60,130,230,.1))!important;border:1px solid rgba(210,232,255,.85)!important;box-shadow:inset 0 0 0 2px rgba(245,214,166,.98),inset 0 1px 0 rgba(255,255,255,.6),0 0 16px rgba(245,214,166,.4)!important;-webkit-backdrop-filter:blur(18px) saturate(180%);backdrop-filter:blur(18px) saturate(180%)}
 .seg.on[data-cf="exp"],.seg.on[data-k="exp"],.seg.on[data-m="exp"],#earn.xm .seg.on,#rep.xrd .seg.on,#earn .seg.on[data-cf="exp"],#rep .seg.on[data-k="exp"],#form .seg.on[data-m="exp"]{background:linear-gradient(180deg,rgba(255,110,135,.34),rgba(255,0,40,.14))!important;border:1px solid rgba(255,120,140,1)!important;box-shadow:inset 0 0 0 2px rgba(255,80,105,1),inset 0 1px 0 rgba(255,255,255,.55),0 0 20px rgba(255,30,60,.75)!important;color:#fff!important;font-weight:800}
+
+/* sub tabs identical to main tabs */
+.seg:not(.on){background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.02))!important;border:1px solid rgba(255,255,255,.34)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 0 rgba(255,255,255,.05),0 4px 14px rgba(0,0,0,.18)!important;color:rgba(255,255,255,.88)}
+.seg.on,#earn .seg.on,#rep .seg.on,#tools .seg.on,#form .seg.on{background:linear-gradient(180deg,rgba(130,190,255,.5),rgba(36,103,214,.2))!important;border:1px solid rgba(200,228,255,.8)!important;box-shadow:inset 0 0 0 2px rgba(245,214,166,.98),inset 0 1px 0 rgba(255,255,255,.55),0 0 14px rgba(245,214,166,.4)!important}
+.seg.on[data-cf="exp"],.seg.on[data-k="exp"],.seg.on[data-m="exp"],#earn.xm .seg.on,#rep.xrd .seg.on,#earn .seg.on[data-cf="exp"],#rep .seg.on[data-k="exp"],#form .seg.on[data-m="exp"]{background:linear-gradient(180deg,rgba(255,95,120,.55),rgba(215,0,40,.28))!important;border:1px solid rgba(255,190,200,.9)!important;box-shadow:inset 0 0 0 2px rgba(255,85,110,1),inset 0 1px 0 rgba(255,255,255,.55),0 0 18px rgba(255,40,70,.6)!important;font-weight:700}
+button.save:not(.inc):not(.alt):not(.del),#gcard button,.dmb.red{background:linear-gradient(180deg,rgba(255,130,150,.42),rgba(228,0,43,.16))!important;border:1px solid rgba(255,215,222,.85)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -1px 0 rgba(255,255,255,.1),0 4px 14px rgba(0,0,0,.18)!important}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1247,7 +1253,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 24 Oct 2026, 08:20 (Clear glass sub tabs)</div></div>`}
+<div class="hint">App version: 24 Oct 2026, 08:40 (Sub tabs like main)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
