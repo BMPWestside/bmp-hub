@@ -610,6 +610,17 @@ select.dbxs{width:100%;padding:11px;margin:6px 0 8px;border-radius:10px;font-siz
 .bls .blb button.go{background:linear-gradient(180deg,#4f9fff,#2467d6);box-shadow:inset 0 0 0 1px rgba(245,214,166,.85);border-color:transparent}
 .bls .bldt{margin-top:10px;padding:8px 10px;border-radius:14px;background:rgba(10,15,60,.4);border:1px solid var(--edge)}
 .bls .bldt .pfh{margin-bottom:2px}.bls .blmt{font-size:12px;color:var(--muted);padding:12px 2px}
+
+/* ---- round icon tabs ---- */
+.ib{display:flex!important;gap:6px;align-items:center;justify-content:space-between;grid-template-columns:none!important}
+.ib>.seg,.ib>.tab{position:relative;flex:0 0 38px!important;flex-grow:0!important;width:auto;min-width:0;height:38px;padding:0!important;margin:0;display:flex!important;align-items:center;justify-content:center;border-radius:999px!important;overflow:visible;font-size:13px!important;transition:flex-grow .32s cubic-bezier(.3,.8,.2,1),background .2s,box-shadow .2s}
+.ib>.on{flex-grow:1!important}
+.card.tabs.ib>.tab{height:42px;flex-basis:42px!important}
+.card.tabs.ib>.tab:not(.on){background:rgba(255,255,255,.08)}
+.ib .ico{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ib .ict{max-width:0;opacity:0;margin-left:0;overflow:hidden;white-space:nowrap;transition:max-width .32s,opacity .18s,margin-left .32s}
+.ib .on .ict{max-width:120px;opacity:1;margin-left:7px}
+.ib .bdg{position:absolute;top:-5px;right:-3px;margin:0;z-index:2}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1158,7 +1169,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 24 Oct 2026, 00:40 (Ignore fix)</div></div>`}
+<div class="hint">App version: 24 Oct 2026, 01:10 (Icon tabs)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -1894,6 +1905,54 @@ document.addEventListener('click',ev=>{const t=ev.target.closest&&ev.target.clos
 (function(){const _l=loadSheet;loadSheet=async function(){const r=await _l.apply(this,arguments);loadBills();return r};
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(loadBills,900)});
   setInterval(loadBills,300000);setTimeout(blBadge,600);})();
+
+(function(){
+const P={inc:'<path d="M12 3v11"/><path d="m7.5 10 4.5 4.5L16.5 10"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
+exp:'<path d="M12 14V3"/><path d="m7.5 7 4.5-4.5L16.5 7"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
+loan:'<path d="M3 10 12 4l9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20h18"/>',
+pro:'<path d="M3 17 9 11l4 4 8-9"/><path d="M15 6h6v6"/>',
+cash:'<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v.01M18 14.5v.01"/>',
+bills:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/>',
+day:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/>',
+week:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M7 15h.01M10 15h.01M13 15h.01M16 15h.01"/>',
+month:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 14h8M8 17.5h5"/>',
+year:'<path d="M20 12a8 8 0 1 1-2.5-5.8"/><path d="M20 4v5h-5"/><path d="M12 8v4l2.5 2"/>',
+qtr:'<circle cx="12" cy="12" r="9"/><path d="M12 12V3"/><path d="M12 12h9"/>',
+trend:'<path d="M3 20h18"/><path d="M5 16l4-5 4 3 6-8"/>',
+find:'<circle cx="11" cy="11" r="6.5"/><path d="m16 16 5 5"/>',
+mgr:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16"/>',
+set:'<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/>',
+rec:'<path d="M17 3l3 3-3 3"/><path d="M4 11V9a3 3 0 0 1 3-3h13"/><path d="M7 21l-3-3 3-3"/><path d="M20 13v2a3 3 0 0 1-3 3H4"/>',
+debt:'<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>',
+bak:'<path d="M7 18a4 4 0 0 1-.6-7.95A6 6 0 0 1 18 9.5 4 4 0 0 1 17.5 18"/><path d="M12 12v8"/><path d="m9 15 3-3 3 3"/>',
+course:'<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/>',
+doc:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/>',
+add:'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
+money:'<path d="M3 7a2 2 0 0 1 2-2h13v3"/><path d="M3 7v11a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H5a2 2 0 0 1-2-2z"/><circle cx="16.5" cy="14" r="1.1"/>',
+rep:'<path d="M5 20V11M11 20V4M17 20v-6"/><path d="M3 20h18"/>',
+tools:'<path d="M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.5 2.5-2.4-.6-.6-2.4z"/>'};
+const MAP=[['.tab[data-t]','t',{form:'add',earn:'money',rep:'rep',tools:'tools'}],
+['.seg[data-m]','m',{}],['.seg[data-cf]','cf',{}],['.seg[data-cv]','cv',{}],['.seg[data-k]','k',{}],
+['.seg[data-r]','r',{quarter:'qtr'}],['.seg[data-tl]','tl',{dat:'bak'}],['.seg[data-bt]','bt',{b:'bills',c:'course',d:'doc'}]];
+const SEL=MAP.map(x=>x[0]+':not([data-ic])').join(',');
+function deco(){
+  document.querySelectorAll(SEL).forEach(b=>{
+    for(const [q,a,m] of MAP){ if(!b.matches(q))continue;
+      const v=b.dataset[a],k=m[v]||v; if(!P[k])return;
+      const bd=[...b.children].filter(c=>c.classList.contains('bdg'));
+      const txt=[...b.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();
+      if(!txt)return;
+      b.setAttribute('aria-label',txt);b.dataset.ic='1';
+      [...b.childNodes].forEach(n=>{if(n.nodeType===3)n.remove()});
+      b.insertAdjacentHTML('afterbegin','<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">'+P[k]+'</svg><span class="ict">'+txt+'</span>');
+      b.parentNode.classList.add('ib');
+      return;}
+  });
+}
+let q=false;function sch(){if(q)return;q=true;Promise.resolve().then(()=>{q=false;deco()})}
+new MutationObserver(sch).observe(document.body,{childList:true,subtree:true});
+deco();
+})();
 render();
 </script>
 </body>
