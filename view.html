@@ -669,6 +669,20 @@ select.dbxs{width:100%;padding:11px;margin:6px 0 8px;border-radius:10px;font-siz
 button.save:not(.inc):not(.alt):not(.del),#gcard button,.dmb.red{background:linear-gradient(180deg,rgba(255,110,135,.6),rgba(228,0,43,.38))!important;border:1px solid rgba(255,190,200,.65)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 4px 16px rgba(228,0,43,.3)!important;color:#fff!important}
 button.save.del{background:linear-gradient(180deg,rgba(255,110,135,.3),rgba(228,0,43,.18))!important;border:1px solid rgba(255,150,165,.6)!important}
 input,select,textarea{background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.03))!important;border:1px solid rgba(255,255,255,.22)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
+
+/* ---- full glass look ---- */
+:root{--gl:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.02));--glb:rgba(255,255,255,.34)}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:var(--wm,none) center 58%/min(120vw,780px) no-repeat;opacity:.2;filter:saturate(1.1) blur(1px)}
+.card,.card.sec,form.card,.card.tabs,.card.tl{background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.03) 55%),rgba(8,26,66,.26)!important;-webkit-backdrop-filter:blur(12px) saturate(150%);backdrop-filter:blur(12px) saturate(150%);border:1px solid rgba(255,255,255,.22)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 8px 26px rgba(0,0,0,.22)!important}
+.top:not(.top2){background:linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.03) 55%),rgba(228,0,43,.26)!important;-webkit-backdrop-filter:blur(12px) saturate(150%);backdrop-filter:blur(12px) saturate(150%);border:1px solid rgba(255,255,255,.26)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 6px 20px rgba(0,0,0,.2)!important}
+.top.top2{background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.03) 55%),rgba(0,76,149,.22)!important;-webkit-backdrop-filter:blur(12px) saturate(150%);backdrop-filter:blur(12px) saturate(150%);border:1px solid rgba(255,255,255,.24)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.28)!important}
+.cf,.dn,.hd.h{background:rgba(255,255,255,.07)!important;border:1px solid rgba(255,255,255,.16)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.14)}
+.cf.t,.hd.h:last-child{background:rgba(120,185,255,.16)!important;border-color:rgba(190,220,255,.4)!important}
+input,select,textarea{background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.01))!important;border:1px solid rgba(255,255,255,.3)!important}
+.tab,.seg,.nb,.mini,.go,.lk2,.dmb,button.save,#gcard button,input,select,textarea{-webkit-backdrop-filter:blur(14px) saturate(170%);backdrop-filter:blur(14px) saturate(170%)}
+.tab.on,.seg.on,#earn .seg.on,#rep .seg.on,#tools .seg.on,#form .seg.on,.card.tabs .tab.on,button.save.inc{background:linear-gradient(180deg,rgba(130,190,255,.5),rgba(36,103,214,.2))!important;border:1px solid rgba(200,228,255,.8)!important}
+.seg.on[data-cf="exp"],.seg.on[data-k="exp"],.seg.on[data-m="exp"],#earn.xm .seg.on,#rep.xrd .seg.on,#earn .seg.on[data-cf="exp"],#rep .seg.on[data-k="exp"],#form .seg.on[data-m="exp"]{background:linear-gradient(180deg,rgba(255,120,145,.5),rgba(196,0,31,.2))!important;border:1px solid rgba(255,205,212,.8)!important}
+button.save:not(.inc):not(.alt):not(.del),#gcard button,.dmb.red{background:linear-gradient(180deg,rgba(255,120,145,.48),rgba(228,0,43,.2))!important;border:1px solid rgba(255,205,212,.75)!important}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1217,7 +1231,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 24 Oct 2026, 06:30 (Glass controls)</div></div>`}
+<div class="hint">App version: 24 Oct 2026, 07:00 (Full glass)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -2011,6 +2025,8 @@ deco();
 })();
 
 (function(){const r0=renderRep;renderRep=function(){r0.apply(this,arguments);try{document.querySelectorAll('#rep details.bk .cf').forEach(c=>{if(c.textContent.trim()==='A$0.00'){c.classList.add('zq');c.textContent='–'}})}catch(e){}}})();
+
+(function(){try{const g=document.querySelector('img.gl');if(g&&g.src)document.documentElement.style.setProperty('--wm','url("'+g.src+'")')}catch(e){}})();
 render();
 </script>
 </body>
