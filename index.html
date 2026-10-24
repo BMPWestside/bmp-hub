@@ -869,7 +869,7 @@ function silentSign(){
 }
 async function api(url,opt){
   if(PX){
-    let r;try{r=await fetch(PX.u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({k:PX.k,url,method:(opt&&opt.method)||'GET',body:(opt&&opt.body)||null})})}catch(e){throw {message:(navigator.onLine===false?'offline':'cannot reach the link. In Apps Script the Web app must be set to Who has access: Anyone')}}
+    let r;try{r=await fetch(PX.u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({k:PX.k,url,method:(opt&&opt.method)||'GET',body:(opt&&opt.body)||null})})}catch(e){throw {message:(navigator.onLine===false?'offline':'cannot reach the link ('+String(e&&e.message||e).slice(0,60)+')')}}
     let j;try{j=await r.json()}catch(e){throw {message:'Link did not answer'}}
     if(j&&j.error){if(j.code===403&&j.error==='bad key')say('The key was not accepted. Check it in Tools > Backup.');throw {message:String(j.error).slice(0,120)}}
     return j.data}
@@ -1271,7 +1271,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 24 Oct 2026, 14:10 (Link error text)</div></div>`}
+<div class="hint">App version: 24 Oct 2026, 14:20 (Link error detail)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
