@@ -844,6 +844,9 @@ const CLIENT_ID='825840710134-jlflm38t6bnijmk66a4v2d6fauu676om.apps.googleuserco
 const SCOPE=window.BMP_VIEW?'https://www.googleapis.com/auth/spreadsheets.readonly':'https://www.googleapis.com/auth/spreadsheets';
 let tok=null,tokExp=0,tc=null;
 try{const t=JSON.parse(localStorage.getItem('gtok')||'null');if(t&&t.exp>Date.now()){tok=t.t;tokExp=t.exp}}catch(e){}
+const PXK=window.BMP_VIEW?'pxv':'px';let PX=null;
+try{const p=JSON.parse(localStorage.getItem(PXK)||'null');if(p&&p.u&&p.k)PX=p}catch(e){}
+if(PX){tok='proxy';tokExp=8.64e15}
 function authUI(){$('gcard').style.display=(tok&&Date.now()<tokExp)?'none':'block'}
 function signIn(){
   if(!window.google||!google.accounts){say('Google sign-in is still loading. Try again in a moment.');return}
@@ -866,6 +869,11 @@ function silentSign(){
     tc.requestAccessToken({prompt:'none'})}catch(e){silentBusy=false}
 }
 async function api(url,opt){
+  if(PX){
+    let r;try{r=await fetch(PX.u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({k:PX.k,url,method:(opt&&opt.method)||'GET',body:(opt&&opt.body)||null})})}catch(e){throw {message:'offline'}}
+    let j;try{j=await r.json()}catch(e){throw {message:'Link did not answer'}}
+    if(j&&j.error){if(j.code===403&&j.error==='bad key')say('The key was not accepted. Check it in Tools > Backup.');throw {message:String(j.error).slice(0,120)}}
+    return j.data}
   if(!tok||Date.now()>tokExp){tok=null;authUI();silentSign();throw {code:'needs_reauth'}}
   const r=await fetch(url,Object.assign({headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'}},opt||{}));
   if(r.status===401){tok=null;authUI();silentSign();throw {code:'needs_reauth'}}
@@ -1264,7 +1272,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 24 Oct 2026, 09:10 (Unified glass)</div></div>`}
+<div class="hint">App version: 24 Oct 2026, 12:30 (Stay signed in link)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -2061,6 +2069,26 @@ deco();
 (function(){const r0=renderRep;renderRep=function(){r0.apply(this,arguments);try{document.querySelectorAll('#rep details.bk .cf').forEach(c=>{if(c.textContent.trim()==='A$0.00'){c.classList.add('zq');c.textContent='–'}})}catch(e){}}})();
 
 (function(){try{const g=document.querySelector('img.gl');if(g&&g.src)document.documentElement.style.setProperty('--wm','url("'+g.src+'")')}catch(e){}})();
+
+/* ===== Stay signed in: Apps Script link instead of Google sign-in ===== */
+function pxHtml(){const on=!!PX;
+  return `<div class="card tl" id="pxc"><div class="pfh">Stay signed in</div>`+
+  (on?`<div class="hint">Connected. BMP Hub reads and saves through your Apps Script link, so Google sign-in is not needed on this device.</div><button type="button" class="mini" id="px_off" style="width:100%;margin-top:8px">Disconnect</button>`
+  :`<div class="hint">Paste the Web app link and key from your Apps Script (see setupProxy). Stored on this device only.</div>
+  <label>Web app link<input id="px_u" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" autocapitalize="off"></label>
+  <label>Key<input id="px_k" placeholder="paste key" autocomplete="off" autocapitalize="off"></label>
+  <button type="button" class="mini" id="px_save" style="width:100%;margin-top:8px">Connect</button><div class="hint" id="px_m"></div>`)+`</div>`}
+(function(){const t0=toolsView;toolsView=function(){t0();try{if(tl==='dat'){$('tools').insertAdjacentHTML('beforeend',pxHtml());fit()}}catch(e){}};
+document.addEventListener('click',async e=>{const b=e.target.closest('#px_save,#px_off');if(!b)return;
+  if(b.id==='px_off'){try{localStorage.removeItem(PXK)}catch(x){}PX=null;tok=null;tokExp=0;authUI();toolsView();return}
+  const u=($('px_u').value||'').trim(),k=($('px_k').value||'').trim(),m=$('px_m');
+  if(!/^https:\/\/script\.google\.com\/macros\/s\/[^\s]+\/exec$/.test(u)||k.length<20){m.textContent='Check the link (ends with /exec) and the key.';return}
+  m.textContent='Testing...';PX={u,k};tok='proxy';tokExp=8.64e15;
+  try{await api('https://sheets.googleapis.com/v4/spreadsheets/'+SID+'/values/'+encodeURIComponent('Untitled!A1:A1'));
+    try{localStorage.setItem(PXK,JSON.stringify(PX));localStorage.setItem('gever','1')}catch(x){}
+    authUI();toolsView();say('');autoSync().then(loadSheet)}
+  catch(err){PX=null;tok=null;tokExp=0;authUI();m.textContent='Could not connect: '+((err&&err.message)||'unknown')}
+},true)})();
 render();
 </script>
 </body>
