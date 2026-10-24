@@ -1271,7 +1271,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 24 Oct 2026, 12:30 (Stay signed in link)</div></div>`}
+<div class="hint">App version: 24 Oct 2026, 14:00 (Stay signed in link, view)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -2088,6 +2088,10 @@ document.addEventListener('click',async e=>{const b=e.target.closest('#px_save,#
     authUI();toolsView();say('');autoSync().then(loadSheet)}
   catch(err){PX=null;tok=null;tokExp=0;authUI();m.textContent='Could not connect: '+((err&&err.message)||'unknown')}
 },true)})();
+
+if(window.BMP_VIEW)(function(){const add=()=>{try{const g=$('gcard');if(!g||PX||$('pxd'))return;
+  g.insertAdjacentHTML('beforeend','<details id="pxd" style="margin-top:10px"><summary style="cursor:pointer;font-size:13px;color:var(--muted)">Connect with a link instead</summary><div class="hint">Paste the link and the view key you were given. Stored on this device only.</div><label>Web app link<input id="px_u" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" autocapitalize="off"></label><label>Key<input id="px_k" placeholder="paste key" autocomplete="off" autocapitalize="off"></label><button type="button" class="mini" id="px_save" style="width:100%;margin-top:8px">Connect</button><div class="hint" id="px_m"></div></details>')}catch(e){}};
+  add();window.addEventListener('load',add)})();
 render();
 </script>
 </body>
