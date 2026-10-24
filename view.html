@@ -868,10 +868,22 @@ function silentSign(){
     if(!tc)tc=mkTc();silentBusy=true;setTimeout(()=>{silentBusy=false},15000);
     tc.requestAccessToken({prompt:'none'})}catch(e){silentBusy=false}
 }
+
+/* form + postMessage transport: works where Safari blocks fetch to Apps Script */
+function pxForm(q){return new Promise((res,rej)=>{
+  const id='f'+Math.random().toString(36).slice(2),ifr=document.createElement('iframe'),f=document.createElement('form'),i=document.createElement('input');
+  ifr.name=id;ifr.style.display='none';f.method='POST';f.action=PX.u;f.target=id;i.type='hidden';i.name='p';i.value=JSON.stringify(Object.assign({id},q));f.appendChild(i);
+  let t;const h=e=>{const d=e.data;if(d&&d.bmp===id)done(res,d.r)};
+  const done=(fn,v)=>{clearTimeout(t);window.removeEventListener('message',h);ifr.remove();f.remove();fn(v)};
+  t=setTimeout(()=>done(rej,{message:'timed out. Paste the new script, then Deploy > Manage deployments > New version'}),25000);
+  window.addEventListener('message',h);document.body.append(ifr,f);f.submit()})}
 async function api(url,opt){
   if(PX){
-    let r;try{r=await fetch(PX.u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({k:PX.k,url,method:(opt&&opt.method)||'GET',body:(opt&&opt.body)||null})})}catch(e){throw {message:(navigator.onLine===false?'offline':'cannot reach the link ('+String(e&&e.message||e).slice(0,60)+')')}}
-    let j;try{j=await r.json()}catch(e){throw {message:'Link did not answer'}}
+    const q={k:PX.k,url,method:(opt&&opt.method)||'GET',body:(opt&&opt.body)||null};let j;
+    if(PX.m!=='form'){
+      try{const r=await fetch(PX.u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(q)});j=await r.json()}
+      catch(e){if(navigator.onLine===false)throw {message:'offline'};j=null}}
+    if(!j){try{j=await pxForm(q);PX.m='form';try{localStorage.setItem(PXK,JSON.stringify(PX))}catch(x){}}catch(e){throw {message:'cannot reach the link ('+((e&&e.message)||'no answer')+')'}}}
     if(j&&j.error){if(j.code===403&&j.error==='bad key')say('The key was not accepted. Check it in Tools > Backup.');throw {message:String(j.error).slice(0,120)}}
     return j.data}
   if(!tok||Date.now()>tokExp){tok=null;authUI();silentSign();throw {code:'needs_reauth'}}
@@ -1272,7 +1284,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 24 Oct 2026, 14:20 (Link error detail)</div></div>`}
+<div class="hint">App version: 24 Oct 2026, 14:45 (Safari-safe link)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
