@@ -1283,7 +1283,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 29 Oct 2026, 13:30 (Week rule fix)</div></div>`}
+<div class="hint">App version: 30 Oct 2026, 11:00 (Monthly payment advice)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -2104,6 +2104,46 @@ document.addEventListener('click',async e=>{const b=e.target.closest('#px_save,#
 if(window.BMP_VIEW)(function(){const add=()=>{try{const g=$('gcard');if(!g||PX||$('pxd'))return;
   g.insertAdjacentHTML('beforeend','<details id="pxd" style="margin-top:10px"><summary style="cursor:pointer;font-size:13px;color:var(--muted)">Connect with a link instead</summary><div class="hint">Paste the link and the view key you were given. Stored on this device only.</div><label>Web app link<input id="px_u" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" autocapitalize="off"></label><label>Key<input id="px_k" placeholder="paste key" autocomplete="off" autocapitalize="off"></label><button type="button" class="mini" id="px_save" style="width:100%;margin-top:8px">Connect</button><div class="hint" id="px_m"></div></details>')}catch(e){}};
   add();window.addEventListener('load',add)})();
+
+/* ===== Monthly payment advice (read from the private "Monthly" tab) ===== */
+let ADV={},advBusy=false;
+const advSig=a=>a?a.ym+'|'+a.rev+'|'+a.dc+'|'+a.rec:'';
+async function loadAdvice(){
+  if(window.BMP_VIEW||advBusy||!(tok&&Date.now()<tokExp))return;
+  advBusy=true;
+  try{
+    const r=await mcp.callTool('Google Sheets','get_values',{spreadsheetId:SID,range:'Monthly!A2:M60'});
+    const o={};
+    ((r.payload&&r.payload.values)||[]).forEach(v=>{const ym=String(v[0]||'');if(!/^\d{4}-\d\d$/.test(ym))return;
+      let days={};try{days=JSON.parse(v[11]||'{}')}catch(e){}
+      o[ym]={ym,rev:num(v[2]),ex:num(v[3]),gst:num(v[4]),pk:num(v[5]),nv:num(v[6]),ot:num(v[7]),dc:num(v[8]),rec:String(v[9]||''),days,note:String(v[12]||'')}});
+    ADV=o;
+  }catch(e){}
+  finally{advBusy=false}
+  if(typeof cf!=='undefined'&&cf==='cash')render()}
+const advNew=ym=>{const a=ADV[ym],m=MF[ym]||{};return !!a&&m.advSig!==advSig(a)};
+function advDays(ym){const a=ADV[ym];if(!a)return[];const gst=!!CFG.gst,out=[],app={};
+  entries.forEach(e=>{if(e.x||e.ln)return;app[e.d]=(app[e.d]||0)+gInc(e).n});
+  Object.keys(a.days).sort().forEach(d=>{const exp=gst?Math.round(a.days[d]/1.1*100)/100:a.days[d],got=Math.round((app[d]||0)*100)/100;
+    if(!got)out.push({d,t:'Missing in app · advice '+A(exp)+' excl'});
+    else if(Math.abs(got-exp)>0.06)out.push({d,t:'App '+A(got)+' · advice '+A(exp)+' excl'})});
+  Object.keys(app).sort().forEach(d=>{if(!(d in a.days)&&info(d).ym===ym&&app[d]>0.005)out.push({d,t:'In app ('+A(Math.round(app[d]*100)/100)+') · not in advice'})});
+  return out.sort((x,y)=>x.d<y.d?-1:1)}
+document.getElementById('mf_c').insertAdjacentHTML('afterend','<div class="mfc" id="mf_adv" style="display:none"></div>');
+function advPaint(){const box=$('mf_adv'),a=ADV[mfCur];if(!a){box.style.display='none';return}
+  const bad=advDays(mfCur),n=Object.keys(a.days).length;
+  box.innerHTML='<b>Payment advice'+(advNew(mfCur)?' · filled in below':'')+'</b><br>Revenue '+A(a.rev)+' · direct credit '+A(a.dc)+'<br>'+(bad.length?'<span class="cr">'+bad.length+' day'+(bad.length>1?'s':'')+' to check of '+n+':</span><br>'+bad.slice(0,10).map(x=>dAU(x.d)+' · '+x.t).join('<br>')+(bad.length>10?'<br>+'+(bad.length-10)+' more':''):'<span class="cg">✔ All '+n+' days match the daily income</span>')+(a.note?'<br><small>'+esc(a.note)+'</small>':'');
+  box.style.display=''}
+(function(){const o=openMf;openMf=function(ym){o(ym);const a=ADV[ym];
+  if(advNew(ym)){const ex=a.ex||(CFG.gst?Math.round(a.rev/1.1*100)/100:a.rev);$('mf_ex').value=ex;$('mf_in').value=a.rev;$('mf_dPk').value=a.pk||'';$('mf_dNv').value=a.nv||'';$('mf_dOt').value=a.ot||'';
+    if(!MF[ym]||!MF[ym].recDate){$('mf_ra').value=a.dc||'';$('mf_rd').value=(a.rec||'').slice(0,10)}mfChk()}
+  advPaint()};
+  const r=mfRead;mfRead=function(){const m=r();const a=ADV[mfCur];if(a)m.advSig=advSig(a);return m};
+  const c=cashView;cashView=function(){c();document.querySelectorAll('#earn [data-mf]').forEach(b=>{const ym=b.dataset.mf,m=MF[ym]||{};
+    if(advNew(ym)&&!m.recDate){const sm=b.querySelector('small');if(sm){sm.textContent='Payment advice received · tap to apply';sm.className='cg'}}})};
+  const _l=loadSheet;loadSheet=async function(){const r=await _l.apply(this,arguments);loadAdvice();return r};
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(loadAdvice,1200)});
+  setInterval(loadAdvice,600000);setTimeout(loadAdvice,4000)})();
 render();
 </script>
 </body>
