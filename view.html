@@ -783,7 +783,7 @@ const fyOf=ym=>{const Y=+ym.slice(0,4),M=+ym.slice(5);return M>=7?Y+1:Y}; /* Aus
 const BIZ_YM='2026-10',BIZ_FY=2027; /* business started 28-Sep-2026 = Mainfreight October week 1 */
 function info(ds,nm){const d=new Date(ds+'T00:00');const m=new Date(d);m.setDate(d.getDate()-((d.getDay()+6)%7));
   const th=new Date(m);th.setDate(m.getDate()+6);let ym=iso(th).slice(0,7),y,w=Math.floor((th.getDate()-1)/7)+1; /* a week belongs to the month it ends in: the week containing the 1st is that month's Week 1 */
-  if(nm){const t=new Date(th.getFullYear(),th.getMonth()+1,1);ym=iso(t).slice(0,7);w=1}
+  if(nm){const tq=new Date(m);tq.setDate(m.getDate()+3);const t=new Date(tq.getFullYear(),tq.getMonth()+1,1);ym=iso(t).slice(0,7);w=1} /* 'Next month' is counted from the week's Thursday month, as before, so entries already flagged keep their month */
   y=fyOf(ym);return{ds,ym,y,w}}
 const sum=l=>{const de=l.reduce((a,e)=>a+(e.a!==undefined?e.a:(e.del||0)),0),pu=l.reduce((a,e)=>a+(e.pu||0),0);return[de,pu]};
 const sumX=l=>{let r=0,sa=0,p=0;l.forEach(e=>{if(e.x){const c=e.cat||'';if(/repayment|\(ATO\)/i.test(c))p+=e.x;else if(/^(salary|superannuation)/i.test(c))sa+=e.x;else r+=e.x}});return[r,sa,p]};
@@ -1284,7 +1284,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 29 Oct 2026, 13:10 (Week ends in month)</div></div>`}
+<div class="hint">App version: 29 Oct 2026, 13:30 (Week rule fix)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
