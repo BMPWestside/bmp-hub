@@ -1293,7 +1293,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 31 Oct 2026, 23:30 (Logo removed from Income/Expenses)</div></div>`}
+<div class="hint">App version: 31 Oct 2026, 23:30 (Weekly card on Day tab only)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -2233,7 +2233,7 @@ function basHtml(){const cur=info(todayK()).ym,L=[];let q=cur;for(let i=0;i<3;i+
 <div class="two2"><button type="button" class="mini" data-bas="copy" data-q="${b.qe}">Copy figures</button>${pd?`<button type="button" class="mini" data-bas="undo" data-q="${b.qe}">Undo paid</button>`:`<button type="button" class="mini" data-bas="paid" data-q="${b.qe}">Mark paid</button>`}</div></div>`}).join('')}
 <div class="pfn">Amounts are estimates from your entries for the quarter. Mark paid adds the GST and PAYG payments to your expenses (they are not counted as profit). Check with your accountant before lodging.</div></div>`}
 (function(){const c=cashView;cashView=function(){c();const e=$('earn');if(e&&!window.BMP_VIEW)e.insertAdjacentHTML('beforeend',taxHtml()+basHtml())};
-  const r=render;render=function(){r();if(cf==='inc'&&$('earn')&&!$('wkc'))$('earn').insertAdjacentHTML('beforeend',wkHtml())};window.render=render})();
+  const r=render;render=function(){r();const w=$('wkc'),on=cf==='inc'&&CV==='day';if(w&&!on)w.remove();else if(on&&!w&&$('earn'))$('earn').insertAdjacentHTML('beforeend',wkHtml())};window.render=render})();
 document.addEventListener('click',ev=>{const t=ev.target,x=t.closest&&t.closest('[data-tx],[data-txdel],[data-bas]');if(!x||window.BMP_VIEW)return;
   if(x.dataset.tx==='add'){const a=parseFloat($('tx_a').value),d=$('tx_d').value||todayK();if(!(a>0))return;ST.tax.push({id:'t'+Date.now(),d,a:Math.round(a*100)/100});saveX();render();return}
   if(x.dataset.tx==='fill'){const cur=info(todayK()).ym,fy=fyOf(cur),Y=agg(e=>info(e.d,e.nm).y===fy),done=ST.tax.filter(t=>fyOf(info(t.d).ym)===fy).reduce((a,t)=>a+(+t.a||0),0),g=Math.max(0,Y.P)*(+CFG.tax||0)/100-done;if(g>0)$('tx_a').value=g.toFixed(2);return}
