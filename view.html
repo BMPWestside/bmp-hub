@@ -724,6 +724,7 @@ html body #cft,html body #rkt,html body #tlt,html body #cvb{padding:4px!importan
 .chr span{min-width:0}.chr em{font-style:normal;color:#F5D6A6;font-weight:700}.chr .x{color:#ff8da1;padding:0 4px}
 .chx{color:#ff8da1;padding:0 4px;cursor:pointer}.basq{padding:6px 0;border-top:1px solid var(--edge)}.basq:first-of-type{border-top:0}.basq small{font-size:10.5px;margin-left:4px}
 .card.cc>.pfh{cursor:pointer;display:flex;justify-content:space-between;align-items:center}.card.cc>.pfh::after{content:'';width:8px;height:8px;border-right:2px solid #F5D6A6;border-bottom:2px solid #F5D6A6;transform:rotate(45deg);margin:0 4px 3px 8px;transition:transform .2s}.card.cc.shut>.pfh::after{transform:rotate(-45deg);margin-bottom:0}.card.cc.shut>*:not(.pfh){display:none}
+#wkc{padding:7px 10px}#wkc .pfh{font-size:11px;margin:0 0 3px}#wkc .pfr{font-size:11.5px;padding:2px 0;line-height:1.25}#wkc .pfr.h{font-size:9.5px}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1292,7 +1293,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 31 Oct 2026, 23:30 (Collapsible Cash cards)</div></div>`}
+<div class="hint">App version: 31 Oct 2026, 23:30 (Weekly card moved, compact)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -2213,7 +2214,7 @@ function wkStat(r){const L=entries.filter(e=>e.d>=r[0]&&e.d<=r[1]&&!e.ln),a=agg(
   return{inc:a.I,exp:a.X,pro:a.P,del,pu,days:days.size}}
 function wkHtml(){const t=wkStat(wkRng(0)),p=wkStat(wkRng(-1)),dl=(a,b)=>{const d=a-b;if(!b&&!a)return'-';return `<span class="${d<0?'cr':'cg'}">${d<0?'▼':'▲'} ${kN(Math.abs(d))}</span>`};
   const row=(l,k,neg)=>`<div class="pfr"><span>${l}</span><span>${kN(t[k])}</span><span>${kN(p[k])}</span>${neg?(t[k]-p[k]===0?'<span>-</span>':`<span class="${t[k]>p[k]?'cr':'cg'}">${t[k]>p[k]?'▲':'▼'} ${kN(Math.abs(t[k]-p[k]))}</span>`):dl(t[k],p[k])}</div>`;
-  const r=wkRng(0);return `<div class="card pf" id="wkc"><div class="pfh">This week · ${dAU(r[0])} to ${dAU(r[1])}</div><div class="pfr h"><span></span><span>This week</span><span>Last week</span><span>Change</span></div>${row('Income','inc')}${row('Deliveries','del')}${row('Pickups','pu')}${row('Expenses','exp',1)}${row('Profit','pro')}<div class="pfr"><span>Days worked</span><span>${t.days}</span><span>${p.days}</span><span>${t.days===p.days?'-':(t.days>p.days?'▲ ':'▼ ')+Math.abs(t.days-p.days)}</span></div><div class="pfn">Amounts exclude GST.</div></div>`}
+  const r=wkRng(0);return `<div class="card pf" id="wkc"><div class="pfh">This week · ${dAU(r[0])} to ${dAU(r[1])}</div><div class="pfr h"><span></span><span>This week</span><span>Last week</span><span>Change</span></div>${row('Income','inc')}${row('Deliveries','del')}${row('Pickups','pu')}${row('Expenses','exp',1)}${row('Profit','pro')}<div class="pfr"><span>Days</span><span>${t.days}</span><span>${p.days}</span><span>${t.days===p.days?'-':(t.days>p.days?'▲ ':'▼ ')+Math.abs(t.days-p.days)}</span></div></div>`}
 function taxHtml(){const cur=info(todayK()).ym,fy=fyOf(cur),Y=agg(e=>info(e.d,e.nm).y===fy),M=agg(e=>info(e.d,e.nm).ym===cur),rate=(+CFG.tax||0)/100;
   const should=Math.max(0,Y.P)*rate,list=ST.tax.filter(t=>fyOf(info(t.d).ym)===fy).sort((a,b)=>a.d<b.d?1:-1),done=list.reduce((a,t)=>a+(+t.a||0),0),gap=should-done;
   return `<div class="card pf" id="txc"><div class="pfh">Company tax set-aside tracker · FY${String(fy).slice(2)}</div>
@@ -2232,7 +2233,7 @@ function basHtml(){const cur=info(todayK()).ym,L=[];let q=cur;for(let i=0;i<3;i+
 <div class="two2"><button type="button" class="mini" data-bas="copy" data-q="${b.qe}">Copy figures</button>${pd?`<button type="button" class="mini" data-bas="undo" data-q="${b.qe}">Undo paid</button>`:`<button type="button" class="mini" data-bas="paid" data-q="${b.qe}">Mark paid</button>`}</div></div>`}).join('')}
 <div class="pfn">Amounts are estimates from your entries for the quarter. Mark paid adds the GST and PAYG payments to your expenses (they are not counted as profit). Check with your accountant before lodging.</div></div>`}
 (function(){const c=cashView;cashView=function(){c();const e=$('earn');if(e&&!window.BMP_VIEW)e.insertAdjacentHTML('beforeend',taxHtml()+basHtml())};
-  const r=render;render=function(){r();if(cf==='inc'&&$('cft')&&!$('wkc'))$('cft').insertAdjacentHTML('afterend',wkHtml())};window.render=render})();
+  const r=render;render=function(){r();if(cf==='inc'&&$('earn')&&!$('wkc'))$('earn').insertAdjacentHTML('beforeend',wkHtml())};window.render=render})();
 document.addEventListener('click',ev=>{const t=ev.target,x=t.closest&&t.closest('[data-tx],[data-txdel],[data-bas]');if(!x||window.BMP_VIEW)return;
   if(x.dataset.tx==='add'){const a=parseFloat($('tx_a').value),d=$('tx_d').value||todayK();if(!(a>0))return;ST.tax.push({id:'t'+Date.now(),d,a:Math.round(a*100)/100});saveX();render();return}
   if(x.dataset.tx==='fill'){const cur=info(todayK()).ym,fy=fyOf(cur),Y=agg(e=>info(e.d,e.nm).y===fy),done=ST.tax.filter(t=>fyOf(info(t.d).ym)===fy).reduce((a,t)=>a+(+t.a||0),0),g=Math.max(0,Y.P)*(+CFG.tax||0)/100-done;if(g>0)$('tx_a').value=g.toFixed(2);return}
