@@ -723,6 +723,7 @@ html body #cft,html body #rkt,html body #tlt,html body #cvb{padding:4px!importan
 .chr{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 10px;border-radius:10px;border:1px solid var(--edge);background:rgba(70,130,215,.12);font:inherit;font-size:13.5px;color:#fff;width:100%;text-align:left}
 .chr span{min-width:0}.chr em{font-style:normal;color:#F5D6A6;font-weight:700}.chr .x{color:#ff8da1;padding:0 4px}
 .chx{color:#ff8da1;padding:0 4px;cursor:pointer}.basq{padding:6px 0;border-top:1px solid var(--edge)}.basq:first-of-type{border-top:0}.basq small{font-size:10.5px;margin-left:4px}
+.card.cc>.pfh{cursor:pointer;display:flex;justify-content:space-between;align-items:center}.card.cc>.pfh::after{content:'';width:8px;height:8px;border-right:2px solid #F5D6A6;border-bottom:2px solid #F5D6A6;transform:rotate(45deg);margin:0 4px 3px 8px;transition:transform .2s}.card.cc.shut>.pfh::after{transform:rotate(-45deg);margin-bottom:0}.card.cc.shut>*:not(.pfh){display:none}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1291,7 +1292,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 31 Oct 2026, 23:00 (Sync CHEP, BAS helper, tax tracker, weekly card)</div></div>`}
+<div class="hint">App version: 31 Oct 2026, 23:30 (Collapsible Cash cards)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -2243,6 +2244,16 @@ document.addEventListener('click',ev=>{const t=ev.target,x=t.closest&&t.closest(
     const note='BAS '+b.ql+' '+b.qy+' (BMP Hub)',d=todayK();if(b.net>0.004)entries.push({d,del:0,pu:0,nm:false,x:Math.round(b.net*100)/100,cat:'BAS / GST payment (ATO)',note});if(b.w2>0.004)entries.push({d,del:0,pu:0,nm:false,x:Math.round(b.w2*100)/100,cat:'PAYG withholding (ATO)',note});
     ST.bas[q]={d,a:Math.round(b.pay*100)/100};persist();saveX();autoSync();render()}
   else if(x.dataset.bas==='undo'){const note='BAS '+b.ql+' '+b.qy+' (BMP Hub)';entries.filter(e=>e.x&&e.note===note).forEach(removeEntry);delete ST.bas[q];persist();saveX();autoSync();render()}});
+
+/* ===== collapsible Cash cards ===== */
+let CCS={};try{CCS=JSON.parse(localStorage.getItem('ccs')||'{}')||{}}catch(e){}
+const ccKey=c=>c.id==='txc'?'tax':c.id==='basc'?'bas':'n30';
+function ccApply(){document.querySelectorAll('#earn .card.pf').forEach(c=>{const h=c.querySelector('.pfh');if(!h)return;
+  if(c.id!=='txc'&&c.id!=='basc'&&!/^next 30 days/i.test(h.textContent.trim()))return;
+  c.classList.add('cc');c.classList.toggle('shut',!!CCS[ccKey(c)]);h.dataset.cc='1';h.setAttribute('role','button')})}
+(function(){const c=cashView;cashView=function(){c();ccApply()}})();
+document.addEventListener('click',ev=>{const h=ev.target.closest&&ev.target.closest('.pfh[data-cc]');if(!h)return;const c=h.closest('.card');if(!c)return;
+  const k=ccKey(c);CCS[k]=!CCS[k];try{localStorage.setItem('ccs',JSON.stringify(CCS))}catch(e){}c.classList.toggle('shut',!!CCS[k])});
 render();
 </script>
 </body>
