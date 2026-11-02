@@ -759,7 +759,7 @@ html body #cft,html body #rkt,html body #tlt,html body #cvb{padding:4px!importan
       </div>
       <div class="fg" id="expf" style="display:none">
         <label>Expense amount<div class="cur"><span>A$</span><input id="ex" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00"></div></label>
-        <label>Expense category<select id="cat"><option>Fuel</option><option>Tolls</option><option>Parking</option><option>Tyres</option><option>Maintenance &amp; repairs</option><option>Truck Wash</option><option>Registration &amp; CTP</option><option>Truck &amp; public liability insurance</option><option>Insurance</option><option>Truck Repayment</option><option>Car Repayment</option><option>Salary</option><option>Superannuation</option><option>Superannuation - extra</option><option>Accounting fees</option><option>ASIC fees</option><option>Bank fees</option><option>Phone &amp; software</option><option>PPE &amp; uniform</option><option>PAYG withholding (ATO)</option><option>BAS / GST payment (ATO)</option><option>Company tax (ATO)</option><option>Other</option></select></label>
+        <label>Expense category<select id="cat"><option>Fuel</option><option>Tolls</option><option>Parking</option><option>Tyres</option><option>Maintenance &amp; repairs</option><option>Truck Wash</option><option>Registration &amp; CTP</option><option>Truck &amp; public liability insurance</option><option>Insurance</option><option>Worker’s Insurance</option><option>Truck Repayment</option><option>Car Repayment</option><option>Salary</option><option>Superannuation</option><option>Superannuation - extra</option><option>Accounting fees</option><option>ASIC fees</option><option>Bank fees</option><option>Phone &amp; software</option><option>PPE &amp; uniform</option><option>PAYG withholding (ATO)</option><option>BAS / GST payment (ATO)</option><option>Company tax (ATO)</option><option>Other</option></select></label>
         <label>Note (optional)<input id="note" type="text" maxlength="60" placeholder="e.g. BP Rocklea"></label>
       </div>
       <div class="fg" id="lnf" style="display:none">
@@ -1293,7 +1293,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 31 Oct 2026, 23:30 (Weekly card on Day tab only)</div></div>`}
+<div class="hint">App version: 31 Oct 2026, 23:30 (Worker’s Insurance category)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
