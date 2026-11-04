@@ -1294,7 +1294,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='5 Nov 2026, 10:55 (Preview colours, bottom bar gap fixed)';
+const APPV='5 Nov 2026, 11:10 (Face ID waits for opening animation)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -1456,7 +1456,7 @@ function showLock(mode,title,cb){lkMode=mode;lkBuf='';lkTmp='';lkCb=cb||null;$('
   if(fid)$('lkt').textContent='BMP Hub is locked';
   $('lkf').style.display=fid?'block':'none';$('lkpin').style.display=fid?'block':'none';$('lkp').style.display=fid?'none':'';$('lkd').style.display=fid?'none':'';
   $('lkc').style.display=mode==='unlock'?'none':'block';$('lockov').style.display='flex';
-  if(fid)setTimeout(()=>{try{lkFid()}catch(e){}},window.__opn?2500:350)}
+  if(fid)setTimeout(()=>{try{lkFid()}catch(e){}},window.__opn?4800:350)}
 const hideLock=()=>{$('lockov').style.display='none';document.documentElement.classList.remove('locked');if(window.opnDone)window.opnDone()};
 $('lkc').onclick=()=>{$('lockov').style.display='none'};
 $('lkp').onclick=async ev=>{const b=ev.target.closest('[data-k]');if(!b)return;const k=b.dataset.k;
@@ -2356,7 +2356,7 @@ document.addEventListener('click',ev=>{const h=ev.target.closest&&ev.target.clos
     T.forEach(clearTimeout);at(reduce?100:650,()=>finish(true))};
   window.opnFail=function(){finish(false)};
   o.classList.add('run');
-  const t1=reduce?200:2500;
+  const t1=reduce?200:4000;
   at(t1,()=>{
     if(fid){o.classList.add('up');o.querySelector('.fid').classList.add('on')}
     else if(locked){finish(false)}
