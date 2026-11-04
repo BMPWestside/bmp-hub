@@ -1222,6 +1222,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
+const APPV='4 Nov 2026, 21:50 (Employee categories)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -1297,7 +1298,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 31 Oct 2026, 23:30 (Employee wages and super)</div></div>`}
+<div class="hint">App version: ${APPV}</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -2261,6 +2262,12 @@ function ccApply(){document.querySelectorAll('#earn .card.pf').forEach(c=>{const
 (function(){const c=cashView;cashView=function(){c();ccApply()}})();
 document.addEventListener('click',ev=>{const h=ev.target.closest&&ev.target.closest('.pfh[data-cc]');if(!h)return;const c=h.closest('.card');if(!c)return;
   const k=ccKey(c);CCS[k]=!CCS[k];try{localStorage.setItem('ccs',JSON.stringify(CCS))}catch(e){}c.classList.toggle('shut',!!CCS[k])});
+
+/* ===== auto-update: if a newer copy is online, reload once ===== */
+(function(){if(!/^https?:/.test(location.protocol))return;
+  const chk=async()=>{try{const t=await (await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'})).text(),m=/const APPV='([^']+)'/.exec(t);
+    if(m&&m[1]!==APPV){const k='rl_'+m[1];if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');location.reload()}}catch(e){}};
+  setTimeout(chk,2500);document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(chk,800)})})();
 render();
 </script>
 </body>
