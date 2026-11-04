@@ -795,6 +795,9 @@ html body #f:has(.seg.on[data-m="exp"]) input:not([type=checkbox]),html body #f:
 html body #earn.xm .hd.h,html body #earn.xm .dn,html body #rep.xrd .hd.h,html body #rep.xrd .dn{background:rgba(228,0,43,.16)!important;border-color:rgba(255,110,135,.4)!important}
 html body #earn.xm .cf:not(.zq):not(.t),html body #rep.xrd .cf:not(.zq):not(.t){background:rgba(228,0,43,.14)!important;border-color:rgba(255,110,135,.35)!important}
 html body #earn.xm .cf.t:not(.zq),html body #rep.xrd .cf.t:not(.zq){background:rgba(228,0,43,.14)!important;border-color:rgba(255,160,175,.95)!important}
+
+/* bottom safe area: only pad for the part of the home indicator that lies inside the page */
+@media (max-width:999px){html body .card.tabs{padding-bottom:max(8px,calc(env(safe-area-inset-bottom,0px) - var(--bgap,0px)))!important;background:rgba(4,12,28,.94)!important}}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1295,7 +1298,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='5 Nov 2026, 11:10 (Face ID waits for opening animation)';
+const APPV='5 Nov 2026, 11:40 (Face ID delay fix, bottom gap)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -1371,7 +1374,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: ${APPV}</div></div>`}
+<div class="hint">App version: ${APPV}<br>Screen ${screen.width}x${screen.height}, view ${innerWidth}x${innerHeight}, bottom gap ${getComputedStyle(document.documentElement).getPropertyValue('--bgap')||0}</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -1457,7 +1460,7 @@ function showLock(mode,title,cb){lkMode=mode;lkBuf='';lkTmp='';lkCb=cb||null;$('
   if(fid)$('lkt').textContent='BMP Hub is locked';
   $('lkf').style.display=fid?'block':'none';$('lkpin').style.display=fid?'block':'none';$('lkp').style.display=fid?'none':'';$('lkd').style.display=fid?'none':'';
   $('lkc').style.display=mode==='unlock'?'none':'block';$('lockov').style.display='flex';
-  if(fid)setTimeout(()=>{try{lkFid()}catch(e){}},window.__opn?4800:350)}
+  if(fid)setTimeout(()=>{try{lkFid()}catch(e){}},document.getElementById('opn')?4800:350)}
 const hideLock=()=>{$('lockov').style.display='none';document.documentElement.classList.remove('locked');if(window.opnDone)window.opnDone()};
 $('lkc').onclick=()=>{$('lockov').style.display='none'};
 $('lkp').onclick=async ev=>{const b=ev.target.closest('[data-k]');if(!b)return;const k=b.dataset.k;
@@ -2370,6 +2373,8 @@ document.addEventListener('click',ev=>{const h=ev.target.closest&&ev.target.clos
 })();
 
 (function(){try{const u=document.querySelector('.topwrap img.lg');if(u&&u.src)document.documentElement.style.setProperty('--wm','url("'+u.src+'")')}catch(e){}})();
+
+(function(){const m=()=>{try{const g=Math.round(screen.height-innerHeight);document.documentElement.style.setProperty('--bgap',(innerHeight<innerWidth||g<8||g>120?0:g)+'px')}catch(e){}};m();addEventListener('resize',m);addEventListener('orientationchange',()=>setTimeout(m,300))})();
 render();
 </script>
 </body>
