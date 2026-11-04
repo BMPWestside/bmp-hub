@@ -760,7 +760,8 @@ html body #cft,html body #rkt,html body #tlt,html body #cvb{padding:4px!importan
       </div>
       <div class="fg" id="expf" style="display:none">
         <label>Expense amount<div class="cur"><span>A$</span><input id="ex" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00"></div></label>
-        <label>Expense category<select id="cat"><option>Fuel</option><option>Tolls</option><option>Parking</option><option>Tyres</option><option>Maintenance &amp; repairs</option><option>Truck Wash</option><option>Registration &amp; CTP</option><option>Truck &amp; public liability insurance</option><option>Insurance</option><option>Worker’s Insurance</option><option>Truck Repayment</option><option>Car Repayment</option><option>Salary</option><option>Superannuation</option><option>Superannuation - extra</option><option>Accounting fees</option><option>ASIC fees</option><option>Bank fees</option><option>Phone &amp; software</option><option>PPE &amp; uniform</option><option>PAYG withholding (ATO)</option><option>BAS / GST payment (ATO)</option><option>Company tax (ATO)</option><option>Other</option></select></label>
+        <label>Expense category<select id="cat"><option>Fuel</option><option>Tolls</option><option>Parking</option><option>Tyres</option><option>Maintenance &amp; repairs</option><option>Truck Wash</option><option>Registration &amp; CTP</option><option>Truck &amp; public liability insurance</option><option>Insurance</option><option>Worker’s Insurance</option><option>Employee Wages</option><option>Employee Super</option><option>Truck Repayment</option><option>Car Repayment</option><option>Salary</option><option>Superannuation</option><option>Superannuation - extra</option><option>Accounting fees</option><option>ASIC fees</option><option>Bank fees</option><option>Phone &amp; software</option><option>PPE &amp; uniform</option><option>PAYG withholding (ATO)</option><option>BAS / GST payment (ATO)</option><option>Company tax (ATO)</option><option>Other</option></select></label>
+        <label id="whl" style="display:none">Tax withheld (PAYG) from her pay<div class="cur"><span>A$</span><input id="wh" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00"></div></label>
         <label>Note (optional)<input id="note" type="text" maxlength="60" placeholder="e.g. BP Rocklea"></label>
       </div>
       <div class="fg" id="lnf" style="display:none">
@@ -999,12 +1000,14 @@ function setMode(m){fm=m;$('sv').classList.toggle('inc',m==='inc');$('incf').sty
   document.querySelectorAll('#ftabs .seg').forEach(b=>b.classList.toggle('on',b.dataset.m===m));fit()}
 $('ftabs').onclick=ev=>{const b=ev.target.closest('[data-m]');if(b&&!editing)setMode(b.dataset.m)};
 function setEdit(e){editing=e;$('sv').textContent=e?'Update Entry':'Save Entry';$('cn').style.display=e?'block':'none';$('ftabs').classList.toggle('lock',!!e)}
-function clearForm(){['del','pu','oth','ex','note','lna','lnn'].forEach(i=>$(i).value='');$('othk').value='del';$('lnd').value='in';$('cm').value='';$('cat').selectedIndex=0;setMode('inc')}
+function clearForm(){['del','pu','oth','ex','note','lna','lnn'].forEach(i=>$(i).value='');$('othk').value='del';$('lnd').value='in';$('cm').value='';$('cat').selectedIndex=0;$('wh').value='';$('whl').style.display='none';setMode('inc')}
 function startEdit(e){
   clearForm();setEdit(e);$('date').value=e.d;setDay();
   if(e.x){setMode('exp');$('ex').value=e.x;
     if(e.cat&&![...$('cat').options].some(o=>o.value===e.cat)){const o=document.createElement('option');o.textContent=e.cat;$('cat').appendChild(o)}
-    if(e.cat)$('cat').value=e.cat;$('note').value=e.note||''}
+    if(e.cat)$('cat').value=e.cat;let nt=e.note||'';
+    if(/^employee wages/i.test(e.cat||'')){const m=/PAYG\s*([\d.]+)(?:\s*·\s*)?/i.exec(nt);if(m){$('wh').value=m[1];nt=nt.replace(m[0],'').trim()}$('whl').style.display=''}
+    $('note').value=nt}
   else if(e.ln){setMode('loan');$('lnd').value=e.ln<0?'out':'in';$('lna').value=Math.abs(e.ln);$('lnn').value=e.note||''}
   else{$('del').value=(e.a!==undefined?e.a:e.del)||'';$('pu').value=e.pu||''}
   $('cm').value=e.nm?'nm':'';
@@ -1012,7 +1015,8 @@ function startEdit(e){
   showTab('form');
 }
 function removeEntry(e){const i=entries.indexOf(e);if(i<0)return;entries.splice(i,1);if(e.s){pendingOps.push({sig:sig(e)});savePops()}persist()}
-$('cat').onchange=()=>{if($('cat').value==='Truck Repayment'&&$('ex').value==='')$('ex').value=TRUCK.monthly};
+$('cat').onchange=()=>{if($('cat').value==='Truck Repayment'&&$('ex').value==='')$('ex').value=TRUCK.monthly;$('whl').style.display=$('cat').value==='Employee Wages'?'':'none'};
+const expNote=()=>{const n=$('note').value.trim(),w=parseFloat($('wh').value)||0;return $('cat').value==='Employee Wages'&&w>0?('PAYG '+w.toFixed(2)+(n?' · '+n:'')):n};
 $('cn').onclick=()=>{clearForm();setEdit(null);say('');showTab('earn')};
 $('f').onsubmit=ev=>{
   ev.preventDefault();
@@ -1020,7 +1024,7 @@ $('f').onsubmit=ev=>{
   if(fm==='loan'){const a=parseFloat($('lna').value)||0;if(!(a>0)){say('Enter a loan amount.');return}
     en={d,del:0,pu:0,nm:false,ln:$('lnd').value==='out'?-a:a,note:$('lnn').value.trim()}}
   else if(fm==='exp'){const x=parseFloat($('ex').value)||0;if(!(x>0)){say('Enter an expense amount.');return}
-    en={d,del:0,pu:0,nm,x,cat:$('cat').value,note:$('note').value.trim()}}
+    en={d,del:0,pu:0,nm,x,cat:$('cat').value,note:expNote()}}
   else{if($('del').value===''&&$('pu').value===''&&$('oth').value===''){say('Enter deliveries or pickups.');return}
     const o=parseFloat($('oth').value)||0,ok=$('othk').value;
     en={d,del:(parseFloat($('del').value)||0)+(ok==='del'?o:0),pu:(parseFloat($('pu').value)||0)+(ok==='pu'?o:0),nm}}
@@ -1229,7 +1233,7 @@ const kN=n=>(n<0?'-':'')+'A$'+Math.abs(Math.round(n)).toLocaleString('en-AU');
 const todayK=()=>iso(new Date());
 /* GST: income entered ex-GST (default) or incl-GST; expenses entered incl-GST except GST-free categories */
 function gInc(e){const a=amt(e);if(!CFG.gst)return{n:a,g:0};if(CFG.incGst==='inc'){const n=a/1.1;return{n,g:a-n}}return{n:a,g:a*.1}}
-function gExp(e){const c=e.cat||'',rep=/repayment|\(ATO\)/i.test(c),free=rep||/^(salary|superannuation|registration|asic)/i.test(c);const g=(CFG.gst&&!free)?e.x/11:0;return{n:e.x-g,g,rep}}
+function gExp(e){const c=e.cat||'',rep=/repayment|\(ATO\)/i.test(c),free=rep||/^(salary|superannuation|employee (wages|super)|registration|asic)/i.test(c);const g=(CFG.gst&&!free)?e.x/11:0;return{n:e.x-g,g,rep}}
 function agg(f){let I=0,Ig=0,X=0,Xg=0;entries.forEach(e=>{if(e.ln||!f(e))return;if(e.x){const c=gExp(e);if(c.rep)return;X+=c.n;Xg+=c.g}else{const c=gInc(e);I+=c.n;Ig+=c.g}});return{I,Ig,X,Xg,P:I-X}}
 const qRange=ym=>{const Y=+ym.slice(0,4),M=+ym.slice(5),s=Math.floor((M-1)/3)*3;return[s,Y,MN[s]+'-'+MN[s+2]]};
 function proView(){
@@ -1294,7 +1298,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: 31 Oct 2026, 23:30 (Worker’s Insurance category)</div></div>`}
+<div class="hint">App version: 31 Oct 2026, 23:30 (Employee wages and super)</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -1337,7 +1341,7 @@ async function impBackup(f){if(!f)return;let j;try{j=JSON.parse(await f.text())}
 function fyData(fy){const L=entries.filter(e=>info(e.d,e.nm).y===fy);
   const months=[];for(let i=0;i<12;i++){const mm=(6+i)%12,yy=i<6?fy-1:fy,k=yy+'-'+String(mm+1).padStart(2,'0');if(k<BIZ_YM)continue;months.push([MN[mm]+' '+yy,agg(e=>info(e.d,e.nm).ym===k)])}
   const T=agg(e=>info(e.d,e.nm).y===fy),cats={},reps={};let sal=0,sup=0,truck=0;
-  L.forEach(e=>{if(!e.x)return;const c=e.cat||'Other',g=gExp(e),o=g.rep?reps:cats;(o[c]=o[c]||{t:0,g:0,n:0});o[c].t+=e.x;o[c].g+=g.g;o[c].n+=g.n;if(/^salary/i.test(c))sal+=e.x;if(/^superannuation/i.test(c))sup+=e.x;if(/^truck repayment/i.test(c))truck+=e.x});
+  L.forEach(e=>{if(!e.x)return;const c=e.cat||'Other',g=gExp(e),o=g.rep?reps:cats;(o[c]=o[c]||{t:0,g:0,n:0});o[c].t+=e.x;o[c].g+=g.g;o[c].n+=g.n;if(/^(salary|employee wages)/i.test(c))sal+=e.x;if(/^(superannuation|employee super)/i.test(c))sup+=e.x;if(/^truck repayment/i.test(c))truck+=e.x});
   const dl=entries.reduce((a,e)=>a+(e.ln||0),0),tp=entries.filter(e=>e.x&&/^truck repayment/i.test(e.cat||'')).reduce((a,e)=>a+e.x,0);
   const bas=basList(fy),setAside=ST.tax.filter(t=>fyOf(info(t.d).ym)===fy).reduce((a,t)=>a+(+t.a||0),0);
   return{bas,setAside,fy,months,T,cats:Object.entries(cats).sort((a,b)=>b[1].t-a[1].t),reps:Object.entries(reps),sal,sup,truck,dl,left:Math.max(0,TRUCK.price-TRUCK.deposit-tp),tax:Math.max(0,T.P)*CFG.tax/100}}
@@ -1719,7 +1723,9 @@ function mfDedSync(ym,m){const d=ym+'-15';
 function mfAmt(ym){const m=MF[ym]||{};return (+m.invInc>0?+m.invInc:mfCalc(ym).inc)-dedSum(m)}
 const isSal=e=>!!e.x&&/^salary\b/i.test(e.cat||'');
 const whRate=()=>{const g=+CFG.sal||0,n=+CFG.net||0;return g>0&&n>0&&n<g?(g-n)/g:0};
-const whOf=e=>isSal(e)?e.x*whRate():0;
+const isEmpW=e=>!!e.x&&/^employee wages/i.test(e.cat||'');
+const empWh=e=>{const m=/PAYG\s*([\d.,]+)/i.exec(e.note||'');return m?Math.min(e.x,parseFloat(m[1].replace(/,/g,''))||0):0};
+const whOf=e=>isSal(e)?e.x*whRate():isEmpW(e)?empWh(e):0;
 const netOf=a=>a*(1-whRate());
 const isPayg=e=>!!e.x&&/PAYG/i.test(e.cat||'');
 function paygHeld(){return Math.max(0,entries.reduce((a,e)=>a+whOf(e)-(isPayg(e)?e.x:0),0))}
@@ -1736,7 +1742,7 @@ function forecast(){const now=todayK(),cur=info(now).ym,t0=new Date(now+'T00:00'
   const Y=t0.getFullYear();[Y-1,Y,Y+1].forEach(y=>[3,6,9,12].forEach(q=>{const qe=y+'-'+pad2(q);if(qe<BIZ_YM)return;const due=(q===12?nextYm(nextYm(qe)):nextYm(qe))+'-28';if(due<now||due>ek)return;
     const qk=[qe,prevYm(qe),prevYm(prevYm(qe))],Q=agg(e=>qk.includes(info(e.d,e.nm).ym)),g=Q.Ig-Q.Xg;
     if(g>0&&!entries.some(e=>e.x&&/BAS/i.test(e.cat||'')&&e.d>qe+'-28'))ev.push({d:due,t:'BAS (GST estimate)',a:-g});
-    const pg=entries.filter(e=>isSal(e)&&qk.includes(info(e.d,e.nm).ym)).reduce((a,e)=>a+whOf(e),0);
+    const pg=entries.filter(e=>(isSal(e)||isEmpW(e))&&qk.includes(info(e.d,e.nm).ym)).reduce((a,e)=>a+whOf(e),0);
     if(pg>0&&!entries.some(e=>isPayg(e)&&e.d>qe+'-28'))ev.push({d:due,t:'PAYG withholding (BAS)',a:-pg})}));
   REM.forEach(r=>{if(r.d&&r.d>=now&&r.d<=ek)ev.push({d:r.d,t:r.n,a:0})});
   ev.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0);let bal=est(),low=null;ev.forEach(x=>{bal+=x.a;x.b=bal;if(bal<0&&!low)low=x.d});return{ev,low,end:bal}}
@@ -2205,7 +2211,7 @@ document.addEventListener('click',ev=>{const t=ev.target,msg=x=>{const e=$('ch_m
 
 /* ===== BAS helper, tax set-aside tracker, weekly summary ===== */
 function basQ(ym){const [qs,qy,ql]=qRange(ym),qk=[0,1,2].map(i=>iso(new Date(qy,qs+i,1)).slice(0,7)),qe=qk[2];
-  const Q=agg(e=>qk.includes(info(e.d,e.nm).ym)),sal=entries.filter(e=>isSal(e)&&qk.includes(info(e.d,e.nm).ym));
+  const Q=agg(e=>qk.includes(info(e.d,e.nm).ym)),sal=entries.filter(e=>(isSal(e)||isEmpW(e))&&qk.includes(info(e.d,e.nm).ym));
   const w1=sal.reduce((a,e)=>a+e.x,0),w2=sal.reduce((a,e)=>a+whOf(e),0),net=Q.Ig-Q.Xg,mo=qs+3;
   return{qe,qk,ql,qy,g1:Q.I+Q.Ig,ga:Q.Ig,gb:Q.Xg,net,w1,w2,pay:Math.max(0,net)+w2,due:(mo===12?nextYm(nextYm(qe)):nextYm(qe))+'-28'}}
 function basList(fy){const out=[];[fy-1+'-09',fy-1+'-12',fy+'-03',fy+'-06'].forEach(q=>{if(q>=BIZ_YM)out.push(basQ(q))});return out}
