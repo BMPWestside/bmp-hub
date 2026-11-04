@@ -811,6 +811,10 @@ html body .topwrap .ttl,html body .topwrap .ttl *{text-shadow:none!important}
 html body .topwrap .card.top,html body #gtg .card.top{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:linear-gradient(180deg,rgba(130,190,255,.16),rgba(36,103,214,.1))!important}
 html body .topwrap .card.top .ttl,html body .topwrap .card.top *{filter:none!important}
 html body .topwrap>.card.top:not(.top2){border-color:rgba(245,214,166,.45)!important}
+
+/* header rows: no entrance animation, no transform, no outer shadow (iOS left the first row soft after the slide-in) */
+html body .topwrap .card,html body #gtg,html body #gtg .card{animation:none!important;transition:none!important;transform:none!important;opacity:1!important}
+html body .topwrap>.card.top:not(.top2){box-shadow:inset 0 1px 0 rgba(255,255,255,.3)!important}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1311,7 +1315,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='5 Nov 2026, 13:10 (Crisp header, bottom bar as before)';
+const APPV='5 Nov 2026, 13:35 (Header without slide-in effect)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
