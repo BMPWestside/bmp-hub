@@ -805,6 +805,11 @@ html body .topwrap .ttl,html body .topwrap .ttl *{text-shadow:none!important}
   html.fitlow body .wrap{bottom:calc(-1px * var(--bgapn,0))!important}
   html.fitlow body .card.tabs{padding-bottom:max(8px,env(safe-area-inset-bottom,0px))!important}
 }
+
+/* crisp header rows: no filters or backdrop blur inside the fixed top rows (iOS renders them soft) */
+html body .topwrap .card.top,html body #gtg .card.top{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:linear-gradient(180deg,rgba(130,190,255,.16),rgba(36,103,214,.1))!important}
+html body .topwrap .card.top .ttl,html body .topwrap .card.top *{filter:none!important}
+html body .topwrap>.card.top:not(.top2){border-color:rgba(245,214,166,.45)!important}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1305,7 +1310,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='5 Nov 2026, 12:40 (Sharp header, bottom bar lowered)';
+const APPV='5 Nov 2026, 13:10 (Crisp header, bottom bar as before)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -1381,7 +1386,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
-<div class="hint">App version: ${APPV}<br>Screen ${screen.width}x${screen.height}, view ${innerWidth}x${innerHeight}, bottom gap ${getComputedStyle(document.documentElement).getPropertyValue('--bgap')||0}</div><button type="button" class="mini" id="fitb" style="margin-top:8px">Bottom bar: ${(()=>{try{return localStorage.getItem('fit')!=='0'}catch(e){return true}})()?'lowered (tap to undo)':'normal (tap to lower)'}</button></div>`}
+<div class="hint">App version: ${APPV}<br>Screen ${screen.width}x${screen.height}, view ${innerWidth}x${innerHeight}, bottom gap ${getComputedStyle(document.documentElement).getPropertyValue('--bgap')||0}</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
@@ -2383,7 +2388,7 @@ document.addEventListener('click',ev=>{const h=ev.target.closest&&ev.target.clos
 
 (function(){const get=()=>{try{return localStorage.getItem('fit')||'1'}catch(e){return'1'}};
 const m=()=>{try{const r=document.documentElement,sa=!!(navigator.standalone||matchMedia('(display-mode: standalone)').matches),port=innerHeight>innerWidth,g=Math.round(screen.height-innerHeight),ok=port&&g>=8&&g<=120;
-r.style.setProperty('--bgap',(ok?g:0)+'px');r.style.setProperty('--bgapn',ok?g:0);r.classList.toggle('fitlow',get()==='1'&&sa&&ok)}catch(e){}};
+r.style.setProperty('--bgap',(ok?g:0)+'px');r.style.setProperty('--bgapn',ok?g:0);r.classList.remove('fitlow')}catch(e){}};
 m();addEventListener('resize',m);addEventListener('orientationchange',()=>setTimeout(m,300));
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#fitb');if(!b)return;try{localStorage.setItem('fit',get()==='1'?'0':'1')}catch(x){}m();b.textContent=get()==='1'?'Bottom bar: lowered (tap to undo)':'Bottom bar: normal (tap to lower)'})})();
 render();
