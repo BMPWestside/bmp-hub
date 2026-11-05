@@ -823,6 +823,13 @@ html body .nb:not(#_):not(#__):not(#___){background:transparent!important;border
 html body button.mini:not(.dmdel):not(.dbx):not([id=db_add]):not(#_):not(#__):not(#___),html body button.go:not(#_):not(#__):not(#___),html body .tools-btn:not(#_):not(#__):not(#___),html body button.save.inc:not(#_):not(#__):not(#___),html body button.lk2:not(#_):not(#__):not(#___),html body button.dmb:not(.red):not(#_):not(#__):not(#___){background:linear-gradient(180deg,rgba(130,190,255,.2),rgba(36,103,214,.12))!important;border:0!important;box-shadow:inset 0 0 0 1px rgba(160,200,255,.6)!important;border-radius:14px!important}
 html body button.save:not(.inc):not(.alt):not(.del):not(#_):not(#__):not(#___),html body #gcard button:not(#_):not(#__):not(#___),html body button.mini.dmdel:not(#_):not(#__):not(#___),html body button.mini[id=db_add]:not(#_):not(#__):not(#___),html body button.save.del:not(#_):not(#__):not(#___),html body button.dmb.red:not(#_):not(#__):not(#___){background:linear-gradient(180deg,rgba(255,110,135,.26),rgba(228,0,43,.14))!important;border:0!important;box-shadow:inset 0 0 0 1px rgba(255,150,168,.85)!important;border-radius:14px!important}
 html body button.save.alt:not(#_):not(#__):not(#___){background:transparent!important;border:0!important;box-shadow:inset 0 0 0 1px rgba(160,200,255,.3)!important;border-radius:14px!important;color:var(--muted)!important}
+
+/* Trend charts: see-through glass bars with a thin outline */
+html body #rep .tv svg rect{fill-opacity:.3;stroke-width:1.2px;stroke-opacity:.95}
+html body #rep .tv svg rect[fill="#4dff9a"]{stroke:#4dff9a}
+html body #rep .tv svg rect[fill="#ff7a8a"]{stroke:#ff7a8a}
+html body #rep .tv svg circle{fill-opacity:.85}
+html body #rep .tv .lgd i{opacity:.55}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1323,7 +1330,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='5 Nov 2026, 14:30 (Buttons and tabs in bottom-bar style)';
+const APPV='5 Nov 2026, 15:00 (Transparent trend charts)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
