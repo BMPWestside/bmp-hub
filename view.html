@@ -868,7 +868,7 @@ html body #rep .tv .lgd i{opacity:.55}
       </div>
       <div class="fg" id="expf" style="display:none">
         <label>Expense amount<div class="cur"><span>A$</span><input id="ex" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00"></div></label>
-        <label>Expense category<select id="cat"><option>Fuel</option><option>Tolls</option><option>Parking</option><option>Tyres</option><option>Maintenance &amp; repairs</option><option>Truck Wash</option><option>Registration &amp; CTP</option><option>Truck &amp; public liability insurance</option><option>Insurance</option><option>Worker’s Insurance</option><option>Employee Wages</option><option>Employee Super</option><option>Truck Repayment</option><option>Car Repayment</option><option>Salary</option><option>Superannuation</option><option>Superannuation - extra</option><option>Accounting fees</option><option>ASIC fees</option><option>Bank fees</option><option>Phone &amp; software</option><option>PPE &amp; uniform</option><option>PAYG withholding (ATO)</option><option>BAS / GST payment (ATO)</option><option>Company tax (ATO)</option><option>Other</option></select></label>
+        <label>Expense category<select id="cat"><option>Fuel</option><option>Tolls</option><option>Parking</option><option>Tyres</option><option>Maintenance &amp; repairs</option><option>Truck Wash</option><option>Registration &amp; CTP</option><option>Truck &amp; public liability insurance</option><option>Insurance</option><option>Worker’s Insurance</option><option>Employee Wages</option><option>Employee Super</option><option>Truck Repayment</option><option>Car Repayment</option><option>Salary</option><option>Superannuation</option><option>Superannuation - extra</option><option>Accounting fees</option><option>ASIC fees</option><option>Bank fees</option><option>Phone &amp; software</option><option>Wyndham Asia membership</option><option>PPE &amp; uniform</option><option>PAYG withholding (ATO)</option><option>BAS / GST payment (ATO)</option><option>Company tax (ATO)</option><option>Other</option></select></label>
         <label id="whl" style="display:none">Tax withheld (PAYG) from her pay<div class="cur"><span>A$</span><input id="wh" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00"></div></label>
         <label>Note (optional)<input id="note" type="text" maxlength="60" placeholder="e.g. BP Rocklea"></label>
       </div>
@@ -1331,7 +1331,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='5 Nov 2026, 15:00 (Transparent trend charts)';
+const APPV='6 Nov 2026, 21:45 (Wyndham Asia membership, recurring with changing amount)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -1801,7 +1801,7 @@ const WD=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'
 function recHtml(){const cats=[...document.querySelectorAll('#cat option')].map(o=>o.value);
   const card=(r,i)=>{const w=r.freq==='w';return `<div class="rcr"><label class="f2">Name<input data-rc="${i}" data-f="n" value="${esc(r.n)}" placeholder="e.g. Truck repayment"></label><b data-rcdel="${i}">✕</b>
 <label class="f2">Category<select data-rc="${i}" data-f="cat">${cats.map(c=>`<option${c===r.cat?' selected':''}>${esc(c)}</option>`).join('')}</select></label>
-<label>Amount (A$)<input data-rc="${i}" data-f="amt" type="number" inputmode="decimal" step="0.01" value="${esc(r.amt)}" placeholder="0.00"></label>
+<label>Amount<select data-rc="${i}" data-f="ask"><option value=""${r.ask?'':' selected'}>Same every time</option><option value="1"${r.ask?' selected':''}>Changes each time (ask me)</option></select></label>${r.ask?'':`<label>Amount (A$, incl. GST)<input data-rc="${i}" data-f="amt" type="number" inputmode="decimal" step="0.01" value="${esc(r.amt)}" placeholder="0.00"></label>`}
 <label>Repeats<select data-rc="${i}" data-f="freq"><option value="m"${w?'':' selected'}>Every month</option><option value="w"${w?' selected':''}>Every week</option></select></label>
 ${w?`<label>On<select data-rc="${i}" data-f="wd">${[1,2,3,4,5,6,0].map(d=>`<option value="${d}"${+r.wd===d?' selected':''}>${WD[d]}</option>`).join('')}</select></label>`:`<label>Day of month<input data-rc="${i}" data-f="day" type="number" inputmode="numeric" min="1" max="28" value="${esc(r.day)}" placeholder="1-28"></label>`}
 <label>Starting<input data-rc="${i}" data-f="from" type="month" value="${esc(r.from)}"></label></div>`};
@@ -1811,12 +1811,12 @@ ${w?`<label>On<select data-rc="${i}" data-f="wd">${[1,2,3,4,5,6,0].map(d=>`<opti
 const rcSal=()=>RC.some(r=>r.freq==='w'&&/^salary/i.test(r.cat||'')&&+r.amt>0);
 function recOcc(r,now){if(r.freq==='w'){const d=new Date(now+'T00:00');d.setDate(d.getDate()-((d.getDay()-(+r.wd)+7)%7));return iso(d)}return now.slice(0,7)+'-'+pad2(Math.min(28,+r.day))}
 function recDone(r,k){if(r.freq==='w'){const lo=new Date(k+'T00:00'),hi=new Date(lo);lo.setDate(lo.getDate()-3);hi.setDate(hi.getDate()+3);return entries.some(e=>e.x&&e.cat===r.cat&&e.d>=iso(lo)&&e.d<=iso(hi))}return entries.some(e=>e.x&&e.cat===r.cat&&e.d.slice(0,7)===k.slice(0,7))}
-const recOk=r=>(+r.amt)&&r.cat&&(r.freq==='w'?(r.wd!==''&&r.wd!=null):+r.day);
+const recOk=r=>(+r.amt||r.ask)&&r.cat&&(r.freq==='w'?(r.wd!==''&&r.wd!=null):+r.day);
 function recDue(){const now=todayK(),out=[];
   RC.forEach((r,i)=>{if(!recOk(r))return;const k=recOcc(r,now);if(r.from&&k<r.from+'-01')return;if(k>now)return;if(r.freq==='w'&&k<PAY_START)return;if(recDone(r,k))return;out.push({i,d:k})});return out}
 const payDue0=payDue;payDue=function(){return rcSal()?null:payDue0()};
 const banners0=banners;
-banners=function(){return banners0()+recDue().map(o=>{const r=RC[o.i];return `<div class="al"><span>${esc(r.n||r.cat)} ${A(+r.amt)} due ${dAU(o.d)}</span><button type="button" data-act="rec" data-i="${o.i}" data-d="${o.d}">Log</button></div>`}).join('')};
+banners=function(){return banners0()+recDue().map(o=>{const r=RC[o.i];return r.ask?`<div class="al"><span>${esc(r.n||r.cat)} due ${dAU(o.d)}</span><input type="number" inputmode="decimal" step="0.01" id="rca${o.i}" placeholder="A$ amount" style="width:96px;font:inherit;font-size:13px;padding:5px 8px;border-radius:10px;border:1px solid rgba(255,190,70,.6);background:rgba(0,0,0,.3);color:#fff"><button type="button" data-act="rec" data-i="${o.i}" data-d="${o.d}">Log</button></div>`:`<div class="al"><span>${esc(r.n||r.cat)} ${A(+r.amt)} due ${dAU(o.d)}</span><button type="button" data-act="rec" data-i="${o.i}" data-d="${o.d}">Log</button></div>`}).join('')};
 /* cash */
 function mfCalc(ym){const a=agg(e=>info(e.d,e.nm).ym===ym);return{ex:a.I,inc:a.I+a.Ig}}
 const MFD=[['dPk','Truck Parking','Parking'],['dNv','Navman','Phone & software'],['dOt','Other','Other']];
@@ -1844,8 +1844,8 @@ function chk(m,c){const ex=+m.invEx||0,inc=+m.invInc||0;let d;if(ex>0)d=ex-c.ex;
 function forecast(){const now=todayK(),cur=info(now).ym,t0=new Date(now+'T00:00'),en=new Date(t0);en.setDate(en.getDate()+30);const ek=iso(en),ev=[];
   for(let d=new Date(t0);d<=en;d.setDate(d.getDate()+1)){const k=iso(d);if(d.getDay()===2&&k>=PAY_START&&!rcSal()){const lo=new Date(d),hi=new Date(d);lo.setDate(lo.getDate()-3);hi.setDate(hi.getDate()+3);
     if(!entries.some(e=>e.x&&/^salary/i.test(e.cat||'')&&e.d>=iso(lo)&&e.d<=iso(hi)))ev.push({d:k,t:'Salary + super',a:-(netOf(CFG.sal)+CFG.sup)})}}
-  [cur,nextYm(cur)].forEach(m=>RC.forEach(r=>{if(r.freq==='w'||!(+r.amt)||!(+r.day)||(r.from&&m<r.from))return;const dd=m+'-'+pad2(Math.min(28,+r.day));
-    if(entries.some(e=>e.x&&e.cat===r.cat&&e.d.slice(0,7)===m))return;if(dd>ek)return;if(dd<now&&m!==cur)return;ev.push({d:dd<now?now:dd,t:(r.n||r.cat)+(dd<now?' (due)':''),a:-(+r.amt)})}));
+  [cur,nextYm(cur)].forEach(m=>RC.forEach(r=>{if(r.freq==='w'||!(+r.amt||+r.last)||!(+r.day)||(r.from&&m<r.from))return;const dd=m+'-'+pad2(Math.min(28,+r.day));
+    if(entries.some(e=>e.x&&e.cat===r.cat&&e.d.slice(0,7)===m))return;if(dd>ek)return;if(dd<now&&m!==cur)return;ev.push({d:dd<now?now:dd,t:(r.n||r.cat)+(dd<now?' (due)':''),a:-(+r.amt||+r.last)})}));
   RC.forEach(r=>{if(r.freq!=='w'||!recOk(r))return;for(let d=new Date(t0);d<=en;d.setDate(d.getDate()+1)){const k=iso(d);if(d.getDay()!==+r.wd||(r.from&&k<r.from+'-01')||recDone(r,k))continue;ev.push({d:k,t:r.n||r.cat,a:-(/^salary\b/i.test(r.cat||'')?netOf(+r.amt):+r.amt)})}});
   for(let ym=BIZ_YM;ym<=cur;ym=nextYm(ym)){const m=MF[ym]||{};if(m.recDate)continue;const due=dueOf(ym);if(due>ek)continue;ev.push({d:due<now?now:due,t:'Mainfreight '+ymName(ym)+(ym===cur?' (so far)':''),a:mfAmt(ym)})}
   const Y=t0.getFullYear();[Y-1,Y,Y+1].forEach(y=>[3,6,9,12].forEach(q=>{const qe=y+'-'+pad2(q);if(qe<BIZ_YM)return;const due=(q===12?nextYm(nextYm(qe)):nextYm(qe))+'-28';if(due<now||due>ek)return;
@@ -1869,7 +1869,7 @@ function cashView(){const now=todayK(),cur=info(now).ym,e0=est(),ms=[];for(let y
   if(cf==='cash')cashView();else if(cf==='bills')$('earn').innerHTML=cftBar()+billsHtml();else{const c=$('cft');if(c)c.outerHTML=cftBar()}
   $('earn').classList.toggle('cash',cf==='cash');if(rk==='find'&&$('fr'))findPaint();fit()};window.render=render})();
 $('earn').addEventListener('click',ev=>{const t=ev.target;
-  const b=t.closest('[data-act="rec"]');if(b){const r=RC[+b.dataset.i];if(r){entries.push({d:b.dataset.d,del:0,pu:0,nm:false,x:+r.amt,cat:r.cat,note:r.n||''});persist();render();autoSync()}return}
+  const b=t.closest('[data-act="rec"]');if(b){const r=RC[+b.dataset.i];if(r){let am=+r.amt;if(r.ask){const f=$('rca'+b.dataset.i);am=f?Math.round((+f.value||0)*100)/100:0;if(!(am>0)){if(f)f.focus();return}r.last=am;saveX()}entries.push({d:b.dataset.d,del:0,pu:0,nm:false,x:am,cat:r.cat,note:r.n||''});persist();render();autoSync()}return}
   const m=t.closest('[data-mf]');if(m){openMf(m.dataset.mf);return}
   if(t.id==='bk_set'){const v=parseFloat($('bk_in').value);if(isNaN(v))return;BK.adj=0;BK.adj=v-est();saveX();render()}});
 /* invoice modal */
@@ -1903,7 +1903,7 @@ $('tools').addEventListener('click',ev=>{const t=ev.target;
   if(t.dataset.rcdel!==undefined){RC.splice(+t.dataset.rcdel,1);saveX();toolsView();render();return}
   if(t.dataset.bin!==undefined)binRestore(+t.dataset.bin)});
 $('tools').addEventListener('change',ev=>{const t=ev.target;if(t.dataset.rc===undefined)return;const r=RC[+t.dataset.rc],f=t.dataset.f;if(!r)return;
-  r[f]=(f==='amt'||f==='day'||f==='wd')?(t.value===''?'':+t.value):t.value;if(f==='freq'&&r.freq==='w'&&(r.wd===''||r.wd==null))r.wd=2;saveX();render();if(f==='freq')toolsView()});
+  r[f]=(f==='amt'||f==='day'||f==='wd')?(t.value===''?'':+t.value):(f==='ask'?(t.value?1:0):t.value);if(f==='freq'&&r.freq==='w'&&(r.wd===''||r.wd==null))r.wd=2;saveX();render();if(f==='freq'||f==='ask')toolsView()});
 /* reports: trend + find */
 let tm=null,fq='',ft='all',fmn='all';
 const rkBar=()=>`<div class="segs four" id="rkt">${[['inc','Income'],['exp','Expenses'],['trend','Trend'],['find','Find']].map(([k,n])=>`<button type="button" class="seg${rk===k?' on':''}" data-k="${k}">${n}</button>`).join('')}</div>`;
@@ -2412,6 +2412,8 @@ const m=()=>{try{const r=document.documentElement,sa=!!(navigator.standalone||ma
 r.style.setProperty('--bgap',(ok?g:0)+'px');r.style.setProperty('--bgapn',ok?g:0);r.classList.remove('fitlow')}catch(e){}};
 m();addEventListener('resize',m);addEventListener('orientationchange',()=>setTimeout(m,300));
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#fitb');if(!b)return;try{localStorage.setItem('fit',get()==='1'?'0':'1')}catch(x){}m();b.textContent=get()==='1'?'Bottom bar: lowered (tap to undo)':'Bottom bar: normal (tap to lower)'})})();
+
+(function(){if(window.BMP_VIEW)return;try{if(!jget('rcw',0)){if(!RC.some(r=>r.cat==='Wyndham Asia membership'))RC.push({n:'Wyndham Asia membership',cat:'Wyndham Asia membership',amt:'',ask:1,freq:'m',day:6,wd:2,from:'2026-11'});jset('rcw',1);saveX()}}catch(e){}})();
 render();
 </script>
 </body>
