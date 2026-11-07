@@ -1385,7 +1385,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='7 Nov 2026, 22:40 (Laptop: full-width tabs and pages)';
+const APPV='7 Nov 2026, 23:10 (Laptop: same tab size on every page)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -2497,11 +2497,13 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 /* laptop: every page is scaled to fit the screen height (no scrolling) */
 let lapBusy=false;
 function lapFit(){if(lapBusy)return;lapBusy=true;try{const sc=document.querySelector('.scroll'),p=document.querySelector('.panel.on');if(!p||!sc)return;
-  const W=innerWidth,zmax=W>=1800?1.5:W>=1400?1.28:W>=1100?1.12:.95,zmin=zmax*.5;document.querySelectorAll('.panel').forEach(x=>x.style.zoom='');sc.classList.remove('nofit');
-  const cs=getComputedStyle(sc),pad=(parseFloat(cs.paddingTop)||0)+(parseFloat(cs.paddingBottom)||0),gap=parseFloat(cs.rowGap)||8;
-  const others=()=>[...sc.children].filter(c=>c!==p&&c.offsetParent!==null&&getComputedStyle(c).position!=='fixed').reduce((a,c)=>a+c.getBoundingClientRect().height+gap,0);
-  const fits=z=>{p.style.zoom=z;return p.getBoundingClientRect().height<=sc.clientHeight-pad-others()-2};
-  if(!fits(zmax)){let lo=zmin,hi=zmax;for(let i=0;i<9;i++){const m=(lo+hi)/2;if(fits(m))lo=m;else hi=m}p.style.zoom=lo;}
+  const W=innerWidth,zmax=W>=1800?1.5:W>=1400?1.28:W>=1100?1.12:.95,zmin=zmax*.5;document.querySelectorAll('.panel,.panel .segs.ib').forEach(x=>x.style.zoom='');sc.classList.remove('nofit');
+  const cs=getComputedStyle(sc),pb=parseFloat(cs.paddingBottom)||0;sc.scrollTop=0;
+  const bars=[...p.querySelectorAll('.segs.ib')];
+  const top=()=>p.getBoundingClientRect().top-sc.getBoundingClientRect().top;
+  const setz=z=>{p.style.zoom=z;bars.forEach(b=>b.style.zoom=(zmax/z).toFixed(4))};
+  const fits=z=>{setz(z);return p.getBoundingClientRect().height+top()<=sc.clientHeight-pb-2};
+  if(!fits(zmax)){let lo=zmin,hi=zmax;for(let i=0;i<9;i++){const m=(lo+hi)/2;if(fits(m))lo=m;else hi=m}setz(lo)}
 }catch(e){}finally{lapBusy=false}}
 (function(){let t=null;const go=()=>{clearTimeout(t);t=setTimeout(()=>{try{fit()}catch(e){}},90)};
  setInterval(()=>{try{if(matchMedia('(min-width:900px) and (min-height:520px)').matches)lapFit()}catch(e){}},1200);document.addEventListener('click',go,true);document.addEventListener('change',go,true);addEventListener('resize',go);
