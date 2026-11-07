@@ -850,7 +850,6 @@ html body #rep .tv .lgd i{opacity:.55}
   html body .card.tabs.ib .bdg{position:absolute!important;top:50%!important;right:14px!important;transform:translateY(-50%);margin:0!important;min-width:20px;height:20px;line-height:20px;font-size:11px}
   html body .card.tabs.ib>.tab:not(.on):hover:not(#_):not(#__):not(#___){background:rgba(160,200,255,.1)!important;color:#fff!important}
   /* bigger pages */
-  html body .panel{zoom:1.12}
   html body .al input[id^=rca]{width:130px!important}
   html body .card.tabs.ib .ict{max-width:none!important;opacity:1!important;margin-left:0!important;font-size:16px!important;letter-spacing:0!important;font-weight:700}
   html body .card.tabs.ib>.tab{width:auto!important}
@@ -859,7 +858,10 @@ html body #rep .tv .lgd i{opacity:.55}
   html body #tools .segs.ib,html body #tools .segs{max-width:none!important}
   html body #tools #tlt .seg{font-size:13.5px!important}
   html body .panel .segs.ib{display:grid!important;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px!important;width:100%}
-  html body .panel .segs.ib>.seg{flex:none!important;width:auto!important;height:auto!important;min-height:50px;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important;padding:7px 6px!important;border-radius:14px!important}
+  html body .panel .segs.ib>.seg{flex:none!important;width:auto!important;height:auto!important;min-height:40px;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:8px!important;padding:6px 8px!important;border-radius:14px!important}
+  html body .panel .segs.ib>.seg .ico{width:18px!important;height:18px!important;flex:none}
+  html body #flogo{width:60px!important;height:60px!important}html body .flg{padding:2px 0 0!important;margin:0!important}
+  html body .dmlist{max-height:420px!important}html body .rcs{max-height:480px!important;min-height:0!important}html body .fres{max-height:420px!important}
   html body .panel .segs.ib>.seg .ict{max-width:none!important;opacity:1!important;margin:0!important;overflow:visible!important;text-overflow:clip!important;white-space:nowrap;font-size:14px!important}
   html body #tools .card .segs.ib,html body .card .segs.ib{max-width:560px!important;margin-left:auto!important;margin-right:auto!important}
   html body #tools .chbox .chlogo{width:150px!important;height:150px!important}
@@ -872,8 +874,7 @@ html body #rep .tv .lgd i{opacity:.55}
   html body .tab{font-size:16px!important}
 }
 @media (min-width:1000px) and (max-width:1249px) and (min-height:520px){html body .topwrap{grid-template-columns:1fr!important;gap:8px!important}}
-@media (min-width:1400px) and (min-height:520px){html body .panel{zoom:1.28}}
-@media (min-width:1800px) and (min-height:520px){html body .panel{zoom:1.5}html body .card.tabs{width:260px!important}html body .wrap{margin-left:260px!important}}
+@media (min-width:1800px) and (min-height:520px){html body .card.tabs{width:260px!important}html body .wrap{margin-left:260px!important}}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1374,7 +1375,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='7 Nov 2026, 20:30 (Safe sync: devices merge instead of overwrite)';
+const APPV='7 Nov 2026, 21:10 (Laptop: pages fit the screen)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -1812,7 +1813,7 @@ async function dbPdf(key){const J=window.jspdf;if(!J){alert('PDF tool is still l
   lhFoot(doc);const nm='BMP-Debts-'+(key?grp[names[0]].n.replace(/[^\w-]+/g,'_'):'Total')+'-'+todayK()+'.pdf';await shareFile(new File([doc.output('blob')],nm,{type:'application/pdf'}),nm)}
 /* keep sub-tab bars the same visual size whatever the panel zoom is */
 (function(){const _fit=fit;fit=function(){
-  try{if(matchMedia('(min-width:1000px) and (min-height:520px)').matches){document.querySelectorAll('.panel,.panel .segs[id]').forEach(x=>x.style.zoom='');document.querySelector('.scroll').classList.remove('nofit');return}}catch(e){}
+  try{if(matchMedia('(min-width:1000px) and (min-height:520px)').matches){lapFit();return}}catch(e){}
   try{const g=$('gcard');if(g&&g.style.display!=='none'&&!matchMedia('(min-width:1000px) and (min-height:520px)').matches){document.querySelectorAll('.panel,.panel .segs[id]').forEach(x=>x.style.zoom='');document.querySelector('.scroll').classList.remove('nofit');return}}catch(e){}
   const bars=()=>document.querySelectorAll('.panel .segs[id]');bars().forEach(b=>b.style.zoom='');
   _fit();
@@ -2482,6 +2483,19 @@ m();addEventListener('resize',m);addEventListener('orientationchange',()=>setTim
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#fitb');if(!b)return;try{localStorage.setItem('fit',get()==='1'?'0':'1')}catch(x){}m();b.textContent=get()==='1'?'Bottom bar: lowered (tap to undo)':'Bottom bar: normal (tap to lower)'})})();
 
 (function(){if(window.BMP_VIEW)return;try{if(!jget('rcw',0)){if(!RC.some(r=>r.cat==='Wyndham Asia membership'))RC.push({n:'Wyndham Asia membership',cat:'Wyndham Asia membership',amt:'',ask:1,freq:'m',day:6,wd:2,from:'2026-11'});jset('rcw',1);saveX(true)}}catch(e){}})();
+
+/* laptop: every page is scaled to fit the screen height (no scrolling) */
+let lapBusy=false;
+function lapFit(){if(lapBusy)return;lapBusy=true;try{const sc=document.querySelector('.scroll'),p=document.querySelector('.panel.on');if(!p||!sc)return;
+  const W=innerWidth,zmax=W>=1800?1.5:W>=1400?1.28:1.12;document.querySelectorAll('.panel').forEach(x=>x.style.zoom='');sc.classList.remove('nofit');
+  const cs=getComputedStyle(sc),pad=(parseFloat(cs.paddingTop)||0)+(parseFloat(cs.paddingBottom)||0),gap=parseFloat(cs.rowGap)||8;
+  const others=()=>[...sc.children].filter(c=>c!==p&&c.offsetParent!==null&&getComputedStyle(c).position!=='fixed').reduce((a,c)=>a+c.getBoundingClientRect().height+gap,0);
+  const fits=z=>{p.style.zoom=z;return p.getBoundingClientRect().height<=sc.clientHeight-pad-others()-2};
+  if(!fits(zmax)){let lo=.38,hi=zmax;for(let i=0;i<9;i++){const m=(lo+hi)/2;if(fits(m))lo=m;else hi=m}p.style.zoom=lo;if(!fits(lo))sc.classList.remove('nofit')}
+}catch(e){}finally{lapBusy=false}}
+(function(){let t=null;const go=()=>{clearTimeout(t);t=setTimeout(()=>{try{fit()}catch(e){}},90)};
+ setInterval(()=>{try{if(matchMedia('(min-width:1000px) and (min-height:520px)').matches)lapFit()}catch(e){}},1200);document.addEventListener('click',go,true);document.addEventListener('change',go,true);addEventListener('resize',go);
+ try{new MutationObserver(go).observe(document.querySelector('.scroll'),{childList:true,subtree:true,characterData:true})}catch(e){}})();
 render();
 </script>
 </body>
