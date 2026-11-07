@@ -830,6 +830,45 @@ html body #rep .tv svg rect[fill="#4dff9a"]{stroke:#4dff9a}
 html body #rep .tv svg rect[fill="#ff7a8a"]{stroke:#ff7a8a}
 html body #rep .tv svg circle{fill-opacity:.85}
 html body #rep .tv .lgd i{opacity:.55}
+
+/* ===== v9: laptop layout — left side menu, larger scrolling pages (phones untouched) ===== */
+@media (min-width:1000px) and (min-height:520px){
+  html body .wrap{max-width:none!important;margin:0 0 0 232px!important;padding:0 40px 24px!important;box-sizing:border-box;height:100%!important}
+  html body .topwrap,html body .scroll{max-width:1320px;width:100%;margin-left:auto!important;margin-right:auto!important}
+  html body .topwrap{padding:16px 0 0!important}
+  html body .scroll{overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(160,200,255,.3) transparent;padding:8px 0 28px!important}
+  html body .scroll.nofit{overflow-y:auto}
+  html body .top .r{font-size:22px!important}html body .top .l{font-size:16px!important}html body .top2 span{font-size:18px!important}
+  html body .lg{width:40px!important;height:40px!important}
+  html body .card.top{padding-top:7px!important;padding-bottom:7px!important}
+  /* side menu */
+  html body .card.tabs{position:fixed!important;left:0!important;top:0!important;bottom:0!important;right:auto!important;width:232px!important;max-width:none!important;height:auto!important;margin:0!important;border-radius:0!important;border:0!important;border-right:1px solid var(--edge)!important;background:rgba(5,12,29,.82)!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:none!important;display:flex!important;flex-direction:column!important;justify-content:flex-start!important;align-items:stretch!important;gap:6px!important;padding:22px 14px!important;z-index:20;animation:none!important}
+  html body .card.tabs::before{content:"";display:block;flex:none;height:132px;margin:4px 0 20px;background:var(--wm,none) center/contain no-repeat}
+  html body .card.tabs.ib>.tab:not(#_):not(#__):not(#___){flex:none!important;display:flex!important;flex-direction:row!important;justify-content:flex-start!important;align-items:center!important;gap:14px!important;height:52px!important;padding:0 18px!important;font-size:16px!important;border-radius:14px!important;text-align:left!important;position:relative}
+  html body .card.tabs.ib>.tab.on:not(#_):not(#__):not(#___){flex:none!important;display:flex!important;flex-direction:row!important;justify-content:flex-start!important;gap:14px!important;height:52px!important;padding:0 18px!important;font-size:16px!important;border-radius:14px!important}
+  html body .card.tabs.ib .ico{width:22px!important;height:22px!important;flex:none}
+  html body .card.tabs.ib .bdg{position:absolute!important;top:50%!important;right:14px!important;transform:translateY(-50%);margin:0!important;min-width:20px;height:20px;line-height:20px;font-size:11px}
+  html body .card.tabs.ib>.tab:not(.on):hover:not(#_):not(#__):not(#___){background:rgba(160,200,255,.1)!important;color:#fff!important}
+  /* bigger pages */
+  html body .panel{zoom:1.12}
+  html body .al input[id^=rca]{width:130px!important}
+  html body .card.tabs.ib .ict{max-width:none!important;opacity:1!important;margin-left:0!important;font-size:16px!important;letter-spacing:0!important;font-weight:700}
+  html body .card.tabs.ib>.tab{width:auto!important}
+  html body #ftabs{width:100%;max-width:560px!important;margin-left:auto;margin-right:auto}
+  html body #tlt{max-width:860px!important}
+  html body #tools .segs.ib,html body #tools .segs{max-width:none!important}
+  html body #tools #tlt .seg{font-size:13.5px!important}
+  html body #form{max-width:760px!important}
+  html body #cft,html body #rkt,html body #tlt,html body #ftabs{max-width:720px!important}
+  html body #earn>#cft,html body #rep>#rkt{max-width:720px!important}
+  html body #tools{max-width:1000px!important}
+  html body .seg,html body #earn .seg,html body #rep #rkt .seg,html body #tools .seg,html body #form .seg,html body #rep .seg{padding:7px 0!important;font-size:14px!important}
+  html body .sc.w,html body .sc.m,html body .sc.y,html body #rep .sc{max-height:none!important}
+  html body .tab{font-size:16px!important}
+}
+@media (min-width:1000px) and (max-width:1249px) and (min-height:520px){html body .topwrap{grid-template-columns:1fr!important;gap:8px!important}}
+@media (min-width:1400px) and (min-height:520px){html body .panel{zoom:1.28}}
+@media (min-width:1800px) and (min-height:520px){html body .panel{zoom:1.5}html body .card.tabs{width:260px!important}html body .wrap{margin-left:260px!important}}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1330,7 +1369,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='6 Nov 2026, 21:45 (Wyndham Asia membership, recurring with changing amount)';
+const APPV='7 Nov 2026, 19:30 (Laptop: side menu, larger pages)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -1768,6 +1807,7 @@ async function dbPdf(key){const J=window.jspdf;if(!J){alert('PDF tool is still l
   lhFoot(doc);const nm='BMP-Debts-'+(key?grp[names[0]].n.replace(/[^\w-]+/g,'_'):'Total')+'-'+todayK()+'.pdf';await shareFile(new File([doc.output('blob')],nm,{type:'application/pdf'}),nm)}
 /* keep sub-tab bars the same visual size whatever the panel zoom is */
 (function(){const _fit=fit;fit=function(){
+  try{if(matchMedia('(min-width:1000px) and (min-height:520px)').matches){document.querySelectorAll('.panel,.panel .segs[id]').forEach(x=>x.style.zoom='');document.querySelector('.scroll').classList.remove('nofit');return}}catch(e){}
   try{const g=$('gcard');if(g&&g.style.display!=='none'&&!matchMedia('(min-width:1000px) and (min-height:520px)').matches){document.querySelectorAll('.panel,.panel .segs[id]').forEach(x=>x.style.zoom='');document.querySelector('.scroll').classList.remove('nofit');return}}catch(e){}
   const bars=()=>document.querySelectorAll('.panel .segs[id]');bars().forEach(b=>b.style.zoom='');
   _fit();
