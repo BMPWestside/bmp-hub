@@ -1385,7 +1385,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='7 Nov 2026, 23:10 (Laptop: same tab size on every page)';
+const APPV='7 Nov 2026, 23:40 (Fix: Recurring add item no longer jumps/clears)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -1953,7 +1953,7 @@ $('mfm').addEventListener('click',ev=>{const t=ev.target;if(t===$('mfm')||t.id==
   saveX();$('mfm').style.display='none';render()});
 /* tools: recurring + bin */
 $('tools').addEventListener('click',ev=>{const t=ev.target;
-  if(t.id==='b_radd2'){RC.push({n:'',cat:'Other',amt:'',freq:'m',day:1,wd:2,from:todayK().slice(0,7)});saveX();toolsView();return}
+  if(t.id==='b_radd2'){RC.push({n:'',cat:'Other',amt:'',freq:'m',day:1,wd:2,from:todayK().slice(0,7)});saveX(true);toolsView();setTimeout(()=>{try{const l=document.querySelector('#tools [data-rc="'+(RC.length-1)+'"][data-f="n"]');if(l){l.scrollIntoView({block:'center'});l.focus({preventScroll:true})}}catch(e){}},60);return}
   if(t.id==='b_rsal'){const f='2026-10';const gone=RC.filter(r=>r.freq==='w'&&/^(salary|superannuation)/i.test(r.cat||'')).map(rcKey);RC=RC.filter(r=>!(r.freq==='w'&&/^(salary|superannuation)/i.test(r.cat||'')));RC.push({n:'Salary',cat:'Salary',amt:CFG.sal,freq:'w',wd:2,from:f},{n:'Super',cat:'Superannuation',amt:CFG.sup,freq:'w',wd:2,from:f});{const nk=RC.slice(-2).map(rcKey);ST.rcx=(ST.rcx||[]).filter(k=>!nk.includes(k)).concat(gone.filter(k=>!nk.includes(k)))}saveX();toolsView();render();return}
   if(t.dataset.rcdel!==undefined){const rr=RC[+t.dataset.rcdel];if(rr&&(rr.n||rr.cat))ST.rcx=(ST.rcx||[]).filter(k=>k!==rcKey(rr)).concat(rcKey(rr));RC.splice(+t.dataset.rcdel,1);saveX();toolsView();render();return}
   if(t.dataset.bin!==undefined)binRestore(+t.dataset.bin)});
@@ -2019,19 +2019,19 @@ function xMerge(L,R,lN){
   const NS=lN?sl:sr,OS=lN?sr:sl;
   return{mf:lN?Object.assign({},R.mf||{},L.mf||{}):Object.assign({},L.mf||{},R.mf||{}),bk:bkDef(NB)?(OB||NB||{adj:0}):NB,rc,
     st:Object.assign({},OS,NS,{tax:[...tm.values()],bas:Object.assign({},OS.bas||{},NS.bas||{}),chep:NS.chep!=null?NS.chep:(OS.chep!=null?OS.chep:null),rcx:dead})}}
-let xAgain=false;
+let xAgain=false;const nbk=r=>r&&(String(r.n||'').trim()||+r.amt||r.ask);
 async function xGet(){try{const g=await mcp.callTool('Google Sheets','get_values',{spreadsheetId:SID,range:XTAB+'!A1:A1'});const v=(g.payload.values||[])[0];return v&&v[0]?JSON.parse(v[0]):null}catch(e){if(e&&e.code)throw e;return null}}
 async function pullX(){if(!okTok())return;if(xBusy){xAgain=true;return}xBusy=true;
   try{const r=await xGet();
-    if(!r){if(!XT){XT=Date.now();jset('xt',XT)}await xPut({t:XT,mf:MF,bk:BK,rc:RC,st:ST});return}
+    if(!r){if(!XT){XT=Date.now();jset('xt',XT)}await xPut({t:XT,mf:MF,bk:BK,rc:RC.filter(nbk),st:ST});return}
     const rt=+r.t||0,fresh=!XT&&!localStorage.getItem('xt');
-    const L={mf:MF,bk:BK,rc:RC,st:ST},R={mf:r.mf||{},bk:r.bk||{adj:0},rc:Array.isArray(r.rc)?r.rc:[],st:Object.assign({tax:[],bas:{},chep:null},r.st||{})};
+    const L={mf:MF,bk:BK,rc:RC,st:ST},R={mf:r.mf||{},bk:r.bk||{adj:0},rc:Array.isArray(r.rc)?r.rc.filter(nbk):[],st:Object.assign({tax:[],bas:{},chep:null},r.st||{})};
     let M;if(fresh)M=R;else{try{jset('xbak',{at:Date.now(),t:XT,mf:MF,bk:BK,rc:RC,st:ST})}catch(e){}M=xMerge(L,R,XT>=rt)}
-    const chL=cj(M)!==cj(L),chR=cj(M)!==cj(R);
+    const Mp=Object.assign({},M,{rc:(M.rc||[]).filter(nbk)}),chL=cj(M)!==cj(L),chR=cj(Mp)!==cj(R);
     if(chL){MF=M.mf;BK=Object.assign({adj:0},M.bk);RC=M.rc;ST=Object.assign({tax:[],bas:{},chep:null},M.st);if(ST.chep&&typeof CHEP!=='undefined')CHEP=ST.chep}
     XT=chR?Math.max(XT,rt)+1:Math.max(XT,rt);saveX(true);jset('xt',XT);
-    if(chR)await xPut({t:XT,mf:MF,bk:BK,rc:RC,st:ST});
-    if(chL){render();if($('tools').classList.contains('on'))toolsView()}
+    if(chR)await xPut({t:XT,mf:MF,bk:BK,rc:RC.filter(nbk),st:ST});
+    if(chL){render();const fa=document.activeElement;if($('tools').classList.contains('on')&&!(fa&&$('tools').contains(fa)&&/^(INPUT|SELECT|TEXTAREA)$/.test(fa.tagName)))toolsView()}
   }catch(e){}finally{xBusy=false;if(xAgain){xAgain=false;setTimeout(pullX,300)}}}
 async function pushX(){await pullX()}
 setInterval(()=>{if(!document.hidden&&okTok())pullX()},60000);
@@ -2498,15 +2498,16 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 let lapBusy=false;
 function lapFit(){if(lapBusy)return;lapBusy=true;try{const sc=document.querySelector('.scroll'),p=document.querySelector('.panel.on');if(!p||!sc)return;
   const W=innerWidth,zmax=W>=1800?1.5:W>=1400?1.28:W>=1100?1.12:.95,zmin=zmax*.5;document.querySelectorAll('.panel,.panel .segs.ib').forEach(x=>x.style.zoom='');sc.classList.remove('nofit');
-  const cs=getComputedStyle(sc),pb=parseFloat(cs.paddingBottom)||0;sc.scrollTop=0;
+  const cs=getComputedStyle(sc),pb=parseFloat(cs.paddingBottom)||0;const st0=sc.scrollTop;
   const bars=[...p.querySelectorAll('.segs.ib')];
-  const top=()=>p.getBoundingClientRect().top-sc.getBoundingClientRect().top;
+  const top=()=>p.getBoundingClientRect().top-sc.getBoundingClientRect().top+sc.scrollTop;
   const setz=z=>{p.style.zoom=z;bars.forEach(b=>b.style.zoom=(zmax/z).toFixed(4))};
   const fits=z=>{setz(z);return p.getBoundingClientRect().height+top()<=sc.clientHeight-pb-2};
   if(!fits(zmax)){let lo=zmin,hi=zmax;for(let i=0;i<9;i++){const m=(lo+hi)/2;if(fits(m))lo=m;else hi=m}setz(lo)}
+  sc.scrollTop=st0;
 }catch(e){}finally{lapBusy=false}}
 (function(){let t=null;const go=()=>{clearTimeout(t);t=setTimeout(()=>{try{fit()}catch(e){}},90)};
- setInterval(()=>{try{if(matchMedia('(min-width:900px) and (min-height:520px)').matches)lapFit()}catch(e){}},1200);document.addEventListener('click',go,true);document.addEventListener('change',go,true);addEventListener('resize',go);
+ setInterval(()=>{try{const a=document.activeElement,sc=document.querySelector('.scroll');if(a&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName))return;if(sc&&sc.scrollTop>0)return;if(matchMedia('(min-width:900px) and (min-height:520px)').matches)lapFit()}catch(e){}},1200);document.addEventListener('click',go,true);document.addEventListener('change',go,true);addEventListener('resize',go);
  try{new MutationObserver(go).observe(document.querySelector('.scroll'),{childList:true,subtree:true,characterData:true})}catch(e){}})();
 render();
 </script>
