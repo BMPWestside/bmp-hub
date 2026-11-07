@@ -858,6 +858,11 @@ html body #rep .tv .lgd i{opacity:.55}
   html body #tlt{max-width:860px!important}
   html body #tools .segs.ib,html body #tools .segs{max-width:none!important}
   html body #tools #tlt .seg{font-size:13.5px!important}
+  html body .panel .segs.ib{display:grid!important;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px!important;width:100%}
+  html body .panel .segs.ib>.seg{flex:none!important;width:auto!important;height:auto!important;min-height:50px;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important;padding:7px 6px!important;border-radius:14px!important}
+  html body .panel .segs.ib>.seg .ict{max-width:none!important;opacity:1!important;margin:0!important;overflow:visible!important;text-overflow:clip!important;white-space:nowrap;font-size:14px!important}
+  html body #tools .card .segs.ib,html body .card .segs.ib{max-width:560px!important;margin-left:auto!important;margin-right:auto!important}
+  html body #tools .chbox .chlogo{width:150px!important;height:150px!important}
   html body #form{max-width:760px!important}
   html body #cft,html body #rkt,html body #tlt,html body #ftabs{max-width:720px!important}
   html body #earn>#cft,html body #rep>#rkt{max-width:720px!important}
@@ -1369,7 +1374,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='7 Nov 2026, 19:30 (Laptop: side menu, larger pages)';
+const APPV='7 Nov 2026, 19:50 (Laptop: Tools tabs)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
