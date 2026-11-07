@@ -1375,7 +1375,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='7 Nov 2026, 19:50 (Laptop: Tools tabs)';
+const APPV='7 Nov 2026, 20:30 (Safe sync: devices merge instead of overwrite)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -1944,11 +1944,11 @@ $('mfm').addEventListener('click',ev=>{const t=ev.target;if(t===$('mfm')||t.id==
 /* tools: recurring + bin */
 $('tools').addEventListener('click',ev=>{const t=ev.target;
   if(t.id==='b_radd2'){RC.push({n:'',cat:'Other',amt:'',freq:'m',day:1,wd:2,from:todayK().slice(0,7)});saveX();toolsView();return}
-  if(t.id==='b_rsal'){const f='2026-10';RC=RC.filter(r=>!(r.freq==='w'&&/^(salary|superannuation)/i.test(r.cat||'')));RC.push({n:'Salary',cat:'Salary',amt:CFG.sal,freq:'w',wd:2,from:f},{n:'Super',cat:'Superannuation',amt:CFG.sup,freq:'w',wd:2,from:f});saveX();toolsView();render();return}
-  if(t.dataset.rcdel!==undefined){RC.splice(+t.dataset.rcdel,1);saveX();toolsView();render();return}
+  if(t.id==='b_rsal'){const f='2026-10';const gone=RC.filter(r=>r.freq==='w'&&/^(salary|superannuation)/i.test(r.cat||'')).map(rcKey);RC=RC.filter(r=>!(r.freq==='w'&&/^(salary|superannuation)/i.test(r.cat||'')));RC.push({n:'Salary',cat:'Salary',amt:CFG.sal,freq:'w',wd:2,from:f},{n:'Super',cat:'Superannuation',amt:CFG.sup,freq:'w',wd:2,from:f});{const nk=RC.slice(-2).map(rcKey);ST.rcx=(ST.rcx||[]).filter(k=>!nk.includes(k)).concat(gone.filter(k=>!nk.includes(k)))}saveX();toolsView();render();return}
+  if(t.dataset.rcdel!==undefined){const rr=RC[+t.dataset.rcdel];if(rr&&(rr.n||rr.cat))ST.rcx=(ST.rcx||[]).filter(k=>k!==rcKey(rr)).concat(rcKey(rr));RC.splice(+t.dataset.rcdel,1);saveX();toolsView();render();return}
   if(t.dataset.bin!==undefined)binRestore(+t.dataset.bin)});
-$('tools').addEventListener('change',ev=>{const t=ev.target;if(t.dataset.rc===undefined)return;const r=RC[+t.dataset.rc],f=t.dataset.f;if(!r)return;
-  r[f]=(f==='amt'||f==='day'||f==='wd')?(t.value===''?'':+t.value):(f==='ask'?(t.value?1:0):t.value);if(f==='freq'&&r.freq==='w'&&(r.wd===''||r.wd==null))r.wd=2;saveX();render();if(f==='freq'||f==='ask')toolsView()});
+$('tools').addEventListener('change',ev=>{const t=ev.target;if(t.dataset.rc===undefined)return;const r=RC[+t.dataset.rc],f=t.dataset.f;if(!r)return;const ok0=rcKey(r);
+  r[f]=(f==='amt'||f==='day'||f==='wd')?(t.value===''?'':+t.value):(f==='ask'?(t.value?1:0):t.value);if(f==='freq'&&r.freq==='w'&&(r.wd===''||r.wd==null))r.wd=2;{const nk=rcKey(r);if(nk!==ok0)ST.rcx=(ST.rcx||[]).filter(k=>k!==nk).concat(ok0)}saveX();render();if(f==='freq'||f==='ask')toolsView()});
 /* reports: trend + find */
 let tm=null,fq='',ft='all',fmn='all';
 const rkBar=()=>`<div class="segs four" id="rkt">${[['inc','Income'],['exp','Expenses'],['trend','Trend'],['find','Find']].map(([k,n])=>`<button type="button" class="seg${rk===k?' on':''}" data-k="${k}">${n}</button>`).join('')}</div>`;
@@ -1995,12 +1995,36 @@ function pushXsoon(){clearTimeout(xTimer);xTimer=setTimeout(pushX,1200)}
 async function xPut(v){const a={spreadsheetId:SID,range:XTAB+'!A1:A1',values:[[JSON.stringify(v)]]};
   try{await mcp.callTool('Google Sheets','update_values',a)}
   catch(e){if(e&&e.code)throw e;await mcp.callTool('Google Sheets','update_spreadsheet',{spreadsheetId:SID,requests:[{addSheet:{properties:{title:XTAB}}}]});await mcp.callTool('Google Sheets','update_values',a)}}
-async function pushX(){if(!okTok()||xBusy)return;xBusy=true;try{await xPut({t:XT,mf:MF,bk:BK,rc:RC,st:ST})}catch(e){}finally{xBusy=false}}
-async function pullX(){if(!okTok()||xBusy)return;xBusy=true;
-  try{let r=null;try{const g=await mcp.callTool('Google Sheets','get_values',{spreadsheetId:SID,range:XTAB+'!A1:A1'});const v=(g.payload.values||[])[0];r=v&&v[0]?JSON.parse(v[0]):null}catch(e){if(e&&e.code)throw e}
-    if(!r||(+r.t||0)<XT||(!r.t&&XT)){xBusy=false;await pushX();return}
-    if((+r.t||0)>XT){MF=r.mf||{};BK=Object.assign({adj:0},r.bk||{});if(Array.isArray(r.rc))RC=r.rc;if(r.st){ST=Object.assign({tax:[],bas:{},chep:null},r.st);if(ST.chep&&typeof CHEP!=='undefined')CHEP=ST.chep}XT=+r.t;saveX(true);jset('xt',XT);render();if($('tools').classList.contains('on'))toolsView()}
-  }catch(e){}finally{xBusy=false}}
+const xIsE=v=>v==null||v===''||(Array.isArray(v)&&!v.length)||(typeof v==='object'&&!Array.isArray(v)&&!Object.keys(v).length);
+const rcKey=r=>[String(r.n||'').trim().toLowerCase(),r.cat||'',r.freq||'m'].join('|');
+const cj=v=>JSON.stringify(v,(k,x)=>{if(Array.isArray(x)&&x.length&&typeof x[0]==='object')return x.map(a=>JSON.stringify(a)).sort();return x&&typeof x==='object'&&!Array.isArray(x)?Object.keys(x).sort().reduce((a,c)=>(a[c]=x[c],a),{}):x});
+/* merge two copies (never overwrite one with the other): lN true when the local copy is the newer one */
+function xMerge(L,R,lN){
+  const sl=L.st||{},sr=R.st||{},dead=[...new Set([...(sl.rcx||[]),...(sr.rcx||[])])];
+  const Lr=(L.rc||[]).filter(r=>r&&!dead.includes(rcKey(r))),Rr=(R.rc||[]).filter(r=>r&&!dead.includes(rcKey(r)));
+  const rm=new Map(Rr.map(r=>[rcKey(r),r])),have=new Set(Lr.map(rcKey));
+  const rc=Lr.map(r=>lN?r:(rm.get(rcKey(r))||r));Rr.forEach(r=>{if(!have.has(rcKey(r)))rc.push(r)});
+  const tm=new Map();(lN?[...(sr.tax||[]),...(sl.tax||[])]:[...(sl.tax||[]),...(sr.tax||[])]).forEach(t=>{if(t)tm.set(t.id,t)});
+  const NB=lN?L.bk:R.bk,OB=lN?R.bk:L.bk,bkDef=b=>!b||(!Object.keys(b).some(k=>k!=='adj'&&!xIsE(b[k]))&&!(+b.adj));
+  const NS=lN?sl:sr,OS=lN?sr:sl;
+  return{mf:lN?Object.assign({},R.mf||{},L.mf||{}):Object.assign({},L.mf||{},R.mf||{}),bk:bkDef(NB)?(OB||NB||{adj:0}):NB,rc,
+    st:Object.assign({},OS,NS,{tax:[...tm.values()],bas:Object.assign({},OS.bas||{},NS.bas||{}),chep:NS.chep!=null?NS.chep:(OS.chep!=null?OS.chep:null),rcx:dead})}}
+let xAgain=false;
+async function xGet(){try{const g=await mcp.callTool('Google Sheets','get_values',{spreadsheetId:SID,range:XTAB+'!A1:A1'});const v=(g.payload.values||[])[0];return v&&v[0]?JSON.parse(v[0]):null}catch(e){if(e&&e.code)throw e;return null}}
+async function pullX(){if(!okTok())return;if(xBusy){xAgain=true;return}xBusy=true;
+  try{const r=await xGet();
+    if(!r){if(!XT){XT=Date.now();jset('xt',XT)}await xPut({t:XT,mf:MF,bk:BK,rc:RC,st:ST});return}
+    const rt=+r.t||0,fresh=!XT&&!localStorage.getItem('xt');
+    const L={mf:MF,bk:BK,rc:RC,st:ST},R={mf:r.mf||{},bk:r.bk||{adj:0},rc:Array.isArray(r.rc)?r.rc:[],st:Object.assign({tax:[],bas:{},chep:null},r.st||{})};
+    let M;if(fresh)M=R;else{try{jset('xbak',{at:Date.now(),t:XT,mf:MF,bk:BK,rc:RC,st:ST})}catch(e){}M=xMerge(L,R,XT>=rt)}
+    const chL=cj(M)!==cj(L),chR=cj(M)!==cj(R);
+    if(chL){MF=M.mf;BK=Object.assign({adj:0},M.bk);RC=M.rc;ST=Object.assign({tax:[],bas:{},chep:null},M.st);if(ST.chep&&typeof CHEP!=='undefined')CHEP=ST.chep}
+    XT=chR?Math.max(XT,rt)+1:Math.max(XT,rt);saveX(true);jset('xt',XT);
+    if(chR)await xPut({t:XT,mf:MF,bk:BK,rc:RC,st:ST});
+    if(chL){render();if($('tools').classList.contains('on'))toolsView()}
+  }catch(e){}finally{xBusy=false;if(xAgain){xAgain=false;setTimeout(pullX,300)}}}
+async function pushX(){await pullX()}
+setInterval(()=>{if(!document.hidden&&okTok())pullX()},60000);
 const ls0=loadSheet;loadSheet=async function(){await ls0();await pullX()};
 let lastVis=0;document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&okTok()&&Date.now()-lastVis>15000){lastVis=Date.now();autoSync().then(loadSheet)}});
 /* ===== view-only mode (view.html): Cashflow Income / Expenses / Profit only ===== */
@@ -2458,7 +2482,7 @@ r.style.setProperty('--bgap',(ok?g:0)+'px');r.style.setProperty('--bgapn',ok?g:0
 m();addEventListener('resize',m);addEventListener('orientationchange',()=>setTimeout(m,300));
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#fitb');if(!b)return;try{localStorage.setItem('fit',get()==='1'?'0':'1')}catch(x){}m();b.textContent=get()==='1'?'Bottom bar: lowered (tap to undo)':'Bottom bar: normal (tap to lower)'})})();
 
-(function(){if(window.BMP_VIEW)return;try{if(!jget('rcw',0)){if(!RC.some(r=>r.cat==='Wyndham Asia membership'))RC.push({n:'Wyndham Asia membership',cat:'Wyndham Asia membership',amt:'',ask:1,freq:'m',day:6,wd:2,from:'2026-11'});jset('rcw',1);saveX()}}catch(e){}})();
+(function(){if(window.BMP_VIEW)return;try{if(!jget('rcw',0)){if(!RC.some(r=>r.cat==='Wyndham Asia membership'))RC.push({n:'Wyndham Asia membership',cat:'Wyndham Asia membership',amt:'',ask:1,freq:'m',day:6,wd:2,from:'2026-11'});jset('rcw',1);saveX(true)}}catch(e){}})();
 render();
 </script>
 </body>
