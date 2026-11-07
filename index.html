@@ -875,6 +875,16 @@ html body #rep .tv .lgd i{opacity:.55}
 }
 @media (min-width:900px) and (max-width:1249px) and (min-height:520px){html body .topwrap{grid-template-columns:1fr!important;gap:8px!important}}
 @media (min-width:1800px) and (min-height:520px){html body .card.tabs{width:260px!important}html body .wrap{margin-left:260px!important}}
+
+@media (min-width:900px) and (min-height:520px){
+  html body #cft,html body #rkt,html body #tlt,html body #ftabs,html body #earn>#cft,html body #rep>#rkt,html body #tools #tlt,html body .card .segs.ib,html body #tools .card .segs.ib{max-width:none!important;width:100%!important}
+  html body #form,html body #tools,html body .card.tabs~*{max-width:none!important}
+  html body #form>.card,html body #form .f,html body #tools>.card{max-width:none!important;width:100%!important}
+  html body #earn .card.bls{grid-column:1/-1!important;justify-self:center;width:100%!important;max-width:1100px!important}
+  html body #earn.on,html body #earn.pro.on,html body #earn.cash.on{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  html body #earn>.tgc,html body #earn>.pfn,html body #earn>.al,html body #earn>#cft{grid-column:1/-1!important}
+  html body #tools .card.tl>label{grid-template-columns:minmax(0,1fr) minmax(0,2fr)!important}
+}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1375,7 +1385,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='7 Nov 2026, 22:10 (Laptop: consistent sizes, smaller-window layout)';
+const APPV='7 Nov 2026, 22:40 (Laptop: full-width tabs and pages)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -2487,7 +2497,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 /* laptop: every page is scaled to fit the screen height (no scrolling) */
 let lapBusy=false;
 function lapFit(){if(lapBusy)return;lapBusy=true;try{const sc=document.querySelector('.scroll'),p=document.querySelector('.panel.on');if(!p||!sc)return;
-  const W=innerWidth,zmax=W>=1800?1.5:W>=1400?1.28:W>=1100?1.12:.95,zmin=zmax*.76;document.querySelectorAll('.panel').forEach(x=>x.style.zoom='');sc.classList.remove('nofit');
+  const W=innerWidth,zmax=W>=1800?1.5:W>=1400?1.28:W>=1100?1.12:.95,zmin=zmax*.5;document.querySelectorAll('.panel').forEach(x=>x.style.zoom='');sc.classList.remove('nofit');
   const cs=getComputedStyle(sc),pad=(parseFloat(cs.paddingTop)||0)+(parseFloat(cs.paddingBottom)||0),gap=parseFloat(cs.rowGap)||8;
   const others=()=>[...sc.children].filter(c=>c!==p&&c.offsetParent!==null&&getComputedStyle(c).position!=='fixed').reduce((a,c)=>a+c.getBoundingClientRect().height+gap,0);
   const fits=z=>{p.style.zoom=z;return p.getBoundingClientRect().height<=sc.clientHeight-pad-others()-2};
