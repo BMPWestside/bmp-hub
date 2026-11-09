@@ -892,6 +892,7 @@ html body #rep .tv .lgd i{opacity:.55}
   html body .wrap{padding-bottom:var(--navh,74px)!important;bottom:var(--lift,0px)!important}
   html body .card.tabs{position:absolute!important;left:0!important;right:0!important;bottom:0!important;margin:0!important;width:auto!important;box-sizing:border-box}
 }
+html body .bpl{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);width:100%}html body .bpd{flex:1;min-width:0;font:inherit;padding:6px 8px;border-radius:10px}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1392,7 +1393,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='9 Nov 2026, 21:30 (Bottom bar: auto lift + Raise/Lower)';
+const APPV='9 Nov 2026, 22:30 (Bills: choose the paid date)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -2177,10 +2178,12 @@ function blLate(){
     const g=[];for(let i=1;i<L.length;i++)g.push((new Date(L[i])-new Date(L[i-1]))/864e5);
     const avg=g.reduce((a,b)=>a+b,0)/g.length,last=new Date(L[L.length-1]+'T00:00'),late=Math.floor((Date.now()-last)/864e5-avg);
     return late>=3&&!by[p].some(x=>x.st==='open')?{p,late,avg:Math.round(avg),last:L[L.length-1],dom:by[p][0].dom}:null}).filter(Boolean)}
+const blCat=x=>{const t=(x.p+' '+x.dt).toLowerCase();return /linkt|toll/.test(t)?'Tolls':/allianz|ctp|green slip|rego|registration/.test(t)?'Registration & CTP':/berkrey|liability/.test(t)?'Truck & public liability insurance':/insur/.test(t)?'Insurance':/tony|repair|service/.test(t)?'Maintenance & repairs':'Other'};
+const blPd=x=>x.due&&x.due<=todayK()?x.due:todayK();
 function blRow(x){
   const n=blLeft(x.due),open=x.st==='open',kk=encodeURIComponent(x.key),dd=esc(x.due);
   const meta=x.k==='bill'?`${open?'Due '+blDate(x.due)+' · ':'Invoice '+blDate(x.due)+' · '}<b>${fmt(x.a)}</b>${x.au&&open?' · Auto-debit':''}${!open?' · '+(/already paid/i.test(x.nt)?'Paid at the time':x.st):''}`:`${x.k==='course'?'Due':'Expires'} ${blDate(x.due)||'(no date)'}`;
-  const btn=open?(x.k==='bill'?`<button type="button" class="go" data-bl="paid" data-bk="${kk}" data-bd="${dd}">Paid</button><button type="button" data-bl="dismissed" data-bk="${kk}" data-bd="${dd}">Dismiss</button>`
+  const btn=open?(x.k==='bill'?`<label class="bpl">Paid on <input type="date" class="bpd" value="${blPd(x)}" max="${todayK()}"></label><button type="button" class="go" data-bl="paidx" data-bk="${kk}" data-bd="${dd}">Paid + add to Expenses</button><button type="button" data-bl="paid" data-bk="${kk}" data-bd="${dd}">Paid only</button><button type="button" data-bl="dismissed" data-bk="${kk}" data-bd="${dd}">Dismiss</button>`
       :`<button type="button" class="go" data-bl="done" data-bk="${kk}" data-bd="${dd}">Done</button><button type="button" data-bl="dismissed" data-bk="${kk}" data-bd="${dd}">Dismiss</button>`)
     :(x.k==='bill'&&/already paid/i.test(x.nt)&&!/expensed/i.test(x.nt)&&x.a>0?`<button type="button" class="go" data-bl="exp" data-bk="${kk}" data-bd="${dd}">Add to Expenses</button><button type="button" data-bl="dismissed" data-bk="${kk}" data-bd="${dd}">Ignore</button>`:'');
   return `<div class="blr">${x.k==='bill'?'':blIcon(x.p,x.dom)}<div class="blm"><b>${esc(x.dt||x.p)}</b><small class="${open?blCls(n):''}">${meta}${open&&n!==null?' · '+blLab(n,x.k):''}</small></div><div class="blb">${btn}</div></div>`}
@@ -2236,6 +2239,9 @@ document.addEventListener('click',ev=>{const t=ev.target.closest&&ev.target.clos
   if(t.dataset.bt){blTab=t.dataset.bt;blSel=null;blRefresh();return}
   if(t.dataset.bs){const p=decodeURIComponent(t.dataset.bs);blSel=blSel===p?null:p;blRefresh();return}
   const key=decodeURIComponent(t.dataset.bk||''),due=t.dataset.bd||'',a=t.dataset.bl;
+  if(a==='paidx'){const x=BILLS.find(q=>q.key===key&&q.due===due);if(!x)return;
+    if(x.a>0){const pe=t.closest('.blr'),pi=pe&&pe.querySelector('.bpd'),pdv=pi&&/^\d{4}-\d\d-\d\d$/.test(pi.value)?pi.value:todayK();entries.push({d:pdv,del:0,pu:0,nm:false,x:x.a,cat:blCat(x),note:(x.p.replace(/ Pty Ltd/i,'')+' '+x.dt).slice(0,60)});persist();render();autoSync()}
+    blMark(key,due,'paid',x.a>0?'Paid · Expensed':'Paid');return}
   if(a==='exp'){const x=BILLS.find(q=>q.key===key&&q.due===due);if(!x)return;
     entries.push({d:x.due,del:0,pu:0,nm:false,x:x.a,cat:'Maintenance & repairs',note:(x.p.replace(/ Pty Ltd/i,'')+' '+x.dt).slice(0,60)});persist();render();autoSync();
     blMark(key,due,'paid','Already paid · Expensed');return}
