@@ -885,6 +885,12 @@ html body #rep .tv .lgd i{opacity:.55}
   html body #earn>.tgc,html body #earn>.pfn,html body #earn>.al,html body #earn>#cft{grid-column:1/-1!important}
   html body #tools .card.tl>label{grid-template-columns:minmax(0,1fr) minmax(0,2fr)!important}
 }
+
+/* phone: bottom bar is pinned inside the page area so it can never be cut off */
+@media (max-width:899px){
+  html body .wrap{padding-bottom:var(--navh,74px)!important;bottom:var(--lift,0px)!important}
+  html body .card.tabs{position:absolute!important;left:0!important;right:0!important;bottom:0!important;margin:0!important;width:auto!important;box-sizing:border-box}
+}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1385,7 +1391,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='7 Nov 2026, 23:40 (Fix: Recurring add item no longer jumps/clears)';
+const APPV='9 Nov 2026, 21:30 (Bottom bar: auto lift + Raise/Lower)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -1461,6 +1467,7 @@ function toolsView(){
     b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
+<div class="hint">Bottom bar too low or cut off? Raise it: <button type="button" class="mini" data-nl="-8">Lower</button> <button type="button" class="mini" data-nl="8">Raise</button> (now <span id="nlv">${(()=>{try{return +localStorage.getItem('navlift')||0}catch(e){return 0}})()}</span>)</div>
 <div class="hint">App version: ${APPV}<br>Screen ${screen.width}x${screen.height}, view ${innerWidth}x${innerHeight}, bottom gap ${getComputedStyle(document.documentElement).getPropertyValue('--bgap')||0}</div></div>`}
   $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
@@ -2509,6 +2516,13 @@ function lapFit(){if(lapBusy)return;lapBusy=true;try{const sc=document.querySele
 (function(){let t=null;const go=()=>{clearTimeout(t);t=setTimeout(()=>{try{fit()}catch(e){}},90)};
  setInterval(()=>{try{const a=document.activeElement,sc=document.querySelector('.scroll');if(a&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName))return;if(sc&&sc.scrollTop>0)return;if(matchMedia('(min-width:900px) and (min-height:520px)').matches)lapFit()}catch(e){}},1200);document.addEventListener('click',go,true);document.addEventListener('change',go,true);addEventListener('resize',go);
  try{new MutationObserver(go).observe(document.querySelector('.scroll'),{childList:true,subtree:true,characterData:true})}catch(e){}})();
+
+(function(){const m=()=>{try{if(matchMedia('(max-width:899px)').matches){const t=document.querySelector('.card.tabs');if(t)document.documentElement.style.setProperty('--navh',(t.offsetHeight+8)+'px')}}catch(e){}};m();addEventListener('resize',m);addEventListener('orientationchange',()=>setTimeout(m,300));setTimeout(m,800);setTimeout(m,2500);document.addEventListener('click',()=>setTimeout(m,50),true)})();
+
+(function(){const g=()=>{try{return +localStorage.getItem('navlift')||0}catch(e){return 0}};
+const m=()=>{try{if(!matchMedia('(max-width:899px)').matches)return;const v=window.visualViewport;let a=0;if(v){a=Math.round(innerHeight-v.height-v.offsetTop);if(!(a>=8&&a<=120))a=0}document.documentElement.style.setProperty('--lift',(a+g())+'px')}catch(e){}};
+m();addEventListener('resize',m);addEventListener('orientationchange',()=>setTimeout(m,300));if(window.visualViewport)visualViewport.addEventListener('resize',m);setTimeout(m,800);
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-nl]');if(!b)return;let n=g()+(+b.dataset.nl);n=Math.max(0,Math.min(120,n));try{localStorage.setItem('navlift',n)}catch(x){}m();const o=document.getElementById('nlv');if(o)o.textContent=n})})();
 render();
 </script>
 </body>
