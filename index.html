@@ -1404,7 +1404,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='11 Nov 2026, 09:40 (New Home page)';
+const APPV='11 Nov 2026, 10:00 (Payment advice: ignore months before the business started)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -2357,7 +2357,7 @@ async function loadAdvice(){
   try{
     const r=await mcp.callTool('Google Sheets','get_values',{spreadsheetId:SID,range:'Monthly!A2:M60'});
     const o={};
-    ((r.payload&&r.payload.values)||[]).forEach(v=>{const ym=String(v[0]||'');if(!/^\d{4}-\d\d$/.test(ym))return;
+    ((r.payload&&r.payload.values)||[]).forEach(v=>{const ym=String(v[0]||'');if(!/^\d{4}-\d\d$/.test(ym)||ym<BIZ_YM)return;
       let days={};try{days=JSON.parse(v[11]||'{}')}catch(e){}
       o[ym]={ym,rev:num(v[2]),ex:num(v[3]),gst:num(v[4]),pk:num(v[5]),nv:num(v[6]),ot:num(v[7]),dc:num(v[8]),rec:String(v[9]||''),days,note:String(v[12]||'')}});
     ADV=o;
