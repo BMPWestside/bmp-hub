@@ -938,6 +938,16 @@ html body .tab.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):n
 /* Home quick actions: expense red boxes + icons */
 html body #home .qa button:not(#_):not(#__):not(#___){background:linear-gradient(180deg,rgba(255,110,135,.26),rgba(228,0,43,.14))!important;border:0!important;box-shadow:inset 0 0 0 1px rgba(255,150,168,.9)!important;color:#fff!important}
 html body #home .qa button .ico:not(#_):not(#__){color:#ff7a8a!important;stroke:#ff7a8a!important}
+
+/* Quick actions popup: expense red */
+html body #qapop .popc:not(#_):not(#__){background:linear-gradient(180deg,rgba(80,14,30,.97),rgba(22,8,24,.98))!important;border:1px solid rgba(255,150,168,.9)!important;box-shadow:0 0 0 1px rgba(255,150,168,.35),0 12px 40px rgba(228,0,43,.3)!important}
+html body #qapop h3:not(#_):not(#__){color:#ff9aaa!important}
+html body #qapop label:not(#_):not(#__){color:#ffc2cc}
+html body #qapop input:not(#_):not(#__){border:1px solid rgba(255,150,168,.65)!important;background:rgba(255,110,135,.1)!important}
+html body #qapop input:focus:not(#_):not(#__){border-color:#ff7a8a!important;box-shadow:0 0 0 2px rgba(255,122,138,.55)!important}
+html body #qapop .cur span:not(#_):not(#__){color:#ff9aaa!important}
+html body #qapop button.save:not(.alt):not(#_):not(#__){background:linear-gradient(180deg,#ff5470,#e4002b)!important;border:1px solid rgba(255,150,168,.9)!important;box-shadow:0 0 12px rgba(228,0,43,.5)!important;color:#fff!important}
+html body #qapop button.save.alt:not(#_):not(#__){background:transparent!important;border:1px solid rgba(255,150,168,.7)!important;box-shadow:none!important;color:#ffc2cc!important}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1441,7 +1451,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='11 Nov 2026, 21:15 (Quick actions red; income download buttons blue)';
+const APPV='11 Nov 2026, 21:30 (Quick actions popup red)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
