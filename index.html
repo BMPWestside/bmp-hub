@@ -901,6 +901,14 @@ html body #home .blmt{padding:6px 2px}
 }
 html.view .tab[data-t=home],html.view #home{display:none!important}
 html body #home .inbx{background:none!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important}html body #home .inbx>.pfh{display:none}
+
+html body #home .hdiv{height:1px;background:linear-gradient(90deg,transparent,rgba(245,214,166,.45),transparent);margin:2px 0}
+html body #home .qa{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+html body #home .qa button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:92px;padding:12px 8px;border-radius:18px;font:inherit;font-weight:700;font-size:14px;color:var(--fg,#fff);cursor:pointer;background:rgba(255,255,255,.06);border:1px solid rgba(245,214,166,.35)}
+html body #home .qa button .ico{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;color:#f5d6a6}
+html body #home .qam{margin-top:10px;font-size:13px;color:#8be3a5}
+html body #qapop label{display:flex;flex-direction:column;gap:6px;font-size:13px}
+@media (min-width:900px) and (min-height:520px){html body #home .hdiv,html body #home .qac{grid-column:1/-1}}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1404,7 +1412,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='11 Nov 2026, 10:00 (Payment advice: ignore months before the business started)';
+const APPV='11 Nov 2026, 10:30 (Home: Quick actions Fuel + Employee Salary)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -2544,6 +2552,20 @@ const m=()=>{try{if(!matchMedia('(max-width:899px)').matches)return;const v=wind
 m();addEventListener('resize',m);addEventListener('orientationchange',()=>setTimeout(m,300));if(window.visualViewport)visualViewport.addEventListener('resize',m);setTimeout(m,800);
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-nl]');if(!b)return;let n=g()+(+b.dataset.nl);n=Math.max(0,Math.min(120,n));try{localStorage.setItem('navlift',n)}catch(x){}m();const o=document.getElementById('nlv');if(o)o.textContent=n})})();
 
+
+/* ===== Home quick actions: Fuel and Employee Salary ===== */
+let QAM='',QAT=null;const QA={fuel:{t:'Fuel',cat:'Fuel',ph:'e.g. BP Rocklea'},sal:{t:'Employee Salary',cat:'Employee Wages',ph:'e.g. Sudha weekly pay'}};
+document.body.insertAdjacentHTML('beforeend','<div class="pop" id="qapop" style="display:none"><div class="popc"><h3 id="qat"></h3><label>Date<input id="qad" type="date"></label><label>Amount<div class="cur"><span>A$</span><input id="qaa" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00"></div></label><label id="qawl" style="display:none">Tax withheld (PAYG), optional<div class="cur"><span>A$</span><input id="qaw" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00"></div></label><label>Description<input id="qan" type="text" maxlength="60"></label><div class="hint" id="qae" style="color:#ff8a8a;display:none"></div><button class="save" type="button" id="qas">Save Entry</button><button class="save alt" type="button" id="qax">Cancel</button></div></div>');
+function qaOpen(k){QAT=k;const q=QA[k];$('qat').textContent=q.t;$('qad').value=todayK();$('qaa').value='';$('qaw').value='';$('qan').value='';$('qan').placeholder=q.ph;$('qawl').style.display=k==='sal'?'':'none';$('qae').style.display='none';$('qapop').style.display='flex';setTimeout(()=>$('qaa').focus(),80)}
+function qaClose(){$('qapop').style.display='none';QAT=null}
+function qaSave(){const q=QA[QAT];if(!q)return;const d=$('qad').value,x=Math.round((parseFloat($('qaa').value)||0)*100)/100,w=QAT==='sal'?(parseFloat($('qaw').value)||0):0,n=$('qan').value.trim();
+  const err=m=>{const e=$('qae');e.textContent=m;e.style.display=''};
+  if(!/^\d{4}-\d\d-\d\d$/.test(d)){err('Pick a date.');return}if(!(x>0)){err('Enter an amount.');return}
+  const note=w>0?('PAYG '+w.toFixed(2)+(n?' \u00b7 '+n:'')):n;
+  entries.push({d,del:0,pu:0,nm:false,x,cat:q.cat,note});persist();QAM='Saved '+q.t+' '+fmt(x)+' on '+dAU(d)+' \u2192 Expenses \u203a '+q.cat;
+  qaClose();render();autoSync();setTimeout(()=>{QAM='';try{homeRender()}catch(e){}},6000)}
+document.addEventListener('click',ev=>{const t=ev.target;const b=t.closest&&t.closest('[data-qa]');if(b){qaOpen(b.dataset.qa);return}
+  if(t.id==='qas'){qaSave();return}if(t.id==='qax'||t.id==='qapop')qaClose()});
 /* ===== HOME page: notifications, invoices from email, payment advice ===== */
 const BN=banners;banners=function(){return''};
 function homeCount(){const b=BN(),n=(b.match(/class="al"/g)||[]).length;let a=0;try{Object.keys(ADV||{}).forEach(ym=>{if(advNew(ym)&&!((MF[ym]||{}).recDate))a++})}catch(e){}return n+(INBX.length||0)+a}
@@ -2557,7 +2579,9 @@ function homeRender(){const el=$('home');if(!el||window.BMP_VIEW)return;
   const b=BN();
   el.innerHTML=`<div class="card tl hn"><div class="pfh">Notifications</div>${b||'<div class="blmt">All clear. Nothing due right now.</div>'}</div>`
    +`<div class="card tl hn"><div class="pfh">Income invoices from email</div><div id="hinbx"></div>${INBX.length?'':'<div class="blmt">No new invoices. New ones from your email appear here.</div>'}</div>`
-   +`<div class="card tl hn"><div class="pfh">Payment advice from email</div>${homeAdvHtml()}</div>`;
+   +`<div class="card tl hn"><div class="pfh">Payment advice from email</div>${homeAdvHtml()}</div>`
+   +`<div class="hdiv"></div>`
+   +`<div class="card tl hn qac"><div class="pfh">Quick actions</div><div class="qa"><button type="button" data-qa="fuel"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/><path d="M3 21h12"/><path d="M6.5 8h5"/><path d="M14 9h2.5a1.5 1.5 0 0 1 1.5 1.5V16a1.5 1.5 0 0 0 3 0V8l-3-3"/></svg><span>Fuel</span></button><button type="button" data-qa="sal"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M5 20.5a7 7 0 0 1 14 0"/></svg><span>Employee Salary</span></button></div>${QAM?`<div class="qam">${esc(QAM)}</div>`:''}</div>`;
   try{paintInbox()}catch(e){}homeBadge()}
 (function(){const r=render;render=function(){const x=r.apply(this,arguments);try{homeRender()}catch(e){}return x};window.render=render;
   const la=loadAdvice;loadAdvice=async function(){const x=await la.apply(this,arguments);try{homeRender()}catch(e){}return x};
