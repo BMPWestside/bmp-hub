@@ -949,6 +949,13 @@ html body #qapop input:focus:not(#_):not(#__){border-color:rgba(255,150,168,.9)!
 html body #qapop .cur span:not(#_):not(#__){color:#9db4e0!important}
 html body #qapop button.save:not(.alt):not(#_):not(#__){background:linear-gradient(180deg,rgba(255,110,135,.26),rgba(228,0,43,.14))!important;border:0!important;box-shadow:inset 0 0 0 1px rgba(255,150,168,.85)!important;color:#fff!important}
 html body #qapop button.save.alt:not(#_):not(#__){background:transparent!important;border:0!important;box-shadow:inset 0 0 0 1px rgba(255,110,135,.4)!important;color:#9db4e0!important}
+
+html body #home .qa{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+html body #home .qa.q2{margin-top:10px}
+html body #home .qa button{font-size:13px!important;padding:12px 4px!important}
+html body #home .qa button[data-qn]:not(#_):not(#__):not(#___){background:rgba(30,144,255,.14)!important;border:0!important;box-shadow:inset 0 0 0 1px #1e90ff!important}
+html body #home .qa button[data-qn] .ico:not(#_):not(#__){color:#4db2ff!important;stroke:#4db2ff!important}
+html body #tools .two2 #b_exp{grid-column:1/-1}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1081,7 +1088,7 @@ document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
 });
 const SID='1PMooyxEBlZcOpJmXH-aRkvmJWN-hnE_PvNej0K8W-0s';
 const CLIENT_ID='825840710134-jlflm38t6bnijmk66a4v2d6fauu676om.apps.googleusercontent.com';
-const SCOPE=window.BMP_VIEW?'https://www.googleapis.com/auth/spreadsheets.readonly':'https://www.googleapis.com/auth/spreadsheets';
+const SCOPE=window.BMP_VIEW?'https://www.googleapis.com/auth/spreadsheets.readonly':'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file';
 let tok=null,tokExp=0,tc=null;
 try{const t=JSON.parse(localStorage.getItem('gtok')||'null');if(t&&t.exp>Date.now()){tok=t.t;tokExp=t.exp}}catch(e){}
 const PXK=window.BMP_VIEW?'pxv':'px';let PX=null;
@@ -1452,7 +1459,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='11 Nov 2026, 21:45 (Quick actions popup matches Expense form)';
+const APPV='12 Nov 2026, 05:30 (Backup to Google Drive; Quick actions: Accounts, Cash, Debts)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -1526,7 +1533,7 @@ function toolsView(){
   else if(tl==='debt')b=debtHtml();
   else if(tl==='mgr')b=mgrHtml();
   else{const fys=[];for(let y=BIZ_FY;y<=Math.max(BIZ_FY,fyOf(info(todayK()).ym));y++)fys.push(y);
-    b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Export backup</button><button type="button" class="mini" id="b_imp">Import backup</button></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
+    b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Back up to Google Drive</button><button type="button" class="mini" id="b_dl">Download file</button><button type="button" class="mini" id="b_imp">Import backup</button></div><div class="hint" id="b_st" style="margin-top:6px"></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
 <div class="hint">Bottom bar too low or cut off? Raise it: <button type="button" class="mini" data-nl="-8">Lower</button> <button type="button" class="mini" data-nl="8">Raise</button> (now <span id="nlv">${(()=>{try{return +localStorage.getItem('navlift')||0}catch(e){return 0}})()}</span>)</div>
@@ -1536,7 +1543,7 @@ $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
   const id=t.id;
   if(id==='b_radd'){REM.push({n:'',d:'',km:''});saveCfg();toolsView();return}
-  if(id==='b_payics')icsPay();else if(id==='b_rics')icsRem();else if(id==='b_exp')expBackup();else if(id==='b_imp')$('b_file').click();
+  if(id==='b_payics')icsPay();else if(id==='b_rics')icsRem();else if(id==='b_exp')driveBackup();else if(id==='b_dl')expBackup();else if(id==='b_imp')$('b_file').click();
   else if(id==='b_fypdf')fyPdf(+$('c_fy').value);else if(id==='b_fycsv')fyCsv(+$('c_fy').value);
   else if(id==='b_lkon')showLock('new','Choose a 4-digit PIN (backup)',()=>{LK=jget('lk',null);if(window.PublicKeyCredential)enrollFid().then(toolsView);else toolsView()});
   else if(id==='b_fid')enrollFid().then(toolsView);
@@ -1562,7 +1569,21 @@ function icsRem(){const evs=REM.filter(r=>r.d).map((r,i)=>{const d=r.d.replace(/
   if(!evs.length){alert('Add a due date to at least one item first.');return}
   const nm='BMP-truck-reminders.ics';shareFile(new File([icsWrap(evs)],nm,{type:'text/calendar'}),nm)}
 /* ===== backup ===== */
-function expBackup(){const nm='BMP-backup-'+todayK()+'.json';shareFile(new File([JSON.stringify({app:'BMP',v:1,at:new Date().toISOString(),entries,cfg:CFG,rem:REM,odo:ODO,mf:MF,rc:RC,bk:BK,db:DB})],nm,{type:'application/json'}),nm)}
+const bkJson=()=>JSON.stringify({app:'BMP',v:1,at:new Date().toISOString(),entries,cfg:CFG,rem:REM,odo:ODO,mf:MF,rc:RC,bk:BK,db:DB});
+function expBackup(){const nm='BMP-backup-'+todayK()+'.json';shareFile(new File([bkJson()],nm,{type:'application/json'}),nm)}
+async function driveBackup(){const st=m=>{const e=$('b_st');if(e)e.textContent=m},nm='BMP-backup-'+todayK()+'-'+new Date().toTimeString().slice(0,5).replace(':','')+'.json';
+  if(window.BMP_VIEW||!tok||Date.now()>tokExp){st('Not signed in to Google, so the file was downloaded instead. Tap Sign in at the top, then try again.');try{silentSign()}catch(e){}expBackup();return}
+  st('Backing up to Google Drive...');
+  try{const H={Authorization:'Bearer '+tok},g=async(u,o)=>{const r=await fetch(u,o);if(r.status===401||r.status===403){const e=new Error('scope');e.scope=1;throw e}if(!r.ok)throw new Error((await r.text()).slice(0,100));return r.json()};
+    let fid='';try{fid=localStorage.getItem('bkfid')||''}catch(e){}
+    if(fid){try{const f=await g('https://www.googleapis.com/drive/v3/files/'+fid+'?fields=id,trashed',{headers:H});if(f.trashed)fid=''}catch(e){if(e.scope)throw e;fid=''}}
+    if(!fid){const q=encodeURIComponent("name='Backups' and mimeType='application/vnd.google-apps.folder' and trashed=false"),l=await g('https://www.googleapis.com/drive/v3/files?q='+q+'&fields=files(id)',{headers:H});
+      fid=l.files&&l.files[0]?l.files[0].id:(await g('https://www.googleapis.com/drive/v3/files',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({name:'Backups',mimeType:'application/vnd.google-apps.folder'})})).id;
+      try{localStorage.setItem('bkfid',fid)}catch(e){}}
+    const bd='bmpb'+Date.now(),body='--'+bd+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'+JSON.stringify({name:nm,parents:[fid]})+'\r\n--'+bd+'\r\nContent-Type: application/json\r\n\r\n'+bkJson()+'\r\n--'+bd+'--';
+    await g('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:Object.assign({'Content-Type':'multipart/related; boundary='+bd},H),body});
+    st('Saved to Google Drive > Backups > '+nm);alert('Backup saved to Google Drive > Backups.')}
+  catch(e){if(e.scope){st('Google needs permission for Drive. Tap Sign in at the top, tick the Drive permission, then try again. The file was downloaded for now.');try{localStorage.removeItem('gever')}catch(x){}expBackup()}else{st('Drive backup failed ('+(e.message||e)+'). The file was downloaded instead.');expBackup()}}}
 async function impBackup(f){if(!f)return;let j;try{j=JSON.parse(await f.text())}catch(e){alert('That file is not a valid BMP backup.');return}
   if(!j||j.app!=='BMP'||!Array.isArray(j.entries)){alert('That file is not a valid BMP backup.');return}
   const have=new Set(entries.map(sig)),add=j.entries.filter(e=>e&&/^\d{4}-\d\d-\d\d$/.test(e.d)&&!have.has(sig(e)));
@@ -2604,7 +2625,7 @@ function qaSave(){const q=QA[QAT];if(!q)return;const d=$('qad').value,x=Math.rou
   const note=w>0?('PAYG '+w.toFixed(2)+(n?' \u00b7 '+n:'')):n;
   entries.push({d,del:0,pu:0,nm:false,x,cat:q.cat,note});persist();QAM='Saved '+q.t+' '+fmt(x)+' on '+dAU(d)+' \u2192 Expenses \u203a '+q.cat;
   qaClose();render();autoSync();setTimeout(()=>{QAM='';try{homeRender()}catch(e){}},6000)}
-document.addEventListener('click',ev=>{const t=ev.target;const b=t.closest&&t.closest('[data-qa]');if(b){qaOpen(b.dataset.qa);return}
+document.addEventListener('click',ev=>{const t=ev.target;const nb=t.closest&&t.closest('[data-qn]');if(nb){const k=nb.dataset.qn;if(k==='cash'){showTab('earn');cf='cash';render()}else{showTab('tools');tl=k==='acc'?'mgr':'debt';toolsView()}return}const b=t.closest&&t.closest('[data-qa]');if(b){qaOpen(b.dataset.qa);return}
   if(t.id==='qas'){qaSave();return}if(t.id==='qax'||t.id==='qapop')qaClose()});
 
 /* ===== Custom report builder: by category / income type / description / month / week / day, with optional second grouping ===== */
@@ -2685,7 +2706,7 @@ function homeRender(){const el=$('home');if(!el||window.BMP_VIEW)return;
    +`<div class="hdiv hv"></div>`
    +`<div class="card tl hn"><div class="pfh">Payment advice from email</div>${homeAdvHtml()}</div>`
    +`<div class="hdiv"></div>`
-   +`<div class="card tl hn qac"><div class="pfh">Quick actions</div><div class="qa"><button type="button" data-qa="fuel"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/><path d="M3 21h12"/><path d="M6.5 8h5"/><path d="M14 9h2.5a1.5 1.5 0 0 1 1.5 1.5V16a1.5 1.5 0 0 0 3 0V8l-3-3"/></svg><span>Fuel</span></button><button type="button" data-qa="sal"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M5 20.5a7 7 0 0 1 14 0"/></svg><span>Employee Salary</span></button><button type="button" data-qa="sup"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20h18"/></svg><span>Employee Super</span></button></div>${QAM?`<div class="qam">${esc(QAM)}</div>`:''}</div>`;
+   +`<div class="card tl hn qac"><div class="pfh">Quick actions</div><div class="qa"><button type="button" data-qa="fuel"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/><path d="M3 21h12"/><path d="M6.5 8h5"/><path d="M14 9h2.5a1.5 1.5 0 0 1 1.5 1.5V16a1.5 1.5 0 0 0 3 0V8l-3-3"/></svg><span>Fuel</span></button><button type="button" data-qa="sal"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M5 20.5a7 7 0 0 1 14 0"/></svg><span>Employee Salary</span></button><button type="button" data-qa="sup"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20h18"/></svg><span>Employee Super</span></button></div><div class="qa q2"><button type="button" data-qn="acc"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18"/><path d="M7 15h4"/></svg><span>Accounts</span></button><button type="button" data-qn="cash"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6.5" width="19" height="11" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v.01M18 14.5v.01"/></svg><span>Cash</span></button><button type="button" data-qn="debt"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14.5 3v4.5H19"/><path d="M9.5 15h6"/></svg><span>Debts</span></button></div>${QAM?`<div class="qam">${esc(QAM)}</div>`:''}</div>`;
   try{paintInbox()}catch(e){}homeBadge()}
 (function(){const r=render;render=function(){const x=r.apply(this,arguments);try{homeRender()}catch(e){}return x};window.render=render;
   const la=loadAdvice;loadAdvice=async function(){const x=await la.apply(this,arguments);try{homeRender()}catch(e){}return x};
