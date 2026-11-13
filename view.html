@@ -956,6 +956,9 @@ html body #home .qa button{font-size:13px!important;padding:12px 4px!important}
 html body #home .qa button[data-qn]:not(#_):not(#__):not(#___){background:rgba(30,144,255,.14)!important;border:0!important;box-shadow:inset 0 0 0 1px #1e90ff!important}
 html body #home .qa button[data-qn] .ico:not(#_):not(#__){color:#4db2ff!important;stroke:#4db2ff!important}
 html body #tools .two2 #b_exp{grid-column:1/-1}
+
+html body #home .hgap{height:20px;flex:none}
+@media (min-width:900px) and (min-height:520px){html body #home .hgap{grid-column:1/-1;height:24px}}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1459,7 +1462,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='12 Nov 2026, 13:45 (CHEP Accounts pallet icon)';
+const APPV='13 Nov 2026, 19:20 (Home: empty sections hidden)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -2699,13 +2702,13 @@ function homeAdvHtml(){const ks=Object.keys(ADV||{}).sort().reverse().slice(0,4)
     return `<button type="button" class="mfr" data-mf="${ym}"><span><b>${ymName(ym)}</b><small class="${nw?'cg':''}">${nw?'Payment advice received · tap to apply':(m.recDate?'Applied · received '+dAU(m.recDate):'Advice read · tap to check')}</small></span><span class="r"><b>${A(a.dc||a.rev)}</b><small>${a.dc?'direct credit':'revenue'}</small></span></button>`}).join('')}
 function homeRender(){const el=$('home');if(!el||window.BMP_VIEW)return;
   const fa=document.activeElement;if(fa&&el.contains(fa)&&/^(INPUT|SELECT|TEXTAREA)$/.test(fa.tagName))return;
-  const b=BN();
-  el.innerHTML=`<div class="card tl hn"><div class="pfh">Notifications</div>${b||'<div class="blmt">All clear. Nothing due right now.</div>'}</div>`
-   +`<div class="hdiv hv"></div>`
-   +`<div class="card tl hn"><div class="pfh">Income invoices from email</div><div id="hinbx"></div>${INBX.length?'':'<div class="blmt">No new invoices. New ones from your email appear here.</div>'}</div>`
-   +`<div class="hdiv hv"></div>`
-   +`<div class="card tl hn"><div class="pfh">Payment advice from email</div>${homeAdvHtml()}</div>`
-   +`<div class="hdiv"></div>`
+  const b=BN(),cards=[];
+  if(b)cards.push(`<div class="card tl hn"><div class="pfh">Notifications</div>${b}</div>`);
+  if(INBX.length)cards.push(`<div class="card tl hn"><div class="pfh">Income invoices from email</div><div id="hinbx"></div></div>`);
+  if(Object.keys(ADV||{}).length)cards.push(`<div class="card tl hn"><div class="pfh">Payment advice from email</div>${homeAdvHtml()}</div>`);
+  el.style.gridTemplateColumns=cards.length?(cards.length===1?'minmax(0,1fr)':Array(cards.length).fill('minmax(0,1fr)').join(' 2px ')):'';
+  el.innerHTML=cards.join('<div class="hdiv hv"></div>')
+   +(cards.length?'<div class="hdiv"></div>':'<div class="hgap"></div>')
    +`<div class="card tl hn qac"><div class="pfh">Quick actions</div><div class="qa"><button type="button" data-qa="fuel"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/><path d="M3 21h12"/><path d="M6.5 8h5"/><path d="M14 9h2.5a1.5 1.5 0 0 1 1.5 1.5V16a1.5 1.5 0 0 0 3 0V8l-3-3"/></svg><span>Fuel</span></button><button type="button" data-qa="sal"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M5 20.5a7 7 0 0 1 14 0"/></svg><span>Employee Salary</span></button><button type="button" data-qa="sup"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20h18"/></svg><span>Employee Super</span></button></div><div class="qa q2"><button type="button" data-qn="acc"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5.5" width="20" height="3.5" rx=".6"/><rect x="3.5" y="9" width="3.5" height="6.5"/><rect x="10.25" y="9" width="3.5" height="6.5"/><rect x="17" y="9" width="3.5" height="6.5"/><rect x="2" y="15.5" width="20" height="3.5" rx=".6"/></svg><span>CHEP Accounts</span></button><button type="button" data-qn="cash"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6.5" width="19" height="11" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v.01M18 14.5v.01"/></svg><span>Cash</span></button><button type="button" data-qn="bills"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14.5 3v4.5H19"/><path d="M9.5 15h6"/></svg><span>Bills</span></button></div>${QAM?`<div class="qam">${esc(QAM)}</div>`:''}</div>`;
   try{paintInbox()}catch(e){}homeBadge()}
 (function(){const r=render;render=function(){const x=r.apply(this,arguments);try{homeRender()}catch(e){}return x};window.render=render;
