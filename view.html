@@ -978,6 +978,17 @@ html body #rep .cbtile small{font-size:12.5px;color:var(--muted,#9db4e0)}
 html body #rep .cbtile b{font-size:17px}
 html body #rep .cbsh{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
 html body #rep .cbsh.inc{color:#7be3a0}html body #rep .cbsh.exp{color:#ff9aaa}
+
+html body #rep .cbsum{display:grid;gap:2px;margin-bottom:6px}
+html body #rep .cbsum .pft{padding:3px 0}
+html body #rep.x2 .cbk{padding:10px!important}
+html body #rep.x2 .cbc{gap:6px 8px}
+html body #rep.x2 .cbc input,html body #rep.x2 .cbc select,html body #rep.x2 .cbc .cbi{height:44px;font-size:15px}
+html body #rep.x2 .cbc label{font-size:12.5px!important;gap:3px}
+html body #rep.x2 .cbtb td,html body #rep.x2 .cbtb th{padding:5px 8px}
+html body #rep.x2 .cbtb{font-size:13px}
+html body #rep.x2 .cbr{margin-bottom:4px}
+html body #rep.x2 .dl2 .save{min-height:46px}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1481,7 +1492,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='14 Nov 2026, 18:10 (Custom: Both view split; quiet Drive backup)';
+const APPV='14 Nov 2026, 18:30 (Custom Both: single table, fits screen)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -2681,17 +2692,17 @@ function cbCalc(K){K=K||CB.kind;const all=cbAll(),[f,t]=cbRange();
   const L=all.filter(l=>(K==='both'||(K==='inc')===(l.k==='Income'))&&(!f||l.d>=f)&&(!t||l.d<=t)&&(!CB.sel.length||CB.sel.includes(l.ty)));
   const R=new Map(),C=new Set();let inc=0,exp=0;
   L.forEach(l=>{if(l.k==='Income')inc+=l.amt;else exp+=l.amt;const a=cbKey(CB.g1,l),b=CB.g2==='none'?'':cbKey(CB.g2,l);C.add(b);
-    if(!R.has(a))R.set(a,{n:0,t:0,c:new Map()});const r=R.get(a);r.n++;r.t+=l.amt;const c=r.c.get(b)||{n:0,t:0};c.n++;c.t+=l.amt;r.c.set(b,c)});
+    if(!R.has(a))R.set(a,{n:0,t:0,c:new Map()});const r=R.get(a);const v=K==='both'&&l.k==='Expense'?-l.amt:l.amt;r.n++;r.t+=v;const c=r.c.get(b)||{n:0,t:0};c.n++;c.t+=v;r.c.set(b,c)});
   const chrono=d=>d==='month'||d==='week'||d==='day',cols=[...C].sort((x,y)=>x<y?-1:1);
-  const rows=[...R.entries()].sort(chrono(CB.g1)?(x,y)=>x[0]<y[0]?-1:1:(x,y)=>Math.abs(y[1].t)-Math.abs(x[1].t));
+  const rows=[...R.entries()].sort(chrono(CB.g1)?(x,y)=>x[0]<y[0]?-1:1:(x,y)=>K==='both'?y[1].t-x[1].t:Math.abs(y[1].t)-Math.abs(x[1].t));
   return{L,rows,cols,inc,exp,K,f,t,tot:rows.reduce((a,r)=>a+r[1].t,0)}}
-const cbM=(v,K)=>`<b class="${K==='exp'?'cr':'cg'}">${v<0?'-':''}${fmt(Math.abs(v))}</b>`;
+const cbM=(v,K)=>`<b class="${K==='both'?(v<0?'cr':'cg'):K==='exp'?'cr':'cg'}">${v<0?'-':''}${fmt(Math.abs(v))}</b>`;
 function cbTbl(D){const K=D.K,pv=CB.g2!=='none';if(!D.rows.length)return '<div class="rn">Nothing matches these choices</div>';
-  const hd=`<tr><th>${CBD[CB.g1]}</th>${pv?D.cols.map(c=>`<th>${esc(cbLab(CB.g2,c))}</th>`).join(''):'<th>Entries</th>'}<th>Total</th>${pv?'':'<th>Share</th>'}</tr>`;
-  const bd=D.rows.map(([k,r])=>`<tr><td>${esc(cbLab(CB.g1,k))}</td>${pv?D.cols.map(c=>{const x=r.c.get(c);return `<td>${x?cbM(x.t,K):'-'}</td>`}).join(''):`<td>${r.n}</td>`}<td>${cbM(r.t,K)}</td>${pv?'':`<td>${D.tot?Math.round(r.t/D.tot*100):0}%</td>`}</tr>`).join('');
-  const ft=pv?`<tr class="tt"><td>Total</td>${D.cols.map(c=>`<td>${cbM(D.rows.reduce((a,r)=>a+((r[1].c.get(c)||{}).t||0),0),K)}</td>`).join('')}<td>${cbM(D.tot,K)}</td></tr>`:`<tr class="tt"><td>Total</td><td>${D.L.length}</td><td>${cbM(D.tot,K)}</td><td>100%</td></tr>`;
+  const hd=`<tr><th>${CBD[CB.g1]}</th>${pv?D.cols.map(c=>`<th>${esc(cbLab(CB.g2,c))}</th>`).join(''):'<th>Entries</th>'}<th>Total</th>${pv||K==='both'?'':'<th>Share</th>'}</tr>`;
+  const bd=D.rows.map(([k,r])=>`<tr><td>${esc(cbLab(CB.g1,k))}</td>${pv?D.cols.map(c=>{const x=r.c.get(c);return `<td>${x?cbM(x.t,K):'-'}</td>`}).join(''):`<td>${r.n}</td>`}<td>${cbM(r.t,K)}</td>${pv||K==='both'?'':`<td>${D.tot?Math.round(r.t/D.tot*100):0}%</td>`}</tr>`).join('');
+  const ft=pv?`<tr class="tt"><td>Total</td>${D.cols.map(c=>`<td>${cbM(D.rows.reduce((a,r)=>a+((r[1].c.get(c)||{}).t||0),0),K)}</td>`).join('')}<td>${cbM(D.tot,K)}</td></tr>`:`<tr class="tt"><td>Total</td><td>${D.L.length}</td><td>${cbM(D.tot,K)}</td>${K==='both'?'':'<td>100%</td>'}</tr>`;
   return `<div class="cbt"><table class="cbtb"><thead>${hd}</thead><tbody>${bd}${ft}</tbody></table></div>`}
-function cbHtml(){const all=cbAll(),B=CB.kind==='both',Di=cbCalc(B?'inc':CB.kind),De=B?cbCalc('exp'):null;
+function cbHtml(){const all=cbAll(),B=CB.kind==='both',Di=cbCalc(CB.kind),Ds=B?{inc:cbCalc('inc').tot,exp:cbCalc('exp').tot}:null;
   const opt=(a,v)=>a.map(([k,nm])=>`<option value="${k}"${v===k?' selected':''}>${nm}</option>`).join('');
   const dims=Object.entries(CBD),g2=[['none','None']].concat(dims.filter(x=>x[0]!==CB.g1));
   const bar=`<div class="segs three" id="cbk">${[['inc','Income'],['exp','Expenses'],['both','Both']].map(([k,nm])=>`<button type="button" class="seg${CB.kind===k?' on':''}" data-cbk="${k}">${nm}</button>`).join('')}</div>`;
@@ -2699,9 +2710,8 @@ function cbHtml(){const all=cbAll(),B=CB.kind==='both',Di=cbCalc(B?'inc':CB.kind
   const ctl=`<div class="card sec cbk"><div class="cbc"><label>Period<select id="cbp">${opt(CBP,CB.per)}</select></label><label>Group by<select id="cbg1">${opt(dims,CB.g1)}</select></label>${CB.per==='custom'?`<label>From<input type="date" id="cbf" value="${CB.from}"></label><label>To<input type="date" id="cbt" value="${CB.to}"></label>`:''}<label>Then by<select id="cbg2">${opt(g2,CB.g2)}</select></label><label>Include only<button type="button" class="cbi" id="cbi"><span>${incl}</span><span>&rsaquo;</span></button></label></div></div>`;
   const rng=Di.f||Di.t?`${Di.f?dAU(Di.f,{day:'numeric',month:'short',year:'numeric'}):'Start'} - ${Di.t?dAU(Di.t,{day:'numeric',month:'short',year:'numeric'}):'Today'}`:'All dates';
   let body;
-  if(B){const net=Di.tot-De.tot;
-    body=`<div class="card sec cbk"><div class="cbr">${rng}</div><div class="cbtiles"><div class="cbtile"><small>Income</small><b class="cg">${fmt(Di.tot)}</b></div><div class="cbtile"><small>Expenses</small><b class="cr">${fmt(De.tot)}</b></div><div class="cbtile net"><small>Net</small><b class="${net<0?'cr':'cg'}">${net<0?'-':''}${fmt(Math.abs(net))}</b></div></div></div>
-    <div class="card sec cbk"><div class="cbsh inc">Income</div>${cbTbl(Di)}</div><div class="card sec cbk"><div class="cbsh exp">Expenses</div>${cbTbl(De)}</div>`}
+  if(B){const net=Ds.inc-Ds.exp;
+    body=`<div class="card sec cbk"><div class="cbr">${rng}</div><div class="cbsum"><div class="pft"><span>Income</span><b class="cg">${fmt(Ds.inc)}</b></div><div class="pft"><span>Expenses</span><b class="cr">${fmt(Ds.exp)}</b></div><div class="pft big"><span>Net</span><b class="${net<0?'cr':'cg'}">${net<0?'-':''}${fmt(Math.abs(net))}</b></div></div>${cbTbl(Di)}</div>`}
   else body=`<div class="card sec cbk"><div class="cbr">${rng}</div><div class="cbtiles two"><div class="cbtile"><small>Total ${CB.kind==='inc'?'income':'expenses'}</small><b class="${CB.kind==='exp'?'cr':'cg'}">${fmt(Di.tot)}</b></div><div class="cbtile"><small>Entries</small><b>${Di.L.length}</b></div></div>${cbTbl(Di)}</div>`;
   return bar+ctl+body+`
   <div class="dl2"><button class="save${CB.kind==='inc'?' inc':''}" type="button" id="cbpdf">Download PDF</button><button class="save${CB.kind==='inc'?' inc':' alt'}" type="button" id="cbcsv">Download CSV</button></div>`}
