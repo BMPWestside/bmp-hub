@@ -969,6 +969,14 @@ html body .cbrow.on:not(#_):not(#__){background:rgba(30,144,255,.16)!important;b
 html body #rep .dl2 .save{min-height:54px;font-size:16px;border-radius:16px}
 html body #rep #cbk{grid-template-columns:repeat(3,1fr)!important}
 @media (min-width:900px) and (min-height:520px){html body #rep.x2>#cbk{grid-column:1/-1!important;max-width:980px;width:100%;justify-self:center}}
+
+html body #rep .cbtiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+html body #rep .cbtiles.two{grid-template-columns:1fr 1fr}
+html body #rep .cbtile{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 6px;border-radius:16px;background:rgba(5,12,29,.5);border:1px solid var(--edge,rgba(150,190,255,.3))}
+html body #rep .cbtile small{font-size:12.5px;color:var(--muted,#9db4e0)}
+html body #rep .cbtile b{font-size:17px}
+html body #rep .cbsh{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+html body #rep .cbsh.inc{color:#7be3a0}html body #rep .cbsh.exp{color:#ff9aaa}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1472,7 +1480,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='14 Nov 2026, 17:50 (Drive backup: show Google reason)';
+const APPV='14 Nov 2026, 18:10 (Custom: Both view split; quiet Drive backup)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -1604,7 +1612,7 @@ async function drvUpload(){const nm='BMP-backup-'+todayK()+'-'+new Date().toTime
       try{localStorage.setItem('bkfid',fid)}catch(e){}}
     const bd='bmpb'+Date.now(),body='--'+bd+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'+JSON.stringify({name:nm,parents:[fid]})+'\r\n--'+bd+'\r\nContent-Type: application/json\r\n\r\n'+bkJson()+'\r\n--'+bd+'--';
     await g('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:Object.assign({'Content-Type':'multipart/related; boundary='+bd},H),body});
-    bkSt('Saved to Google Drive > Backups > '+nm);try{alert('Backup saved to Google Drive > Backups.')}catch(e){}}
+    bkSt('Saved to Google Drive > Backups > '+nm+' ('+new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'})+')')}
   catch(e){if(e.st===401){dtok=null;try{localStorage.removeItem('dtok')}catch(x){}bkSt('Google asked to sign in again. Tap Back up to Google Drive once more.')}
     else if(/not been used|disabled|accessNotConfigured/i.test(e.message||'')){const pn=((e.message||'').match(/project[ =](\d{6,})/)||[])[1]||'825840710134';bkSt('Google says: '+(e.message||'').slice(0,160)+' | The Drive API must be enabled in Google Cloud project number '+pn+' (the one the sign-in uses). Open https://console.developers.google.com/apis/api/drive.googleapis.com/overview?project='+pn+' and press Enable. Nothing was saved.')}
     else bkSt('Drive backup failed: '+(e.message||e)+'. Nothing was saved. You can use Download file instead.')}}
@@ -2668,47 +2676,56 @@ function cbAll(){const L=[];entries.forEach(e=>{if(e.ln)return;const i=info(e.d,
   else{const de=e.a!==undefined?e.a:(e.del||0),pu=e.pu||0;if(de)L.push(Object.assign({k:'Income',ty:'Deliveries',amt:de},b));if(pu)L.push(Object.assign({k:'Income',ty:'Pickups',amt:pu},b))}});return L}
 const cbKey=(d,l)=>d==='type'?l.ty:d==='note'?l.note:d==='month'?l.ym:d==='week'?l.ym+' W'+l.w:d==='day'?l.d:d==='kind'?l.k:'';
 const cbLab=(d,k)=>d==='month'?ymName(k):d==='week'?ymName(k.slice(0,7))+k.slice(7):d==='day'?dAU(k,{weekday:'short',day:'numeric',month:'short'}):k;
-function cbCalc(){const all=cbAll(),[f,t]=cbRange(),B=CB.kind==='both';
-  const L=all.filter(l=>(CB.kind==='both'||(CB.kind==='inc')===(l.k==='Income'))&&(!f||l.d>=f)&&(!t||l.d<=t)&&(!CB.sel.length||CB.sel.includes(l.ty)));
-  const sv=l=>B&&l.k==='Expense'?-l.amt:l.amt,R=new Map(),C=new Set();let inc=0,exp=0;
+function cbCalc(K){K=K||CB.kind;const all=cbAll(),[f,t]=cbRange();
+  const L=all.filter(l=>(K==='both'||(K==='inc')===(l.k==='Income'))&&(!f||l.d>=f)&&(!t||l.d<=t)&&(!CB.sel.length||CB.sel.includes(l.ty)));
+  const R=new Map(),C=new Set();let inc=0,exp=0;
   L.forEach(l=>{if(l.k==='Income')inc+=l.amt;else exp+=l.amt;const a=cbKey(CB.g1,l),b=CB.g2==='none'?'':cbKey(CB.g2,l);C.add(b);
-    if(!R.has(a))R.set(a,{n:0,t:0,c:new Map()});const r=R.get(a);r.n++;r.t+=sv(l);const c=r.c.get(b)||{n:0,t:0};c.n++;c.t+=sv(l);r.c.set(b,c)});
-  const chrono=d=>d==='month'||d==='week'||d==='day',cols=[...C].sort(chrono(CB.g2)?(x,y)=>x<y?-1:1:(x,y)=>x<y?-1:1);
+    if(!R.has(a))R.set(a,{n:0,t:0,c:new Map()});const r=R.get(a);r.n++;r.t+=l.amt;const c=r.c.get(b)||{n:0,t:0};c.n++;c.t+=l.amt;r.c.set(b,c)});
+  const chrono=d=>d==='month'||d==='week'||d==='day',cols=[...C].sort((x,y)=>x<y?-1:1);
   const rows=[...R.entries()].sort(chrono(CB.g1)?(x,y)=>x[0]<y[0]?-1:1:(x,y)=>Math.abs(y[1].t)-Math.abs(x[1].t));
-  return{L,rows,cols,inc,exp,B,f,t,tot:rows.reduce((a,r)=>a+r[1].t,0)}}
-const cbM=(v,B)=>`<b class="${B?(v<0?'cr':'cg'):(CB.kind==='exp'?'cr':'cg')}">${B&&v<0?'-':''}${fmt(Math.abs(v))}</b>`;
-function cbHtml(){const D=cbCalc(),all=cbAll(),n=[...new Set(all.filter(l=>CB.kind==='both'||(CB.kind==='inc')===(l.k==='Income')).map(l=>l.ty))].length;
+  return{L,rows,cols,inc,exp,K,f,t,tot:rows.reduce((a,r)=>a+r[1].t,0)}}
+const cbM=(v,K)=>`<b class="${K==='exp'?'cr':'cg'}">${v<0?'-':''}${fmt(Math.abs(v))}</b>`;
+function cbTbl(D){const K=D.K,pv=CB.g2!=='none';if(!D.rows.length)return '<div class="rn">Nothing matches these choices</div>';
+  const hd=`<tr><th>${CBD[CB.g1]}</th>${pv?D.cols.map(c=>`<th>${esc(cbLab(CB.g2,c))}</th>`).join(''):'<th>Entries</th>'}<th>Total</th>${pv?'':'<th>Share</th>'}</tr>`;
+  const bd=D.rows.map(([k,r])=>`<tr><td>${esc(cbLab(CB.g1,k))}</td>${pv?D.cols.map(c=>{const x=r.c.get(c);return `<td>${x?cbM(x.t,K):'-'}</td>`}).join(''):`<td>${r.n}</td>`}<td>${cbM(r.t,K)}</td>${pv?'':`<td>${D.tot?Math.round(r.t/D.tot*100):0}%</td>`}</tr>`).join('');
+  const ft=pv?`<tr class="tt"><td>Total</td>${D.cols.map(c=>`<td>${cbM(D.rows.reduce((a,r)=>a+((r[1].c.get(c)||{}).t||0),0),K)}</td>`).join('')}<td>${cbM(D.tot,K)}</td></tr>`:`<tr class="tt"><td>Total</td><td>${D.L.length}</td><td>${cbM(D.tot,K)}</td><td>100%</td></tr>`;
+  return `<div class="cbt"><table class="cbtb"><thead>${hd}</thead><tbody>${bd}${ft}</tbody></table></div>`}
+function cbHtml(){const all=cbAll(),B=CB.kind==='both',Di=cbCalc(B?'inc':CB.kind),De=B?cbCalc('exp'):null;
   const opt=(a,v)=>a.map(([k,nm])=>`<option value="${k}"${v===k?' selected':''}>${nm}</option>`).join('');
   const dims=Object.entries(CBD),g2=[['none','None']].concat(dims.filter(x=>x[0]!==CB.g1));
   const bar=`<div class="segs three" id="cbk">${[['inc','Income'],['exp','Expenses'],['both','Both']].map(([k,nm])=>`<button type="button" class="seg${CB.kind===k?' on':''}" data-cbk="${k}">${nm}</button>`).join('')}</div>`;
   const incl=CB.sel.length?CB.sel.length+' selected':(CB.kind==='exp'?'All categories':CB.kind==='inc'?'Deliveries + Pickups':'Everything');
   const ctl=`<div class="card sec cbk"><div class="cbc"><label>Period<select id="cbp">${opt(CBP,CB.per)}</select></label><label>Group by<select id="cbg1">${opt(dims,CB.g1)}</select></label>${CB.per==='custom'?`<label>From<input type="date" id="cbf" value="${CB.from}"></label><label>To<input type="date" id="cbt" value="${CB.to}"></label>`:''}<label>Then by<select id="cbg2">${opt(g2,CB.g2)}</select></label><label>Include only<button type="button" class="cbi" id="cbi"><span>${incl}</span><span>&rsaquo;</span></button></label></div></div>`;
-  const sm=`<div class="ts cbs">${D.B?`<div class="pft"><span>Income</span><b class="cg">${fmt(D.inc)}</b></div><div class="pft"><span>Expenses</span><b class="cr">${fmt(D.exp)}</b></div><div class="pft big"><span>Net</span>${cbM(D.inc-D.exp,true)}</div>`:`<div class="pft big"><span>Total ${CB.kind==='inc'?'income':'expenses'}</span>${cbM(D.tot,false)}</div><div class="pft"><span>Entries</span><b>${D.L.length}</b></div>`}</div>`;
-  const pv=CB.g2!=='none',hd=`<tr><th>${CBD[CB.g1]}</th>${pv?D.cols.map(c=>`<th>${esc(cbLab(CB.g2,c))}</th>`).join(''):'<th>Entries</th>'}<th>Total</th>${pv||D.B?'':'<th>Share</th>'}</tr>`;
-  const bd=D.rows.map(([k,r])=>`<tr><td>${esc(cbLab(CB.g1,k))}</td>${pv?D.cols.map(c=>{const x=r.c.get(c);return `<td>${x?cbM(x.t,D.B):'-'}</td>`}).join(''):`<td>${r.n}</td>`}<td>${cbM(r.t,D.B)}</td>${pv||D.B?'':`<td>${D.tot?Math.round(r.t/D.tot*100):0}%</td>`}</tr>`).join('');
-  const ft=pv?`<tr class="tt"><td>Total</td>${D.cols.map(c=>`<td>${cbM(D.rows.reduce((a,r)=>a+((r[1].c.get(c)||{}).t||0),0),D.B)}</td>`).join('')}<td>${cbM(D.tot,D.B)}</td></tr>`:`<tr class="tt"><td>Total</td><td>${D.L.length}</td><td>${cbM(D.tot,D.B)}</td>${D.B?'':'<td>100%</td>'}</tr>`;
-  const rng=D.f||D.t?`${D.f?dAU(D.f,{day:'numeric',month:'short',year:'numeric'}):'Start'} - ${D.t?dAU(D.t,{day:'numeric',month:'short',year:'numeric'}):'Today'}`:'All dates';
-  return bar+ctl+`<div class="card sec cbk"><div class="cbr">${rng}</div>${sm}${D.rows.length?`<div class="cbt"><table class="cbtb"><thead>${hd}</thead><tbody>${bd}${ft}</tbody></table></div>`:'<div class="rn">Nothing matches these choices</div>'}</div>
+  const rng=Di.f||Di.t?`${Di.f?dAU(Di.f,{day:'numeric',month:'short',year:'numeric'}):'Start'} - ${Di.t?dAU(Di.t,{day:'numeric',month:'short',year:'numeric'}):'Today'}`:'All dates';
+  let body;
+  if(B){const net=Di.tot-De.tot;
+    body=`<div class="card sec cbk"><div class="cbr">${rng}</div><div class="cbtiles"><div class="cbtile"><small>Income</small><b class="cg">${fmt(Di.tot)}</b></div><div class="cbtile"><small>Expenses</small><b class="cr">${fmt(De.tot)}</b></div><div class="cbtile net"><small>Net</small><b class="${net<0?'cr':'cg'}">${net<0?'-':''}${fmt(Math.abs(net))}</b></div></div></div>
+    <div class="card sec cbk"><div class="cbsh inc">Income</div>${cbTbl(Di)}</div><div class="card sec cbk"><div class="cbsh exp">Expenses</div>${cbTbl(De)}</div>`}
+  else body=`<div class="card sec cbk"><div class="cbr">${rng}</div><div class="cbtiles two"><div class="cbtile"><small>Total ${CB.kind==='inc'?'income':'expenses'}</small><b class="${CB.kind==='exp'?'cr':'cg'}">${fmt(Di.tot)}</b></div><div class="cbtile"><small>Entries</small><b>${Di.L.length}</b></div></div>${cbTbl(Di)}</div>`;
+  return bar+ctl+body+`
   <div class="dl2"><button class="save${CB.kind==='inc'?' inc':''}" type="button" id="cbpdf">Download PDF</button><button class="save${CB.kind==='inc'?' inc':' alt'}" type="button" id="cbcsv">Download CSV</button></div>`}
 function cbPick(){const all=cbAll().filter(l=>CB.kind==='both'||(CB.kind==='inc')===(l.k==='Income')),tot={};all.forEach(l=>tot[l.ty]=(tot[l.ty]||0)+l.amt);
   const ty=Object.keys(tot).sort((a,b)=>tot[b]-tot[a]);let p=$('cbpop');if(!p){document.body.insertAdjacentHTML('beforeend','<div class="pop" id="cbpop" style="display:none"><div class="popc"><h3>Include only</h3><div class="hint">Tap to pick. With none picked, everything is included.</div><div id="cbrows"></div><button class="save alt" type="button" id="cbclr">Clear</button><button class="save" type="button" id="cbdone">Done</button></div></div>');p=$('cbpop')}
   $('cbrows').innerHTML=ty.map(t=>`<button type="button" class="cbrow${CB.sel.includes(t)?' on':''}" data-cbc="${esc(t)}"><span>${esc(t)}</span><b>${fmt(tot[t])}</b></button>`).join('')||'<div class="rn">No entries yet</div>';p.style.display='flex'}
 (function(){const r2=renderRep;renderRep=function(){if(rk==='custom'){$('rep').classList.add('x2');$('rep').innerHTML=rkBar()+cbHtml();fit();return}r2()};window.renderRep=renderRep})();
-function cbFlat(){const D=cbCalc(),pv=CB.g2!=='none',R=[];D.rows.forEach(([k,r])=>{if(pv)D.cols.forEach(c=>{const x=r.c.get(c);if(x)R.push([cbLab(CB.g1,k),cbLab(CB.g2,c),x.n,x.t])});else R.push([cbLab(CB.g1,k),'',r.n,r.t])});return{D,R,pv}}
+function cbFlat(K){const D=cbCalc(K),pv=CB.g2!=='none',R=[];D.rows.forEach(([k,r])=>{if(pv)D.cols.forEach(c=>{const x=r.c.get(c);if(x)R.push([cbLab(CB.g1,k),cbLab(CB.g2,c),x.n,x.t])});else R.push([cbLab(CB.g1,k),'',r.n,r.t])});return{D,R,pv}}
+const cbKinds=()=>CB.kind==='both'?['inc','exp']:[CB.kind];
 function cbTitle(){return {inc:'Income',exp:'Expenses',both:'Income & Expenses'}[CB.kind]+' by '+CBD[CB.g1].toLowerCase()+(CB.g2!=='none'?' and '+CBD[CB.g2].toLowerCase():'')}
-function cbCsv(){const{D,R,pv}=cbFlat(),q=v=>{v=String(v==null?'':v);return /[",\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
-  const rows=[[CBD[CB.g1]].concat(pv?[CBD[CB.g2]]:[]).concat(['Entries','Amount'])].concat(R.map(r=>(pv?r:[r[0],r[2],r[3]]).map((v,i,a)=>i===a.length-1?(+v).toFixed(2):v)));
+function cbCsv(){const q=v=>{v=String(v==null?'':v);return /[",\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v},pv=CB.g2!=='none',B=CB.kind==='both';
+  const rows=[(B?['Section']:[]).concat([CBD[CB.g1]]).concat(pv?[CBD[CB.g2]]:[]).concat(['Entries','Amount'])];
+  cbKinds().forEach(K=>{const{R}=cbFlat(K);R.forEach(r=>rows.push((B?[K==='inc'?'Income':'Expenses']:[]).concat(pv?[r[0],r[1],r[2],(+r[3]).toFixed(2)]:[r[0],r[2],(+r[3]).toFixed(2)])))});
   const csv='﻿'+rows.map(r=>r.map(q).join(',')).join('\r\n'),nm='BMP-Custom-'+iso(new Date())+'.csv';shareFile(new File([csv],nm,{type:'text/csv'}),nm)}
 async function cbPdf(){const J=window.jspdf;if(!J){alert('PDF tool is still loading. Check your internet and try again.');return}
-  const{D,R,pv}=cbFlat(),d=new J.jsPDF({unit:'mm',format:'a4'});let y=60;lhDraw(d);
-  const rng=D.f||D.t?(D.f?dAU(D.f,{day:'numeric',month:'short',year:'numeric'}):'Start')+' - '+(D.t?dAU(D.t,{day:'numeric',month:'short',year:'numeric'}):'Today'):'All dates';
+  const d=new J.jsPDF({unit:'mm',format:'a4'});let y=60;lhDraw(d);const pv=CB.g2!=='none',Ks=cbKinds(),Dm={};Ks.forEach(K=>Dm[K]=cbFlat(K));
+  const f0=Dm[Ks[0]].D,rng=f0.f||f0.t?(f0.f?dAU(f0.f,{day:'numeric',month:'short',year:'numeric'}):'Start')+' - '+(f0.t?dAU(f0.t,{day:'numeric',month:'short',year:'numeric'}):'Today'):'All dates';
   y=pdfTitle(d,y,'BMP Custom Report',[cbTitle(),rng+(CB.sel.length?'   Only: '+CB.sel.join(', '):''),'Generated '+new Date().toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})]);
-  const mt=(v)=>({t:(v<0?'-':'')+fmt(Math.abs(v)),c:D.B?(v<0?PR_:PG_):(CB.kind==='exp'?PR_:PG_)});
-  y=pdfSec(d,y,'Summary');const sr=D.B?[['Income',{t:fmt(D.inc),c:PG_}],['Expenses',{t:'-'+fmt(D.exp),c:PR_}],['Net',mt(D.inc-D.exp)]]:[['Total '+(CB.kind==='inc'?'income':'expenses'),mt(D.tot)],['Entries',String(D.L.length)]];
+  const mt=(v,K)=>({t:(v<0?'-':'')+fmt(Math.abs(v)),c:K==='exp'?PR_:PG_});
+  y=pdfSec(d,y,'Summary');
+  const sr=Ks.length>1?[['Income',mt(Dm.inc.D.tot,'inc')],['Expenses',mt(Dm.exp.D.tot,'exp')],['Net',mt(Dm.inc.D.tot-Dm.exp.D.tot,Dm.inc.D.tot-Dm.exp.D.tot<0?'exp':'inc')]]:[['Total '+(Ks[0]==='inc'?'income':'expenses'),mt(f0.tot,Ks[0])],['Entries',String(f0.L.length)]];
   y=pdfTbl(d,y,[{t:'Item',x:17},{t:'Amount',x:193,al:'right'}],sr);y+=3;
-  y=pdfSec(d,y,'Breakdown');
-  const rows=R.map(r=>pv?[r[0],r[1],String(r[2]),mt(r[3])]:[r[0],String(r[2]),mt(r[3])]);const t=pv?['Total','',String(D.L.length),mt(D.tot)]:['Total',String(D.L.length),mt(D.tot)];t.b=1;rows.push(t);
-  y=pdfTbl(d,y,pv?[{t:CBD[CB.g1],x:17,w:70},{t:CBD[CB.g2],x:92,w:50},{t:'Entries',x:158,al:'right'},{t:'Amount',x:193,al:'right'}]:[{t:CBD[CB.g1],x:17,w:110},{t:'Entries',x:150,al:'right'},{t:'Amount',x:193,al:'right'}],rows);
+  Ks.forEach(K=>{const{D,R}=Dm[K];y=pdfSec(d,y,Ks.length>1?(K==='inc'?'Income':'Expenses'):'Breakdown');
+    const rows=R.map(r=>pv?[r[0],r[1],String(r[2]),mt(r[3],K)]:[r[0],String(r[2]),mt(r[3],K)]);const t=pv?['Total','',String(D.L.length),mt(D.tot,K)]:['Total',String(D.L.length),mt(D.tot,K)];t.b=1;rows.push(t);
+    y=pdfTbl(d,y,pv?[{t:CBD[CB.g1],x:17,w:70},{t:CBD[CB.g2],x:92,w:50},{t:'Entries',x:158,al:'right'},{t:'Amount',x:193,al:'right'}]:[{t:CBD[CB.g1],x:17,w:110},{t:'Entries',x:150,al:'right'},{t:'Amount',x:193,al:'right'}],rows);y+=3});
   lhFoot(d);const nm='BMP-Custom-'+iso(new Date())+'.pdf';await shareFile(new File([d.output('blob')],nm,{type:'application/pdf'}),nm)}
 $('rep').addEventListener('click',ev=>{const t=ev.target,b=t.closest&&t.closest('[data-cbk]');
   if(b){CB.kind=b.dataset.cbk;CB.sel=[];cbSave();renderRep();return}
