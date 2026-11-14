@@ -1473,7 +1473,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='14 Nov 2026, 17:45 (Drive backup via own permission; Custom report redesign)';
+const APPV='14 Nov 2026, 17:50 (Drive backup: show Google reason)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -1607,7 +1607,7 @@ async function drvUpload(){const nm='BMP-backup-'+todayK()+'-'+new Date().toTime
     await g('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:Object.assign({'Content-Type':'multipart/related; boundary='+bd},H),body});
     bkSt('Saved to Google Drive > Backups > '+nm);try{alert('Backup saved to Google Drive > Backups.')}catch(e){}}
   catch(e){if(e.st===401){dtok=null;try{localStorage.removeItem('dtok')}catch(x){}bkSt('Google asked to sign in again. Tap Back up to Google Drive once more.')}
-    else if(/not been used|disabled|accessNotConfigured/i.test(e.message||''))bkSt('Google Drive is switched off for this app in Google Cloud. Open console.cloud.google.com/apis/library/drive.googleapis.com, press Enable, wait a minute, then try again. Nothing was saved.');
+    else if(/not been used|disabled|accessNotConfigured/i.test(e.message||'')){const pn=((e.message||'').match(/project[ =](\d{6,})/)||[])[1]||'825840710134';bkSt('Google says: '+(e.message||'').slice(0,160)+' | The Drive API must be enabled in Google Cloud project number '+pn+' (the one the sign-in uses). Open https://console.developers.google.com/apis/api/drive.googleapis.com/overview?project='+pn+' and press Enable. Nothing was saved.')}
     else bkSt('Drive backup failed: '+(e.message||e)+'. Nothing was saved. You can use Download file instead.')}}
 async function impBackup(f){if(!f)return;let j;try{j=JSON.parse(await f.text())}catch(e){alert('That file is not a valid BMP backup.');return}
   if(!j||j.app!=='BMP'||!Array.isArray(j.entries)){alert('That file is not a valid BMP backup.');return}
