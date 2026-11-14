@@ -252,7 +252,7 @@ button.save.del{background:rgba(228,0,43,.25);border:1px solid rgba(255,120,135,
 .top .r.vp{font-size:16px;padding:3px 6px;background:none;white-space:nowrap}
 .top .r.g{color:#4dff9a}.top .r.rd{color:#ff7a8a}
 .top .side:last-child{gap:6px}
-#rep .segs.two{margin-bottom:0}#rep #rkt .seg{padding:5px 0}
+#rep .segs.two{margin-bottom:0}#rep #rkt .seg,#rep #cbk .seg{padding:5px 0}
 /* 3-value-column (Expenses) tables, one-line cards, report buttons */
 .card.c3 .dg{grid-template-columns:50px 1px repeat(3,minmax(0,1fr)) 1px minmax(0,1.2fr);gap:3px}
 .card.c3 .cf{font-size:10.5px;padding-left:0;padding-right:0}
@@ -326,7 +326,7 @@ html.locked .wrap{visibility:hidden}
 .top .l{font-size:13px!important}
 .top.top2{height:28px!important;padding:2px 16px!important;margin-top:4px!important}
 .top2 span{font-size:13.5px!important}
-.seg,#earn .seg,#rep #rkt .seg,#tools .seg,#form .seg,#rep .seg{padding:2px 0!important;font-size:11.5px!important}
+.seg,#earn .seg,#rep #rkt .seg,#rep #cbk .seg,#tools .seg,#form .seg,#rep .seg{padding:2px 0!important;font-size:11.5px!important}
 .topwrap{padding-top:20px!important}
 /* data manager */
 .segs.four{grid-template-columns:repeat(4,1fr);margin-bottom:0}
@@ -375,7 +375,7 @@ html.locked .wrap{visibility:hidden}
   .top .r{font-size:21px!important}.top .l{font-size:16px!important}.top2 span{font-size:16px!important}
   .card.tabs{max-width:820px;width:100%;margin:0 auto}
   .tab{padding:6px 0!important;font-size:15px!important}
-  .seg,#earn .seg,#rep #rkt .seg,#tools .seg,#form .seg,#rep .seg{padding:4px 0!important;font-size:13px!important}
+  .seg,#earn .seg,#rep #rkt .seg,#rep #cbk .seg,#tools .seg,#form .seg,#rep .seg{padding:4px 0!important;font-size:13px!important}
   #gcard{max-width:420px;margin:0 auto;width:100%}
   /* Cashflow: 2 x 2 tables */
   #earn.on{display:grid!important;grid-template-columns:1fr 1fr;gap:8px 14px;align-content:start}
@@ -715,7 +715,7 @@ html body button.save:not(.inc):not(.alt):not(.del):not(#_):not(#__),html body #
 html body button.save.alt:not(#_):not(#__){background:linear-gradient(180deg,rgba(255,255,255,.17),rgba(255,255,255,.05))!important;border:1px solid rgba(255,255,255,.3)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.4)!important}
 html body .tab,html body .seg,html body .nb,html body .mini,html body .go,html body .lk2,html body .dmb,html body button.save,html body #gcard button{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 /* standalone sub-tab bars sit in a glass capsule like the main tabs */
-html body #cft,html body #rkt,html body #tlt,html body #cvb{padding:4px!important;border-radius:22px!important;background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.03) 55%),rgba(8,26,66,.26)!important;-webkit-backdrop-filter:blur(12px) saturate(150%);backdrop-filter:blur(12px) saturate(150%);border:1px solid rgba(255,255,255,.22)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 8px 26px rgba(0,0,0,.22)!important;margin-bottom:8px}
+html body #cft,html body #rkt,html body #cbk,html body #tlt,html body #cvb{padding:4px!important;border-radius:22px!important;background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.03) 55%),rgba(8,26,66,.26)!important;-webkit-backdrop-filter:blur(12px) saturate(150%);backdrop-filter:blur(12px) saturate(150%);border:1px solid rgba(255,255,255,.22)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 8px 26px rgba(0,0,0,.22)!important;margin-bottom:8px}
 
 .chs{display:flex;flex-direction:column;gap:9px}.chs h4{margin:2px 0 0;font-size:20px;color:#fff}.chs .chn{font-size:12px;color:var(--mut,#9db4e0);margin-top:-6px}
 .chbox{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;height:210px;padding:12px 14px;border-radius:14px;border:1px solid var(--edge);background:rgba(70,130,215,.14)}.chlogo{max-height:170px;max-width:70%;width:auto;height:auto;pointer-events:none;user-select:none}.chnm{font-size:18px;color:#fff}.chb{display:flex;gap:8px}.chb .mini{flex:1}.chbox .num{font-size:28px;font-weight:800;letter-spacing:1px;color:#F5D6A6}.chbox .dmf{width:100%}.chcard{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:16px 10px;border-radius:14px;border:1px solid var(--edge);background:rgba(70,130,215,.14)}
@@ -784,7 +784,7 @@ body::before{content:"";position:fixed;inset:0;background:var(--wm,none) center 
   html body .card.tabs .tab.on:not(#_):not(#__):not(#___){background:rgba(245,214,166,.1)!important;border:0!important;box-shadow:inset 0 0 0 1px rgba(245,214,166,.55)!important;color:#f5d6a6!important;border-radius:14px!important}
 }
 /* sub tabs: blue glass inside a dark capsule, like the preview */
-html body #cft,html body #rkt,html body #tlt,html body #cvb,html body #ftabs{padding:5px!important;border-radius:20px!important;background:rgba(5,12,29,.35)!important;-webkit-backdrop-filter:none;backdrop-filter:none;border:1px solid var(--edge)!important;box-shadow:none!important;margin-bottom:8px}
+html body #cft,html body #rkt,html body #cbk,html body #tlt,html body #cvb,html body #ftabs{padding:5px!important;border-radius:20px!important;background:rgba(5,12,29,.35)!important;-webkit-backdrop-filter:none;backdrop-filter:none;border:1px solid var(--edge)!important;box-shadow:none!important;margin-bottom:8px}
 html body .seg:not(.on):not(#_):not(#__):not(#___){background:linear-gradient(180deg,rgba(130,190,255,.16),rgba(36,103,214,.08))!important;border:1px solid var(--edge)!important;box-shadow:none!important;color:var(--text)!important}
 /* sections */
 html body .card.sec,html body form.card{background:rgba(70,130,215,.14)!important;border-color:var(--edge)!important;border-radius:22px!important;box-shadow:none!important}
@@ -867,10 +867,10 @@ html body #rep .tv .lgd i{opacity:.55}
   html body #tools .card .segs.ib,html body .card .segs.ib{max-width:560px!important;margin-left:auto!important;margin-right:auto!important}
   html body #tools .chbox .chlogo{width:150px!important;height:150px!important}
   html body #form{max-width:760px!important}
-  html body #cft,html body #rkt,html body #tlt,html body #ftabs{max-width:720px!important}
+  html body #cft,html body #rkt,html body #cbk,html body #tlt,html body #ftabs{max-width:720px!important}
   html body #earn>#cft,html body #rep>#rkt{max-width:720px!important}
   html body #tools{max-width:1000px!important}
-  html body .seg,html body #earn .seg,html body #rep #rkt .seg,html body #tools .seg,html body #form .seg,html body #rep .seg{padding:7px 0!important;font-size:14px!important}
+  html body .seg,html body #earn .seg,html body #rep #rkt .seg,#rep #cbk .seg,html body #tools .seg,html body #form .seg,html body #rep .seg{padding:7px 0!important;font-size:14px!important}
   html body .sc.w,html body .sc.m,html body .sc.y,html body #rep .sc{max-height:none!important}
   html body .tab{font-size:16px!important}
 }
@@ -913,9 +913,11 @@ html body #qapop label{display:flex;flex-direction:column;gap:6px;font-size:13px
 
 html body #rep #rkt{grid-template-columns:repeat(5,1fr)!important}
 html body #rep .cbk .segs{margin-bottom:8px}
-html body #rep .cbc{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-html body #rep .cbc label{display:flex;flex-direction:column;gap:4px;font-size:12px;opacity:.9;min-width:0}
-html body #rep .cbc input,html body #rep .cbc select{height:40px;font-size:15px}
+html body #rep .cbc{display:grid;grid-template-columns:1fr 1fr;gap:12px 10px}
+html body #rep .cbc label{display:flex;flex-direction:column;gap:6px;min-width:0}
+html body #rep .cbc input,html body #rep .cbc select,html body #rep .cbc .cbi{height:52px;width:100%;font:inherit;font-size:16px;border-radius:16px;padding:0 14px;color:var(--text,#fff);background:rgba(5,12,29,.5);border:1px solid var(--edge,rgba(150,190,255,.3));box-shadow:inset 0 1px 0 rgba(255,255,255,.15)}
+html body #rep .cbc .cbi{display:flex;align-items:center;justify-content:space-between;text-align:left;cursor:pointer}
+html body #rep .cbc label{font-size:13.5px!important;color:var(--muted,#9db4e0)}
 html body #rep .cbh{margin-top:10px}html body #rep .cbh small{opacity:.75}
 html body #rep .cbx{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 html body #rep .cbchip{font:inherit;font-size:12.5px;padding:6px 11px;border-radius:999px;color:inherit;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.25);cursor:pointer}
@@ -933,8 +935,8 @@ html body #rep .cbtb tr.tt td{font-weight:700;border-top:2px solid #1e90ff;borde
 
 
 /* selected buttons / tabs: bright blue outline + icon (matches the Home dividers); Expenses views keep their original look */
-html body .tab.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body .card.tabs .tab.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body .cbchip.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #earn .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #rep .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #tools .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #form .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #home .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #cft .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #rkt .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #tlt .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #rep #rkt .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #earn #cft .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #tools #tlt .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #cvb .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____){background:rgba(30,144,255,.16)!important;border:0!important;box-shadow:inset 0 0 0 2px #1e90ff,0 0 12px rgba(30,144,255,.7)!important;color:#fff!important}
-html body .tab.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body .card.tabs .tab.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body .cbchip.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #earn .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #rep .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #tools .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #form .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #home .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #cft .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #rkt .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #tlt .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #rep #rkt .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #earn #cft .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #tools #tlt .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #cvb .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____){stroke:#4db2ff!important;color:#4db2ff!important;filter:drop-shadow(0 0 3px rgba(30,144,255,.8))}
+html body .tab.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body .card.tabs .tab.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body .cbchip.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #earn .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #rep .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #tools .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #form .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #home .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #cft .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #rkt .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #tlt .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #rep #rkt .seg,#rep #cbk .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #earn #cft .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #tools #tlt .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____),html body #cvb .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on):not(#_):not(#__):not(#___):not(#____){background:rgba(30,144,255,.16)!important;border:0!important;box-shadow:inset 0 0 0 2px #1e90ff,0 0 12px rgba(30,144,255,.7)!important;color:#fff!important}
+html body .tab.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body .card.tabs .tab.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body .cbchip.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #earn .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #rep .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #tools .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #form .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #home .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #cft .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #rkt .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #tlt .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #rep #rkt .seg,#rep #cbk .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #earn #cft .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #tools #tlt .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____),html body #cvb .seg.on:not([data-m="exp"]):not([data-cf="exp"]):not([data-k="exp"]):not([data-cbk="exp"]):not(#earn.xm .seg.on):not(#rep.xrd .seg.on) .ico:not(#_):not(#__):not(#___):not(#____){stroke:#4db2ff!important;color:#4db2ff!important;filter:drop-shadow(0 0 3px rgba(30,144,255,.8))}
 
 /* Home quick actions: expense red boxes + icons */
 html body #home .qa button:not(#_):not(#__):not(#___){background:linear-gradient(180deg,rgba(255,110,135,.26),rgba(228,0,43,.14))!important;border:0!important;box-shadow:inset 0 0 0 1px rgba(255,150,168,.9)!important;color:#fff!important}
@@ -959,6 +961,15 @@ html body #tools .two2 #b_exp{grid-column:1/-1}
 
 html body #home .hgap{height:20px;flex:none}
 @media (min-width:900px) and (min-height:520px){html body #home .hgap{grid-column:1/-1;height:24px}}
+
+html body #cbpop .popc{max-height:84vh;overflow:auto;display:flex;flex-direction:column;gap:8px}
+html body #cbpop h3{margin:0;text-align:center}
+html body .cbrow{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;min-height:50px;padding:0 16px;border-radius:16px;font:inherit;font-size:15.5px;color:var(--text,#fff);cursor:pointer;background:rgba(5,12,29,.5);border:1px solid var(--edge,rgba(150,190,255,.3))}
+html body .cbrow b{font-weight:600;opacity:.75;font-size:13.5px}
+html body .cbrow.on:not(#_):not(#__){background:rgba(30,144,255,.16)!important;border-color:#1e90ff!important;box-shadow:inset 0 0 0 1px #1e90ff!important}
+html body #rep .dl2 .save{min-height:54px;font-size:16px;border-radius:16px}
+html body #rep #cbk{grid-template-columns:repeat(3,1fr)!important}
+@media (min-width:900px) and (min-height:520px){html body #rep.x2>#cbk{grid-column:1/-1!important;max-width:980px;width:100%;justify-self:center}}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1091,7 +1102,7 @@ document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
 });
 const SID='1PMooyxEBlZcOpJmXH-aRkvmJWN-hnE_PvNej0K8W-0s';
 const CLIENT_ID='825840710134-jlflm38t6bnijmk66a4v2d6fauu676om.apps.googleusercontent.com';
-const SCOPE=window.BMP_VIEW?'https://www.googleapis.com/auth/spreadsheets.readonly':'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file';
+const SCOPE=window.BMP_VIEW?'https://www.googleapis.com/auth/spreadsheets.readonly':'https://www.googleapis.com/auth/spreadsheets';
 let tok=null,tokExp=0,tc=null;
 try{const t=JSON.parse(localStorage.getItem('gtok')||'null');if(t&&t.exp>Date.now()){tok=t.t;tokExp=t.exp}}catch(e){}
 const PXK=window.BMP_VIEW?'pxv':'px';let PX=null;
@@ -1462,7 +1473,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='13 Nov 2026, 19:20 (Home: empty sections hidden)';
+const APPV='14 Nov 2026, 17:45 (Drive backup via own permission; Custom report redesign)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -1574,19 +1585,30 @@ function icsRem(){const evs=REM.filter(r=>r.d).map((r,i)=>{const d=r.d.replace(/
 /* ===== backup ===== */
 const bkJson=()=>JSON.stringify({app:'BMP',v:1,at:new Date().toISOString(),entries,cfg:CFG,rem:REM,odo:ODO,mf:MF,rc:RC,bk:BK,db:DB});
 function expBackup(){const nm='BMP-backup-'+todayK()+'.json';shareFile(new File([bkJson()],nm,{type:'application/json'}),nm)}
-async function driveBackup(){const st=m=>{const e=$('b_st');if(e)e.textContent=m},nm='BMP-backup-'+todayK()+'-'+new Date().toTimeString().slice(0,5).replace(':','')+'.json';
-  if(window.BMP_VIEW||!tok||Date.now()>tokExp){st('Not signed in to Google, so the file was downloaded instead. Tap Sign in at the top, then try again.');try{silentSign()}catch(e){}expBackup();return}
-  st('Backing up to Google Drive...');
-  try{const H={Authorization:'Bearer '+tok},g=async(u,o)=>{const r=await fetch(u,o);if(r.status===401||r.status===403){const e=new Error('scope');e.scope=1;throw e}if(!r.ok)throw new Error((await r.text()).slice(0,100));return r.json()};
-    let fid='';try{fid=localStorage.getItem('bkfid')||''}catch(e){}
-    if(fid){try{const f=await g('https://www.googleapis.com/drive/v3/files/'+fid+'?fields=id,trashed',{headers:H});if(f.trashed)fid=''}catch(e){if(e.scope)throw e;fid=''}}
+let dtok=null,dexp=0,dtc=null;try{const t=JSON.parse(localStorage.getItem('dtok')||'null');if(t&&t.exp>Date.now()){dtok=t.t;dexp=t.exp}}catch(e){}
+const bkSt=m=>{const e=$('b_st');if(e)e.textContent=m};
+function driveBackup(){
+  if(window.BMP_VIEW){bkSt('Backup to Google Drive is not available in the view-only app.');return}
+  if(dtok&&Date.now()<dexp){drvUpload();return}
+  if(!window.google||!google.accounts||!google.accounts.oauth2){bkSt('Google is still loading. Try again in a moment.');return}
+  bkSt('Asking Google for permission to save to Drive...');
+  try{if(!dtc)dtc=google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:'https://www.googleapis.com/auth/drive.file',
+      callback:r=>{if(r&&r.access_token){dtok=r.access_token;dexp=Date.now()+(r.expires_in-60)*1000;try{localStorage.setItem('dtok',JSON.stringify({t:dtok,exp:dexp}))}catch(e){}drvUpload()}else bkSt('Google did not give permission ('+((r&&r.error)||'cancelled')+'). Nothing was saved.')},
+      error_callback:e=>bkSt('The Google permission window was closed or blocked ('+((e&&e.type)||'error')+'). Nothing was saved.')});
+    dtc.requestAccessToken({prompt:''})}catch(e){bkSt('Could not open Google permission ('+((e&&e.message)||e)+').')}}
+async function drvUpload(){const nm='BMP-backup-'+todayK()+'-'+new Date().toTimeString().slice(0,5).replace(':','')+'.json';bkSt('Saving to Google Drive...');
+  const H={Authorization:'Bearer '+dtok},g=async(u,o)=>{const r=await fetch(u,o);if(!r.ok){let m='';try{m=(await r.json()).error.message||''}catch(e){}const e=new Error(m||('HTTP '+r.status));e.st=r.status;throw e}return r.json()};
+  try{let fid='';try{fid=localStorage.getItem('bkfid')||''}catch(e){}
+    if(fid){try{const f=await g('https://www.googleapis.com/drive/v3/files/'+fid+'?fields=id,trashed',{headers:H});if(f.trashed)fid=''}catch(e){if(e.st===401)throw e;fid=''}}
     if(!fid){const q=encodeURIComponent("name='Backups' and mimeType='application/vnd.google-apps.folder' and trashed=false"),l=await g('https://www.googleapis.com/drive/v3/files?q='+q+'&fields=files(id)',{headers:H});
       fid=l.files&&l.files[0]?l.files[0].id:(await g('https://www.googleapis.com/drive/v3/files',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify({name:'Backups',mimeType:'application/vnd.google-apps.folder'})})).id;
       try{localStorage.setItem('bkfid',fid)}catch(e){}}
     const bd='bmpb'+Date.now(),body='--'+bd+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'+JSON.stringify({name:nm,parents:[fid]})+'\r\n--'+bd+'\r\nContent-Type: application/json\r\n\r\n'+bkJson()+'\r\n--'+bd+'--';
     await g('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:Object.assign({'Content-Type':'multipart/related; boundary='+bd},H),body});
-    st('Saved to Google Drive > Backups > '+nm);alert('Backup saved to Google Drive > Backups.')}
-  catch(e){if(e.scope){st('Google needs permission for Drive. Tap Sign in at the top, tick the Drive permission, then try again. The file was downloaded for now.');try{localStorage.removeItem('gever')}catch(x){}expBackup()}else{st('Drive backup failed ('+(e.message||e)+'). The file was downloaded instead.');expBackup()}}}
+    bkSt('Saved to Google Drive > Backups > '+nm);try{alert('Backup saved to Google Drive > Backups.')}catch(e){}}
+  catch(e){if(e.st===401){dtok=null;try{localStorage.removeItem('dtok')}catch(x){}bkSt('Google asked to sign in again. Tap Back up to Google Drive once more.')}
+    else if(/not been used|disabled|accessNotConfigured/i.test(e.message||''))bkSt('Google Drive is switched off for this app in Google Cloud. Open console.cloud.google.com/apis/library/drive.googleapis.com, press Enable, wait a minute, then try again. Nothing was saved.');
+    else bkSt('Drive backup failed: '+(e.message||e)+'. Nothing was saved. You can use Download file instead.')}}
 async function impBackup(f){if(!f)return;let j;try{j=JSON.parse(await f.text())}catch(e){alert('That file is not a valid BMP backup.');return}
   if(!j||j.app!=='BMP'||!Array.isArray(j.entries)){alert('That file is not a valid BMP backup.');return}
   const have=new Set(entries.map(sig)),add=j.entries.filter(e=>e&&/^\d{4}-\d\d-\d\d$/.test(e.d)&&!have.has(sig(e)));
@@ -2360,9 +2382,9 @@ home:'<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v
 money:'<path d="M3 7a2 2 0 0 1 2-2h13v3"/><path d="M3 7v11a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H5a2 2 0 0 1-2-2z"/><circle cx="16.5" cy="14" r="1.1"/>',
 rep:'<path d="M5 20V11M11 20V4M17 20v-6"/><path d="M3 20h18"/>',
 tools:'<path d="M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.5 2.5-2.4-.6-.6-2.4z"/>'};
-Object.assign(P,{view:'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',single:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',multi:'<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>',dmg:'<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>',chep:'<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18M7 15h4"/>'});
+Object.assign(P,{custom:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',both:'<path d="M7 4v14"/><path d="m3.5 14.5 3.5 3.5 3.5-3.5"/><path d="M17 20V6"/><path d="m13.5 9.5 3.5-3.5 3.5 3.5"/>',view:'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',single:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',multi:'<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>',dmg:'<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>',chep:'<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18M7 15h4"/>'});
 const MAP=[['.tab[data-t]','t',{home:'home',form:'add',earn:'money',rep:'rep',tools:'tools'}],
-['.seg[data-m]','m',{}],['.seg[data-cf]','cf',{}],['.seg[data-cv]','cv',{}],['.seg[data-k]','k',{}],
+['.seg[data-m]','m',{}],['.seg[data-cf]','cf',{}],['.seg[data-cv]','cv',{}],['.seg[data-k]','k',{}],['.seg[data-cbk]','cbk',{inc:'inc',exp:'exp',both:'both'}],
 ['.seg[data-r]','r',{quarter:'qtr'}],['.seg[data-tl]','tl',{dat:'bak'}],['.seg[data-bt]','bt',{b:'bills',c:'course',d:'doc'}],['.seg[data-mg="sub"]','v',{dm:'dmg',ch:'chep'}],['.seg[data-mg="mode"]','v',{view:'view',new:'add'}],['.seg[data-dm="mode"]','v',{new:'add'}],['.seg[data-dm="single"]','v',{'1':'single','0':'multi'}],['.seg[data-tm]','tm',{w:'week',m:'month'}]];
 const SEL=MAP.map(x=>x[0]+':not([data-ic])').join(',');
 const LAST={},BKEY=el=>{const f=el.querySelector('[data-ic],button');if(!f)return'';const d=Object.keys(f.dataset).filter(k=>k!=='ic')[0]||'';return (el.id||el.className.replace(/\b(ib|on)\b/g,'').trim())+'|'+d+'|'+el.children.length};
@@ -2633,7 +2655,7 @@ document.addEventListener('click',ev=>{const t=ev.target;const nb=t.closest&&t.c
 
 /* ===== Custom report builder: by category / income type / description / month / week / day, with optional second grouping ===== */
 let CB=Object.assign({kind:'exp',per:'month',from:'',to:'',g1:'type',g2:'none',sel:[]},jget('cb',{}));if(!Array.isArray(CB.sel))CB.sel=[];
-const CBD={type:'Category / income type',note:'Description',month:'Month',week:'Week',day:'Day',kind:'Income vs Expense'};
+const CBD={type:'Category / type',note:'Description',month:'Month',week:'Week',day:'Day',kind:'Income vs Expense'};
 const CBP=[['week','This week'],['lweek','Last week'],['month','This month'],['lmonth','Last month'],['quarter','This quarter'],['fy','This financial year'],['lfy','Last financial year'],['all','All time'],['custom','Custom dates']];
 const cbSave=()=>jset('cb',CB);
 function cbRange(){const t=new Date(todayK()+'T00:00'),y=t.getFullYear(),m=t.getMonth(),P=CB.per,D=(a,b,c)=>iso(new Date(a,b,c));
@@ -2656,19 +2678,22 @@ function cbCalc(){const all=cbAll(),[f,t]=cbRange(),B=CB.kind==='both';
   const rows=[...R.entries()].sort(chrono(CB.g1)?(x,y)=>x[0]<y[0]?-1:1:(x,y)=>Math.abs(y[1].t)-Math.abs(x[1].t));
   return{L,rows,cols,inc,exp,B,f,t,tot:rows.reduce((a,r)=>a+r[1].t,0)}}
 const cbM=(v,B)=>`<b class="${B?(v<0?'cr':'cg'):(CB.kind==='exp'?'cr':'cg')}">${B&&v<0?'-':''}${fmt(Math.abs(v))}</b>`;
-function cbHtml(){const D=cbCalc(),all=cbAll(),ch=[...new Set(all.filter(l=>CB.kind==='both'||(CB.kind==='inc')===(l.k==='Income')).map(l=>l.ty))].sort();
-  const opt=(a,v)=>a.map(([k,n])=>`<option value="${k}"${v===k?' selected':''}>${n}</option>`).join('');
+function cbHtml(){const D=cbCalc(),all=cbAll(),n=[...new Set(all.filter(l=>CB.kind==='both'||(CB.kind==='inc')===(l.k==='Income')).map(l=>l.ty))].length;
+  const opt=(a,v)=>a.map(([k,nm])=>`<option value="${k}"${v===k?' selected':''}>${nm}</option>`).join('');
   const dims=Object.entries(CBD),g2=[['none','None']].concat(dims.filter(x=>x[0]!==CB.g1));
-  const seg=`<div class="segs three">${[['inc','Income'],['exp','Expenses'],['both','Both']].map(([k,n])=>`<button type="button" class="seg${CB.kind===k?' on':''}" data-cbk="${k}">${n}</button>`).join('')}</div>`;
-  const ctl=`<div class="cbc"><label>Period<select id="cbp">${opt(CBP,CB.per)}</select></label>${CB.per==='custom'?`<label>From<input type="date" id="cbf" value="${CB.from}"></label><label>To<input type="date" id="cbt" value="${CB.to}"></label>`:''}<label>Group by<select id="cbg1">${opt(dims,CB.g1)}</select></label><label>Then by<select id="cbg2">${opt(g2,CB.g2)}</select></label></div>`;
-  const chips=ch.length?`<div class="cbh"><small>Include only (tap to pick, none = all)</small><div class="cbx">${ch.map(c=>`<button type="button" class="cbchip${CB.sel.includes(c)?' on':''}" data-cbc="${esc(c)}">${esc(c)}</button>`).join('')}</div></div>`:'';
+  const bar=`<div class="segs three" id="cbk">${[['inc','Income'],['exp','Expenses'],['both','Both']].map(([k,nm])=>`<button type="button" class="seg${CB.kind===k?' on':''}" data-cbk="${k}">${nm}</button>`).join('')}</div>`;
+  const incl=CB.sel.length?CB.sel.length+' selected':(CB.kind==='exp'?'All categories':CB.kind==='inc'?'Deliveries + Pickups':'Everything');
+  const ctl=`<div class="card sec cbk"><div class="cbc"><label>Period<select id="cbp">${opt(CBP,CB.per)}</select></label><label>Group by<select id="cbg1">${opt(dims,CB.g1)}</select></label>${CB.per==='custom'?`<label>From<input type="date" id="cbf" value="${CB.from}"></label><label>To<input type="date" id="cbt" value="${CB.to}"></label>`:''}<label>Then by<select id="cbg2">${opt(g2,CB.g2)}</select></label><label>Include only<button type="button" class="cbi" id="cbi"><span>${incl}</span><span>&rsaquo;</span></button></label></div></div>`;
   const sm=`<div class="ts cbs">${D.B?`<div class="pft"><span>Income</span><b class="cg">${fmt(D.inc)}</b></div><div class="pft"><span>Expenses</span><b class="cr">${fmt(D.exp)}</b></div><div class="pft big"><span>Net</span>${cbM(D.inc-D.exp,true)}</div>`:`<div class="pft big"><span>Total ${CB.kind==='inc'?'income':'expenses'}</span>${cbM(D.tot,false)}</div><div class="pft"><span>Entries</span><b>${D.L.length}</b></div>`}</div>`;
   const pv=CB.g2!=='none',hd=`<tr><th>${CBD[CB.g1]}</th>${pv?D.cols.map(c=>`<th>${esc(cbLab(CB.g2,c))}</th>`).join(''):'<th>Entries</th>'}<th>Total</th>${pv||D.B?'':'<th>Share</th>'}</tr>`;
   const bd=D.rows.map(([k,r])=>`<tr><td>${esc(cbLab(CB.g1,k))}</td>${pv?D.cols.map(c=>{const x=r.c.get(c);return `<td>${x?cbM(x.t,D.B):'-'}</td>`}).join(''):`<td>${r.n}</td>`}<td>${cbM(r.t,D.B)}</td>${pv||D.B?'':`<td>${D.tot?Math.round(r.t/D.tot*100):0}%</td>`}</tr>`).join('');
   const ft=pv?`<tr class="tt"><td>Total</td>${D.cols.map(c=>`<td>${cbM(D.rows.reduce((a,r)=>a+((r[1].c.get(c)||{}).t||0),0),D.B)}</td>`).join('')}<td>${cbM(D.tot,D.B)}</td></tr>`:`<tr class="tt"><td>Total</td><td>${D.L.length}</td><td>${cbM(D.tot,D.B)}</td>${D.B?'':'<td>100%</td>'}</tr>`;
   const rng=D.f||D.t?`${D.f?dAU(D.f,{day:'numeric',month:'short',year:'numeric'}):'Start'} - ${D.t?dAU(D.t,{day:'numeric',month:'short',year:'numeric'}):'Today'}`:'All dates';
-  return `<div class="card sec cbk">${seg}${ctl}${chips}</div><div class="card sec cbk"><div class="cbr">${rng}</div>${sm}${D.rows.length?`<div class="cbt"><table class="cbtb"><thead>${hd}</thead><tbody>${bd}${ft}</tbody></table></div>`:'<div class="rn">Nothing matches these choices</div>'}</div>
+  return bar+ctl+`<div class="card sec cbk"><div class="cbr">${rng}</div>${sm}${D.rows.length?`<div class="cbt"><table class="cbtb"><thead>${hd}</thead><tbody>${bd}${ft}</tbody></table></div>`:'<div class="rn">Nothing matches these choices</div>'}</div>
   <div class="dl2"><button class="save${CB.kind==='inc'?' inc':''}" type="button" id="cbpdf">Download PDF</button><button class="save${CB.kind==='inc'?' inc':' alt'}" type="button" id="cbcsv">Download CSV</button></div>`}
+function cbPick(){const all=cbAll().filter(l=>CB.kind==='both'||(CB.kind==='inc')===(l.k==='Income')),tot={};all.forEach(l=>tot[l.ty]=(tot[l.ty]||0)+l.amt);
+  const ty=Object.keys(tot).sort((a,b)=>tot[b]-tot[a]);let p=$('cbpop');if(!p){document.body.insertAdjacentHTML('beforeend','<div class="pop" id="cbpop" style="display:none"><div class="popc"><h3>Include only</h3><div class="hint">Tap to pick. With none picked, everything is included.</div><div id="cbrows"></div><button class="save alt" type="button" id="cbclr">Clear</button><button class="save" type="button" id="cbdone">Done</button></div></div>');p=$('cbpop')}
+  $('cbrows').innerHTML=ty.map(t=>`<button type="button" class="cbrow${CB.sel.includes(t)?' on':''}" data-cbc="${esc(t)}"><span>${esc(t)}</span><b>${fmt(tot[t])}</b></button>`).join('')||'<div class="rn">No entries yet</div>';p.style.display='flex'}
 (function(){const r2=renderRep;renderRep=function(){if(rk==='custom'){$('rep').classList.add('x2');$('rep').innerHTML=rkBar()+cbHtml();fit();return}r2()};window.renderRep=renderRep})();
 function cbFlat(){const D=cbCalc(),pv=CB.g2!=='none',R=[];D.rows.forEach(([k,r])=>{if(pv)D.cols.forEach(c=>{const x=r.c.get(c);if(x)R.push([cbLab(CB.g1,k),cbLab(CB.g2,c),x.n,x.t])});else R.push([cbLab(CB.g1,k),'',r.n,r.t])});return{D,R,pv}}
 function cbTitle(){return {inc:'Income',exp:'Expenses',both:'Income & Expenses'}[CB.kind]+' by '+CBD[CB.g1].toLowerCase()+(CB.g2!=='none'?' and '+CBD[CB.g2].toLowerCase():'')}
@@ -2686,9 +2711,14 @@ async function cbPdf(){const J=window.jspdf;if(!J){alert('PDF tool is still load
   const rows=R.map(r=>pv?[r[0],r[1],String(r[2]),mt(r[3])]:[r[0],String(r[2]),mt(r[3])]);const t=pv?['Total','',String(D.L.length),mt(D.tot)]:['Total',String(D.L.length),mt(D.tot)];t.b=1;rows.push(t);
   y=pdfTbl(d,y,pv?[{t:CBD[CB.g1],x:17,w:70},{t:CBD[CB.g2],x:92,w:50},{t:'Entries',x:158,al:'right'},{t:'Amount',x:193,al:'right'}]:[{t:CBD[CB.g1],x:17,w:110},{t:'Entries',x:150,al:'right'},{t:'Amount',x:193,al:'right'}],rows);
   lhFoot(d);const nm='BMP-Custom-'+iso(new Date())+'.pdf';await shareFile(new File([d.output('blob')],nm,{type:'application/pdf'}),nm)}
-$('rep').addEventListener('click',ev=>{const t=ev.target,b=t.closest&&t.closest('[data-cbk],[data-cbc]');
-  if(b){if(b.dataset.cbk){CB.kind=b.dataset.cbk;CB.sel=[]}else{const c=b.dataset.cbc,i=CB.sel.indexOf(c);if(i<0)CB.sel.push(c);else CB.sel.splice(i,1)}cbSave();renderRep();return}
+$('rep').addEventListener('click',ev=>{const t=ev.target,b=t.closest&&t.closest('[data-cbk]');
+  if(b){CB.kind=b.dataset.cbk;CB.sel=[];cbSave();renderRep();return}
+  if(t.closest&&t.closest('#cbi')){cbPick();return}
   if(t.id==='cbpdf')cbPdf();if(t.id==='cbcsv')cbCsv()});
+document.addEventListener('click',ev=>{const t=ev.target,r=t.closest&&t.closest('#cbpop .cbrow');
+  if(r){const c=r.dataset.cbc,i=CB.sel.indexOf(c);if(i<0)CB.sel.push(c);else CB.sel.splice(i,1);r.classList.toggle('on');cbSave();return}
+  if(t.id==='cbclr'){CB.sel=[];cbSave();document.querySelectorAll('#cbpop .cbrow').forEach(x=>x.classList.remove('on'));return}
+  if(t.id==='cbdone'||t.id==='cbpop'){$('cbpop').style.display='none';renderRep()}});
 $('rep').addEventListener('change',ev=>{const t=ev.target,v=t.value;if(rk!=='custom')return;
   if(t.id==='cbp')CB.per=v;else if(t.id==='cbf')CB.from=v;else if(t.id==='cbt')CB.to=v;else if(t.id==='cbg1'){CB.g1=v;if(CB.g2===v)CB.g2='none'}else if(t.id==='cbg2')CB.g2=v;else return;
   cbSave();renderRep()});
