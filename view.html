@@ -1492,7 +1492,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='14 Nov 2026, 18:30 (Custom Both: single table, fits screen)';
+const APPV='17 Nov 2026, 15:10 (Home: advice hides once applied; titles; overdue wording)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -2005,7 +2005,7 @@ function recDue(){const now=todayK(),out=[];
   RC.forEach((r,i)=>{if(!recOk(r))return;const k=recOcc(r,now);if(r.from&&k<r.from+'-01')return;if(k>now)return;if(r.freq==='w'&&k<PAY_START)return;if(recDone(r,k))return;out.push({i,d:k})});return out}
 const payDue0=payDue;payDue=function(){return rcSal()?null:payDue0()};
 const banners0=banners;
-banners=function(){return banners0()+recDue().map(o=>{const r=RC[o.i];return r.ask?`<div class="al"><span>${esc(r.n||r.cat)} due ${dAU(o.d)}</span><input type="number" inputmode="decimal" step="0.01" id="rca${o.i}" placeholder="A$ amount" style="width:96px;font:inherit;font-size:13px;padding:5px 8px;border-radius:10px;border:1px solid rgba(255,190,70,.6);background:rgba(0,0,0,.3);color:#fff"><button type="button" data-act="rec" data-i="${o.i}" data-d="${o.d}">Log</button></div>`:`<div class="al"><span>${esc(r.n||r.cat)} ${A(+r.amt)} due ${dAU(o.d)}</span><button type="button" data-act="rec" data-i="${o.i}" data-d="${o.d}">Log</button></div>`}).join('')};
+banners=function(){return banners0()+recDue().map(o=>{const r=RC[o.i];return r.ask?`<div class="al"><span>${esc(r.n||r.cat)} ${o.d<todayK()?'overdue, was due ':'due '}${dAU(o.d)}</span><input type="number" inputmode="decimal" step="0.01" id="rca${o.i}" placeholder="A$ amount" style="width:96px;font:inherit;font-size:13px;padding:5px 8px;border-radius:10px;border:1px solid rgba(255,190,70,.6);background:rgba(0,0,0,.3);color:#fff"><button type="button" data-act="rec" data-i="${o.i}" data-d="${o.d}">Log</button></div>`:`<div class="al"><span>${esc(r.n||r.cat)} ${A(+r.amt)} ${o.d<todayK()?'overdue, was due ':'due '}${dAU(o.d)}</span><button type="button" data-act="rec" data-i="${o.i}" data-d="${o.d}">Log</button></div>`}).join('')};
 /* cash */
 function mfCalc(ym){const a=agg(e=>info(e.d,e.nm).ym===ym);return{ex:a.I,inc:a.I+a.Ig}}
 const MFD=[['dPk','Truck Parking','Parking'],['dNv','Navman','Phone & software'],['dOt','Other','Other']];
@@ -2267,7 +2267,7 @@ function paintInbox(){
   const rows=INBX.map((x,i)=>{const h=has(x),w=x.st==='check'?'Does not add up. Check the PDF before adding.':(h>0?'You already entered '+fmt(h)+' for this day.':'');
     return `<div class="ibr"><div class="ibd"><b>${lab(x.d)}</b><br>Deliveries <b>${fmt(x.del)}</b>${x.dn?' ('+esc(x.dn)+')':''}<br>Pickups <b>${fmt(x.pu)}</b>${x.pn?' ('+esc(x.pn)+')':''}${w?`<span class="ibw">${esc(w)}</span>`:''}</div><div class="ibb"><button type="button" class="go" data-ib="add" data-i="${i}">${w?'Add anyway':'Add'}</button><button type="button" data-ib="skip" data-i="${i}">Skip</button></div></div>`}).join('');
   const el=document.createElement('div');el.className='card tl inbx';el.id='inbx';
-  el.innerHTML=`<div class="pfh">From email · ${INBX.length} new</div>${rows}${INBX.length>1&&clean?'<button type="button" class="iba" data-ib="all">Add all '+INBX.length+'</button>':''}`;
+  el.innerHTML=`<div class="pfh">${INBX.length} new</div>${rows}${INBX.length>1&&clean?'<button type="button" class="iba" data-ib="all">Add all '+INBX.length+'</button>':''}`;
   cft.after(el)}
 async function ibAct(i,act){
   const x=INBX[i];if(!x)return;
@@ -2753,16 +2753,17 @@ $('rep').addEventListener('change',ev=>{const t=ev.target,v=t.value;if(rk!=='cus
 const BN=banners;banners=function(){return''};
 function homeCount(){const b=BN(),n=(b.match(/class="al"/g)||[]).length;let a=0;try{Object.keys(ADV||{}).forEach(ym=>{if(advNew(ym)&&!((MF[ym]||{}).recDate))a++})}catch(e){}return n+(INBX.length||0)+a}
 function homeBadge(){const e=$('hbdg');if(!e)return;const n=window.BMP_VIEW?0:homeCount();e.textContent=n||'';e.style.display=n?'inline-block':'none'}
-function homeAdvHtml(){const ks=Object.keys(ADV||{}).sort().reverse().slice(0,4);
-  if(!ks.length)return '<div class="blmt">No payment advice yet. New ones from your email appear here.</div>';
+const advPend=ym=>advNew(ym)&&!((MF[ym]||{}).recDate);
+function homeAdvHtml(){const ks=Object.keys(ADV||{}).filter(advPend).sort().reverse().slice(0,4);
+  if(!ks.length)return '';
   return ks.map(ym=>{const a=ADV[ym],m=MF[ym]||{},nw=advNew(ym)&&!m.recDate;
     return `<button type="button" class="mfr" data-mf="${ym}"><span><b>${ymName(ym)}</b><small class="${nw?'cg':''}">${nw?'Payment advice received · tap to apply':(m.recDate?'Applied · received '+dAU(m.recDate):'Advice read · tap to check')}</small></span><span class="r"><b>${A(a.dc||a.rev)}</b><small>${a.dc?'direct credit':'revenue'}</small></span></button>`}).join('')}
 function homeRender(){const el=$('home');if(!el||window.BMP_VIEW)return;
   const fa=document.activeElement;if(fa&&el.contains(fa)&&/^(INPUT|SELECT|TEXTAREA)$/.test(fa.tagName))return;
   const b=BN(),cards=[];
   if(b)cards.push(`<div class="card tl hn"><div class="pfh">Notifications</div>${b}</div>`);
-  if(INBX.length)cards.push(`<div class="card tl hn"><div class="pfh">Income invoices from email</div><div id="hinbx"></div></div>`);
-  if(Object.keys(ADV||{}).length)cards.push(`<div class="card tl hn"><div class="pfh">Payment advice from email</div>${homeAdvHtml()}</div>`);
+  if(INBX.length)cards.push(`<div class="card tl hn"><div class="pfh">Income invoices</div><div id="hinbx"></div></div>`);
+  const ah=homeAdvHtml();if(ah)cards.push(`<div class="card tl hn"><div class="pfh">Payment advice</div>${ah}</div>`);
   el.style.gridTemplateColumns=cards.length?(cards.length===1?'minmax(0,1fr)':Array(cards.length).fill('minmax(0,1fr)').join(' 2px ')):'';
   el.innerHTML=cards.join('<div class="hdiv hv"></div>')
    +(cards.length?'<div class="hdiv"></div>':'<div class="hgap"></div>')
