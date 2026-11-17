@@ -1357,7 +1357,7 @@ const FM=['January','February','March','April','May','June','July','August','Sep
 const tt=l=>sum(l).reduce((a,b)=>a+b,0);
 const dw=l=>new Set(l.filter(e=>!e.x&&!e.ln).map(e=>e.d)).size;
 const av=(l,n)=>n?fmt(tt(l)/n):'-';
-const hr=l=>av(l,dw(l)*10);
+const hr=l=>av(l,dw(l)*12);
 function repBuild(){
   const E=entries.map(e=>Object.assign({e},info(e.d,e.nm)));
   const y=rc.getFullYear(),m=rc.getMonth();
@@ -1377,13 +1377,13 @@ function repBuild(){
     sub=fd(mo)+' - '+fd(su);
     const ks=[];rows=[0,1,2,3,4].map(i=>{const d=new Date(mo);d.setDate(mo.getDate()+i);const k=iso(d);ks.push(k);return[d.toLocaleDateString('en-AU',{weekday:'short'}).toUpperCase()+' '+dm(d),list.filter(e=>e.d===k)]});
     const rest=list.filter(e=>!ks.includes(e.d));if(rest.length)rows.push(['Other days',rest]);
-    A=[['Days worked',String(dw(list))],['Avg per day worked',av(list,dw(list))],['Avg per hour (10 hrs/day)',hr(list)]];
+    A=[['Days worked',String(dw(list))],['Avg per day worked',av(list,dw(list))],['Avg per hour (12 hrs/day)',hr(list)]];
   }else if(rt==='month'){
     const k=iso(new Date(y,m,1)).slice(0,7);list=E.filter(x=>x.ym===k).map(x=>x.e);
     t=FM[m]+' '+y;
     rows=[1,2,3,4,5].map(n=>['Week '+n,E.filter(x=>x.ym===k&&x.w===n).map(x=>x.e)]);
     const wn=new Set(E.filter(x=>x.ym===k).map(x=>x.w)).size;
-    A=[['Days worked',String(dw(list))],['Avg per day worked',av(list,dw(list))],['Avg per hour (10 hrs/day)',hr(list)],['Avg per week',av(list,wn)]];
+    A=[['Days worked',String(dw(list))],['Avg per day worked',av(list,dw(list))],['Avg per hour (12 hrs/day)',hr(list)],['Avg per week',av(list,wn)]];
   }else if(rt==='quarter'){
     const s=m>=9?9:m>=6?6:m>=3?3:0,q={6:1,9:2,0:3,3:4}[s],fy=s>=6?y+1:y;
     t='Q'+q+' FY'+String(fy).slice(2);sub=MN[s]+' - '+MN[s+2]+' '+y;
@@ -1391,14 +1391,14 @@ function repBuild(){
     const Q=E.filter(x=>ks.includes(x.ym));list=Q.map(x=>x.e);
     rows=ks.map((k,i)=>[MN[s+i]+' '+String(y).slice(2),E.filter(x=>x.ym===k).map(x=>x.e)]);
     const mn=new Set(Q.map(x=>x.ym)).size,wn=new Set(Q.map(x=>x.ym+x.w)).size;
-    A=[['Days worked',String(dw(list))],['Avg per day worked',av(list,dw(list))],['Avg per hour (10 hrs/day)',hr(list)],['Avg per week',av(list,wn)],['Avg per month',av(list,mn)]];
+    A=[['Days worked',String(dw(list))],['Avg per day worked',av(list,dw(list))],['Avg per hour (12 hrs/day)',hr(list)],['Avg per week',av(list,wn)],['Avg per month',av(list,mn)]];
   }else{
     const fy=m>=6?y+1:y;t='FY'+String(fy).slice(2);sub='Jul '+(fy-1)+' - Jun '+fy;
     const ks=[];for(let i=0;i<12;i++){const mm=(6+i)%12,yy=i<6?fy-1:fy,k=yy+'-'+String(mm+1).padStart(2,'0');if(k>=BIZ_YM)ks.push([k,MN[mm]+' '+String(yy).slice(2)])}
     const Y=E.filter(x=>x.y===fy);list=Y.map(x=>x.e);
     rows=ks.map(([k,lb])=>[lb,E.filter(x=>x.ym===k).map(x=>x.e)]);
     const mn=new Set(Y.map(x=>x.ym)).size,wn=new Set(Y.map(x=>x.ym+x.w)).size;
-    A=[['Days worked',String(dw(list))],['Avg per day worked',av(list,dw(list))],['Avg per hour (10 hrs/day)',hr(list)],['Avg per week',av(list,wn)],['Avg per month',av(list,mn)]];
+    A=[['Days worked',String(dw(list))],['Avg per day worked',av(list,dw(list))],['Avg per hour (12 hrs/day)',hr(list)],['Avg per week',av(list,wn)],['Avg per month',av(list,mn)]];
   }
   const X=rk==='exp',F=X?sumX:sum;
   if(X){const xs=list.filter(e=>e.x),tot=xs.reduce((a,e)=>a+e.x,0),bc={};
@@ -1514,7 +1514,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='17 Nov 2026, 16:30 (Duplicate warning; weekly backup reminder; income check vs advice)';
+const APPV='17 Nov 2026, 21:10 (Divider under last advice; 12 hrs/day)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -2623,7 +2623,7 @@ document.addEventListener('click',ev=>{const h=ev.target.closest&&ev.target.clos
 
 /* ===== auto-update: if a newer copy is online, reload once ===== */
 (function(){if(!/^https?:/.test(location.protocol))return;
-  const chk=async()=>{try{const t=await (await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'})).text(),m=/const APPV='([^']+)'/.exec(t);
+  const chk=async()=>{try{const t=await (await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'})).text(),m=/const APPV='17 Nov 2026, 21:10 (Divider under last advice; 12 hrs/day)']+)'/.exec(t);
     if(m&&m[1]!==APPV){const k='rl_'+m[1];if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');location.reload()}}catch(e){}};
   setTimeout(chk,2500);document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(chk,800)})})();
 
@@ -2823,7 +2823,7 @@ function homeRender(){const el=$('home');if(!el||window.BMP_VIEW)return;
   let last='';if(!ah){const ks=Object.keys(ADV||{}).sort();if(ks.length){const ym=ks[ks.length-1],a=ADV[ym],m=MF[ym]||{};const lc=ackTxt(ym);last=`<button type="button" class="mfr hlast" ${lc&&lc.bad.length?'data-ack':'data-mf'}="${ym}"><span>Last advice <b>${ymName(ym)}</b>${m.recDate?' · applied '+dAU(m.recDate):''}${lc?(lc.bad.length?' · <b class="cr">'+lc.bad.length+' to check</b>':' · ✔ matches'):''}</span><span class="r"><b>${A(a.dc||a.rev)}</b></span></button>`}}
   el.style.gridTemplateColumns=cards.length?(cards.length===1?'minmax(0,1fr)':Array(cards.length).fill('minmax(0,1fr)').join(' 2px ')):'';
   el.innerHTML=cards.join('<div class="hdiv hv"></div>')
-   +(cards.length?'<div class="hdiv"></div>':'<div class="hgap"></div>')+last
+   +(cards.length?'<div class="hdiv"></div>':'<div class="hgap"></div>')+last+(last?'<div class="hdiv"></div>':'')
    +`<div class="card tl hn qac"><div class="pfh">Quick actions</div><div class="qa"><button type="button" data-qa="fuel"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/><path d="M3 21h12"/><path d="M6.5 8h5"/><path d="M14 9h2.5a1.5 1.5 0 0 1 1.5 1.5V16a1.5 1.5 0 0 0 3 0V8l-3-3"/></svg><span>Fuel</span></button><button type="button" data-qa="sal"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M5 20.5a7 7 0 0 1 14 0"/></svg><span>Employee Salary</span></button><button type="button" data-qa="sup"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20h18"/></svg><span>Employee Super</span></button></div><div class="qa q2"><button type="button" data-qn="acc"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5.5" width="20" height="3.5" rx=".6"/><rect x="3.5" y="9" width="3.5" height="6.5"/><rect x="10.25" y="9" width="3.5" height="6.5"/><rect x="17" y="9" width="3.5" height="6.5"/><rect x="2" y="15.5" width="20" height="3.5" rx=".6"/></svg><span>CHEP Accounts</span></button><button type="button" data-qn="cash"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6.5" width="19" height="11" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v.01M18 14.5v.01"/></svg><span>Cash</span></button><button type="button" data-qn="bills"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14.5 3v4.5H19"/><path d="M9.5 15h6"/></svg><span>Bills</span></button></div>${QAM?`<div class="qam">${esc(QAM)}</div>`:''}</div>`;
   try{paintInbox()}catch(e){}homeBadge()}
 (function(){const r=render;render=function(){const x=r.apply(this,arguments);try{homeRender()}catch(e){}return x};window.render=render;
