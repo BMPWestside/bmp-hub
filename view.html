@@ -996,6 +996,13 @@ html body #home .hlast b{color:var(--text,#fff);font-weight:600}
 html body #home .hlast span,html body #home .hlast b,html body #home .hlast small{display:inline!important}
 html body #home .hlast span:first-child{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
 html body #home .hlast .r{flex:none}
+
+html body #home .advck{width:100%;margin:-4px 0 8px;padding:7px 12px;border-radius:12px;font:inherit;font-size:12.5px;text-align:left;cursor:pointer;background:transparent;border:1px solid rgba(150,190,255,.25);color:var(--muted,#9db4e0)}
+html body #home .advck.ok{color:#7be3a0;border-color:rgba(123,227,160,.35)}
+html body #home .advck.bad{color:#ffb4c0;border-color:rgba(255,150,168,.5)}
+html body #ackpop .popc{max-height:84vh;overflow:auto;display:flex;flex-direction:column;gap:8px}
+html body #ackpop h3{margin:0;text-align:center}
+html body #ackpop .cbrow{height:auto;min-height:48px;padding:8px 14px;text-align:left}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1294,6 +1301,13 @@ function removeEntry(e){const i=entries.indexOf(e);if(i<0)return;entries.splice(
 $('cat').onchange=()=>{if($('cat').value==='Truck Repayment'&&$('ex').value==='')$('ex').value=TRUCK.monthly;$('whl').style.display=$('cat').value==='Employee Wages'?'':'none'};
 const expNote=()=>{const n=$('note').value.trim(),w=parseFloat($('wh').value)||0;return $('cat').value==='Employee Wages'&&w>0?('PAYG '+w.toFixed(2)+(n?' · '+n:'')):n};
 $('cn').onclick=()=>{clearForm();setEdit(null);say('');showTab('earn')};
+function dupOf(en,skip){if(en.ln)return null;const sk=e=>e===skip||(skip&&typeof skip==='object'&&e.d===skip.d&&e.x===skip.x&&e.del===skip.del&&e.pu===skip.pu&&(e.note||'')===(skip.note||'')&&(e.cat||'')===(skip.cat||''));
+  return entries.find(e=>{if(e.ln||sk(e)||e.d!==en.d)return false;
+    if(en.x)return !!e.x&&Math.abs(e.x-en.x)<0.005&&(e.cat||'')===(en.cat||'');
+    return !e.x&&(en.del||en.pu)&&Math.abs((e.del||0)-en.del)<0.005&&Math.abs((e.pu||0)-en.pu)<0.005})||null}
+function dupOk(en,skip){const d=dupOf(en,skip);if(!d)return true;
+  const w=en.x?(en.cat||'Expense')+' '+fmt(en.x):'Income '+fmt((en.del||0)+(en.pu||0));
+  try{return confirm('Possible duplicate: '+w+' on '+dAU(en.d)+' is already logged. Save it anyway?')}catch(e){return true}}
 $('f').onsubmit=ev=>{
   ev.preventDefault();
   const d=$('date').value,nm=$('cm').value==='nm';let en;
@@ -1304,6 +1318,7 @@ $('f').onsubmit=ev=>{
   else{if($('del').value===''&&$('pu').value===''&&$('oth').value===''){say('Enter deliveries or pickups.');return}
     const o=parseFloat($('oth').value)||0,ok=$('othk').value;
     en={d,del:(parseFloat($('del').value)||0)+(ok==='del'?o:0),pu:(parseFloat($('pu').value)||0)+(ok==='pu'?o:0),nm}}
+  if(!dupOk(en,editing))return;
   const was=!!editing;if(editing)removeEntry(editing);
   entries.push(en);persist();
   sel=d;const keepMode=fm;clearForm();setEdit(null);if(!was)setMode(keepMode);say('');
@@ -1499,7 +1514,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='17 Nov 2026, 15:40 (Home: weekend quiet salary/super; last advice line)';
+const APPV='17 Nov 2026, 16:30 (Duplicate warning; weekly backup reminder; income check vs advice)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -1573,7 +1588,7 @@ function toolsView(){
   else if(tl==='debt')b=debtHtml();
   else if(tl==='mgr')b=mgrHtml();
   else{const fys=[];for(let y=BIZ_FY;y<=Math.max(BIZ_FY,fyOf(info(todayK()).ym));y++)fys.push(y);
-    b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Back up to Google Drive</button><button type="button" class="mini" id="b_dl">Download file</button><button type="button" class="mini" id="b_imp">Import backup</button></div><div class="hint" id="b_st" style="margin-top:6px"></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
+    b=`<div class="card tl"><div class="pfh">Backup</div><div class="two2"><button type="button" class="mini" id="b_exp">Back up to Google Drive</button><button type="button" class="mini" id="b_dl">Download file</button><button type="button" class="mini" id="b_imp">Import backup</button></div><div class="hint" id="b_st" style="margin-top:6px"></div><div class="hint" id="b_last"></div><input type="file" id="b_file" accept=".json,application/json" style="display:none">
 <div class="pfh">Financial year pack for your accountant</div><label>Year<select id="c_fy">${fys.map(y=>`<option value="${y}">FY${String(y).slice(2)} (Jul ${y-1} - Jun ${y})</option>`).join('')}</select></label>
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
 <div class="hint">Bottom bar too low or cut off? Raise it: <button type="button" class="mini" data-nl="-8">Lower</button> <button type="button" class="mini" data-nl="8">Raise</button> (now <span id="nlv">${(()=>{try{return +localStorage.getItem('navlift')||0}catch(e){return 0}})()}</span>)</div>
@@ -1610,18 +1625,26 @@ function icsRem(){const evs=REM.filter(r=>r.d).map((r,i)=>{const d=r.d.replace(/
   const nm='BMP-truck-reminders.ics';shareFile(new File([icsWrap(evs)],nm,{type:'text/calendar'}),nm)}
 /* ===== backup ===== */
 const bkJson=()=>JSON.stringify({app:'BMP',v:1,at:new Date().toISOString(),entries,cfg:CFG,rem:REM,odo:ODO,mf:MF,rc:RC,bk:BK,db:DB});
-function expBackup(){const nm='BMP-backup-'+todayK()+'.json';shareFile(new File([bkJson()],nm,{type:'application/json'}),nm)}
+function expBackup(){const nm='BMP-backup-'+todayK()+'.json';bkMark('file');shareFile(new File([bkJson()],nm,{type:'application/json'}),nm)}
 let dtok=null,dexp=0,dtc=null;try{const t=JSON.parse(localStorage.getItem('dtok')||'null');if(t&&t.exp>Date.now()){dtok=t.t;dexp=t.exp}}catch(e){}
 const bkSt=m=>{const e=$('b_st');if(e)e.textContent=m};
-function driveBackup(){
+let dAuto=false;
+const bkLast=()=>{try{return +localStorage.getItem('lastbk')||0}catch(e){return 0}};
+const bkMark=how=>{try{localStorage.setItem('lastbk',String(Date.now()));localStorage.setItem('lastbkhow',how||'')}catch(e){}bkShow();try{homeRender()}catch(e){}};
+try{if(!localStorage.getItem('bkfirst'))localStorage.setItem('bkfirst',String(Date.now()))}catch(e){}
+const bkRef=()=>{let f=0;try{f=+localStorage.getItem('bkfirst')||0}catch(e){}return bkLast()||f||Date.now()};
+const bkDays=()=>Math.floor((Date.now()-bkRef())/864e5);
+const bkOver=()=>!window.BMP_VIEW&&bkDays()>=7;
+function bkShow(){const e=$('b_last');if(!e)return;const t=bkLast();e.textContent=t?('Last backup: '+new Date(t).toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'})+' '+new Date(t).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'})+(localStorage.getItem('lastbkhow')==='drive'?' (Google Drive)':' (file)')):'No backup yet from this phone.'}
+function driveBackup(auto){dAuto=auto===true;
   if(window.BMP_VIEW){bkSt('Backup to Google Drive is not available in the view-only app.');return}
   if(dtok&&Date.now()<dexp){drvUpload();return}
   if(!window.google||!google.accounts||!google.accounts.oauth2){bkSt('Google is still loading. Try again in a moment.');return}
-  bkSt('Asking Google for permission to save to Drive...');
+  if(!dAuto)bkSt('Asking Google for permission to save to Drive...');
   try{if(!dtc)dtc=google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:'https://www.googleapis.com/auth/drive.file',
-      callback:r=>{if(r&&r.access_token){dtok=r.access_token;dexp=Date.now()+(r.expires_in-60)*1000;try{localStorage.setItem('dtok',JSON.stringify({t:dtok,exp:dexp}))}catch(e){}drvUpload()}else bkSt('Google did not give permission ('+((r&&r.error)||'cancelled')+'). Nothing was saved.')},
-      error_callback:e=>bkSt('The Google permission window was closed or blocked ('+((e&&e.type)||'error')+'). Nothing was saved.')});
-    dtc.requestAccessToken({prompt:''})}catch(e){bkSt('Could not open Google permission ('+((e&&e.message)||e)+').')}}
+      callback:r=>{if(r&&r.access_token){dtok=r.access_token;dexp=Date.now()+(r.expires_in-60)*1000;try{localStorage.setItem('dtok',JSON.stringify({t:dtok,exp:dexp}))}catch(e){}drvUpload()}else if(!dAuto)bkSt('Google did not give permission ('+((r&&r.error)||'cancelled')+'). Nothing was saved.')},
+      error_callback:e=>{if(!dAuto)bkSt('The Google permission window was closed or blocked ('+((e&&e.type)||'error')+'). Nothing was saved.')}});
+    dtc.requestAccessToken({prompt:dAuto?'none':''})}catch(e){if(!dAuto)bkSt('Could not open Google permission ('+((e&&e.message)||e)+').')}}
 async function drvUpload(){const nm='BMP-backup-'+todayK()+'-'+new Date().toTimeString().slice(0,5).replace(':','')+'.json';bkSt('Saving to Google Drive...');
   const H={Authorization:'Bearer '+dtok},g=async(u,o)=>{const r=await fetch(u,o);if(!r.ok){let m='';try{m=(await r.json()).error.message||''}catch(e){}const e=new Error(m||('HTTP '+r.status));e.st=r.status;throw e}return r.json()};
   try{let fid='';try{fid=localStorage.getItem('bkfid')||''}catch(e){}
@@ -1631,7 +1654,7 @@ async function drvUpload(){const nm='BMP-backup-'+todayK()+'-'+new Date().toTime
       try{localStorage.setItem('bkfid',fid)}catch(e){}}
     const bd='bmpb'+Date.now(),body='--'+bd+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'+JSON.stringify({name:nm,parents:[fid]})+'\r\n--'+bd+'\r\nContent-Type: application/json\r\n\r\n'+bkJson()+'\r\n--'+bd+'--';
     await g('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:Object.assign({'Content-Type':'multipart/related; boundary='+bd},H),body});
-    bkSt('Saved to Google Drive > Backups > '+nm+' ('+new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'})+')')}
+    bkSt('Saved to Google Drive > Backups > '+nm+' ('+new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'})+')');bkMark('drive')}
   catch(e){if(e.st===401){dtok=null;try{localStorage.removeItem('dtok')}catch(x){}bkSt('Google asked to sign in again. Tap Back up to Google Drive once more.')}
     else if(/not been used|disabled|accessNotConfigured/i.test(e.message||'')){const pn=((e.message||'').match(/project[ =](\d{6,})/)||[])[1]||'825840710134';bkSt('Google says: '+(e.message||'').slice(0,160)+' | The Drive API must be enabled in Google Cloud project number '+pn+' (the one the sign-in uses). Open https://console.developers.google.com/apis/api/drive.googleapis.com/overview?project='+pn+' and press Enable. Nothing was saved.')}
     else bkSt('Drive backup failed: '+(e.message||e)+'. Nothing was saved. You can use Download file instead.')}}
@@ -2674,7 +2697,8 @@ function qaSave(){const q=QA[QAT];if(!q)return;const d=$('qad').value,x=Math.rou
   const err=m=>{const e=$('qae');e.textContent=m;e.style.display=''};
   if(!/^\d{4}-\d\d-\d\d$/.test(d)){err('Pick a date.');return}if(!(x>0)){err('Enter an amount.');return}
   const note=w>0?('PAYG '+w.toFixed(2)+(n?' \u00b7 '+n:'')):n;
-  entries.push({d,del:0,pu:0,nm:false,x,cat:q.cat,note});persist();QAM='Saved '+q.t+' '+fmt(x)+' on '+dAU(d)+' \u2192 Expenses \u203a '+q.cat;
+  const qen={d,del:0,pu:0,nm:false,x,cat:q.cat,note};if(!dupOk(qen))return;
+  entries.push(qen);persist();QAM='Saved '+q.t+' '+fmt(x)+' on '+dAU(d)+' \u2192 Expenses \u203a '+q.cat;
   qaClose();render();autoSync();setTimeout(()=>{QAM='';try{homeRender()}catch(e){}},6000)}
 document.addEventListener('click',ev=>{const t=ev.target;const nb=t.closest&&t.closest('[data-qn]');if(nb){const k=nb.dataset.qn;if(k==='cash'||k==='bills'){showTab('earn');cf=k;render()}else{showTab('tools');tl='mgr';mgSub='ch';toolsView()}return}const b=t.closest&&t.closest('[data-qa]');if(b){qaOpen(b.dataset.qa);return}
   if(t.id==='qas'){qaSave();return}if(t.id==='qax'||t.id==='qapop')qaClose()});
@@ -2756,24 +2780,47 @@ document.addEventListener('click',ev=>{const t=ev.target,r=t.closest&&t.closest(
 $('rep').addEventListener('change',ev=>{const t=ev.target,v=t.value;if(rk!=='custom')return;
   if(t.id==='cbp')CB.per=v;else if(t.id==='cbf')CB.from=v;else if(t.id==='cbt')CB.to=v;else if(t.id==='cbg1'){CB.g1=v;if(CB.g2===v)CB.g2='none'}else if(t.id==='cbg2')CB.g2=v;else return;
   cbSave();renderRep()});
+
+/* weekly backup: silent attempt when overdue, Home reminder as fallback */
+function bkAuto(){if(!bkOver())return;let t=0;try{t=+localStorage.getItem('bkTry')||0}catch(e){}if(Date.now()-t<6*36e5)return;
+  try{localStorage.setItem('bkTry',String(Date.now()))}catch(e){}
+  if(!(window.google&&google.accounts&&google.accounts.oauth2))return;try{driveBackup(true)}catch(e){}}
+setTimeout(bkAuto,9000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(bkAuto,3000)});
+document.addEventListener('click',ev=>{const b=ev.target.closest&&ev.target.closest('[data-bkgo]');if(b){driveBackup()}});
+setTimeout(bkShow,1500);
+/* income check vs payment advice */
+const ackTxt=ym=>{const a=ADV[ym];if(!a)return null;const n=Object.keys(a.days||{}).length;if(!n)return null;const bad=advDays(ym);return{n,bad}};
+function ackOpen(ym){const a=ADV[ym],c=ackTxt(ym);if(!a||!c)return;let p=$('ackpop');
+  if(!p){document.body.insertAdjacentHTML('beforeend','<div class="pop" id="ackpop" style="display:none"><div class="popc"><h3 id="ackt"></h3><div class="hint" id="acks"></div><div id="ackr"></div><button class="save alt" type="button" id="ackm">Open in Monthly</button><button class="save" type="button" id="ackx">Close</button></div></div>');p=$('ackpop')}
+  p.dataset.ym=ym;$('ackt').textContent='Income check · '+ymName(ym);
+  $('acks').textContent='Advice revenue '+A(a.rev)+' · direct credit '+A(a.dc)+(c.bad.length?'. Tap a day to open it in Add and fix it.':'');
+  $('ackr').innerHTML=c.bad.length?c.bad.map(x=>`<button type="button" class="cbrow" data-aday="${x.d}"><span>${dAU(x.d)} · ${esc(x.t)}</span></button>`).join(''):`<div class="rn cg">All ${c.n} days match your daily income.</div>`;
+  p.style.display='flex'}
+document.addEventListener('click',ev=>{const t=ev.target,k=t.closest&&t.closest('[data-ack]');if(k){ackOpen(k.dataset.ack);return}
+  const r=t.closest&&t.closest('#ackpop [data-aday]');if(r){const d=r.dataset.aday;$('ackpop').style.display='none';showTab('form');setMode('inc');$('date').value=d;try{setDay()}catch(e){}return}
+  if(t.id==='ackm'){const y=$('ackpop').dataset.ym;$('ackpop').style.display='none';showTab('earn');try{cf='cash';render()}catch(e){}openMf(y);return}
+  if(t.id==='ackx'||t.id==='ackpop')$('ackpop').style.display='none'});
 /* ===== HOME page: notifications, invoices from email, payment advice ===== */
 const BN=banners;banners=function(){return''};
-function homeBN(){let h=BN();if(!h)return h;const d=new Date().getDay();if(d!==0&&d!==6)return h;
-  const t=document.createElement('div');t.innerHTML=h;t.querySelectorAll('.al').forEach(a=>{if(/salary|super/i.test(a.textContent))a.remove()});return t.querySelector('.al')?t.innerHTML:''}
+function homeBN(){let h=BN()||'';const d=new Date().getDay();
+  if(h&&(d===0||d===6)){const t=document.createElement('div');t.innerHTML=h;t.querySelectorAll('.al').forEach(a=>{if(/salary|super/i.test(a.textContent))a.remove()});h=t.querySelector('.al')?t.innerHTML:''}
+  if(bkOver()){const n=bkDays();h+=`<div class="al"><span>Backup: ${bkLast()?'last one was '+n+' days ago':'none yet, '+n+' days in'}</span><button type="button" data-bkgo="1">Back up</button></div>`}
+  return h}
 function homeCount(){const b=homeBN(),n=(b.match(/class="al"/g)||[]).length;let a=0;try{Object.keys(ADV||{}).forEach(ym=>{if(advNew(ym)&&!((MF[ym]||{}).recDate))a++})}catch(e){}return n+(INBX.length||0)+a}
 function homeBadge(){const e=$('hbdg');if(!e)return;const n=window.BMP_VIEW?0:homeCount();e.textContent=n||'';e.style.display=n?'inline-block':'none'}
 const advPend=ym=>advNew(ym)&&!((MF[ym]||{}).recDate);
 function homeAdvHtml(){const ks=Object.keys(ADV||{}).filter(advPend).sort().reverse().slice(0,4);
   if(!ks.length)return '';
   return ks.map(ym=>{const a=ADV[ym],m=MF[ym]||{},nw=advNew(ym)&&!m.recDate;
-    return `<button type="button" class="mfr" data-mf="${ym}"><span><b>${ymName(ym)}</b><small class="${nw?'cg':''}">${nw?'Payment advice received · tap to apply':(m.recDate?'Applied · received '+dAU(m.recDate):'Advice read · tap to check')}</small></span><span class="r"><b>${A(a.dc||a.rev)}</b><small>${a.dc?'direct credit':'revenue'}</small></span></button>`}).join('')}
+    return `<button type="button" class="mfr" data-mf="${ym}"><span><b>${ymName(ym)}</b><small class="${nw?'cg':''}">${nw?'Payment advice received · tap to apply':(m.recDate?'Applied · received '+dAU(m.recDate):'Advice read · tap to check')}</small></span><span class="r"><b>${A(a.dc||a.rev)}</b><small>${a.dc?'direct credit':'revenue'}</small></span></button>${ackLine(ym)}`}).join('')}
+function ackLine(ym){const c=ackTxt(ym);if(!c)return '';return `<button type="button" class="advck ${c.bad.length?'bad':'ok'}" data-ack="${ym}">${c.bad.length?'⚠ '+c.bad.length+' of '+c.n+' days to check · tap to review':'✔ All '+c.n+' days match your daily income'}</button>`}
 function homeRender(){const el=$('home');if(!el||window.BMP_VIEW)return;
   const fa=document.activeElement;if(fa&&el.contains(fa)&&/^(INPUT|SELECT|TEXTAREA)$/.test(fa.tagName))return;
   const b=homeBN(),cards=[];
   if(b)cards.push(`<div class="card tl hn"><div class="pfh">Notifications</div>${b}</div>`);
   if(INBX.length)cards.push(`<div class="card tl hn"><div class="pfh">Income invoices</div><div id="hinbx"></div></div>`);
   const ah=homeAdvHtml();if(ah)cards.push(`<div class="card tl hn"><div class="pfh">Payment advice</div>${ah}</div>`);
-  let last='';if(!ah){const ks=Object.keys(ADV||{}).sort();if(ks.length){const ym=ks[ks.length-1],a=ADV[ym],m=MF[ym]||{};last=`<button type="button" class="mfr hlast" data-mf="${ym}"><span>Last advice <b>${ymName(ym)}</b>${m.recDate?' · applied '+dAU(m.recDate):''}</span><span class="r"><b>${A(a.dc||a.rev)}</b></span></button>`}}
+  let last='';if(!ah){const ks=Object.keys(ADV||{}).sort();if(ks.length){const ym=ks[ks.length-1],a=ADV[ym],m=MF[ym]||{};const lc=ackTxt(ym);last=`<button type="button" class="mfr hlast" ${lc&&lc.bad.length?'data-ack':'data-mf'}="${ym}"><span>Last advice <b>${ymName(ym)}</b>${m.recDate?' · applied '+dAU(m.recDate):''}${lc?(lc.bad.length?' · <b class="cr">'+lc.bad.length+' to check</b>':' · ✔ matches'):''}</span><span class="r"><b>${A(a.dc||a.rev)}</b></span></button>`}}
   el.style.gridTemplateColumns=cards.length?(cards.length===1?'minmax(0,1fr)':Array(cards.length).fill('minmax(0,1fr)').join(' 2px ')):'';
   el.innerHTML=cards.join('<div class="hdiv hv"></div>')
    +(cards.length?'<div class="hdiv"></div>':'<div class="hgap"></div>')+last
