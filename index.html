@@ -1513,7 +1513,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='17 Nov 2026, 21:10 (Divider under last advice; 12 hrs/day)';
+const APPV='18 Nov 2026, 11:20 (Fix: app not opening)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -2622,7 +2622,7 @@ document.addEventListener('click',ev=>{const h=ev.target.closest&&ev.target.clos
 
 /* ===== auto-update: if a newer copy is online, reload once ===== */
 (function(){if(!/^https?:/.test(location.protocol))return;
-  const chk=async()=>{try{const t=await (await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'})).text(),m=/const APPV='17 Nov 2026, 21:10 (Divider under last advice; 12 hrs/day)']+)'/.exec(t);
+  const chk=async()=>{try{const t=await (await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'})).text(),m=/const APPV='18 Nov 2026, 11:20 (Fix: app not opening)']+)'/.exec(t);
     if(m&&m[1]!==APPV){const k='rl_'+m[1];if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');location.reload()}}catch(e){}};
   setTimeout(chk,2500);document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(chk,800)})})();
 
