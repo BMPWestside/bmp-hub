@@ -2623,7 +2623,7 @@ document.addEventListener('click',ev=>{const h=ev.target.closest&&ev.target.clos
 
 /* ===== auto-update: if a newer copy is online, reload once ===== */
 (function(){if(!/^https?:/.test(location.protocol))return;
-  const chk=async()=>{try{const t=await (await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'})).text(),m=/const APPV='18 Nov 2026, 11:20 (Fix: app not opening)']+)'/.exec(t);
+  const chk=async()=>{try{const t=await (await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'})).text(),m=/const APPV='([^']+)'/.exec(t);
     if(m&&m[1]!==APPV){const k='rl_'+m[1];if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');location.reload()}}catch(e){}};
   setTimeout(chk,2500);document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(chk,800)})})();
 
