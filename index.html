@@ -1002,6 +1002,18 @@ html body #home .advck.bad{color:#ffb4c0;border-color:rgba(255,150,168,.5)}
 html body #ackpop .popc{max-height:84vh;overflow:auto;display:flex;flex-direction:column;gap:8px}
 html body #ackpop h3{margin:0;text-align:center}
 html body #ackpop .cbrow{height:auto;min-height:48px;padding:8px 14px;text-align:left}
+
+html body #earn .lpb{cursor:pointer}
+html body #earn .lpb.lpon{outline:1.5px solid #1e90ff;outline-offset:2px;border-radius:12px}
+html body #earn .lpdiv{height:2px;border-radius:2px;margin:8px 0;background:linear-gradient(90deg,transparent,#1e90ff 20%,#4db2ff 50%,#1e90ff 80%,transparent);box-shadow:0 0 8px rgba(30,144,255,.7)}
+html body #earn .lpc{padding:10px 12px}
+html body #earn .lph{display:flex;justify-content:space-between;align-items:center;font-weight:700;margin-bottom:6px}
+html body #earn .lpx{background:transparent;border:1px solid rgba(150,190,255,.35);color:inherit;border-radius:10px;padding:4px 10px;font:inherit;font-size:12px}
+html body #earn .lpl{max-height:34vh;overflow:auto}
+html body #earn .lpr{display:flex;gap:10px;align-items:center;padding:7px 2px;border-top:1px solid rgba(150,190,255,.15);font-size:13px}
+html body #earn .lpr .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.85}
+html body #earn .lpr b{white-space:nowrap}
+html body #earn .lpf{margin-top:6px;padding-top:6px;border-top:1px solid rgba(150,190,255,.3);font-size:13px;text-align:right}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1124,9 +1136,9 @@ function render(){
   }else{
     const loan=28118.52,paid=entries.filter(e=>e.x&&/^car repayment/i.test(e.cat||'')).reduce((a,e)=>a+e.x,0),left=Math.max(0,loan-paid),pc=Math.round(paid/loan*100);
     const lb=entries.reduce((a,e)=>a+(e.ln||0),0);
-    extra=`<div class="card top tgc"><div class="tg r1${left<=0?' hit':''}"><span>Car loan <b>${pc}%</b></span><div class="tgb"><i style="width:${Math.min(100,pc)}%"></i></div><span><b>${kc(left)}</b> left</span></div><div class="tg r1 ln${lb<0?' bad':''}"><span>Director loan</span><div></div><span><b>${kA(Math.abs(lb))}</b></span></div></div>`}
+    extra=`<div class="card top tgc"><div class="tg r1 lpb${LP==='car'?' lpon':''}" data-lp="car" role="button"${left<=0?'':''}><span>Car loan <b>${pc}%</b></span><div class="tgb"><i style="width:${Math.min(100,pc)}%"></i></div><span><b>${kc(left)}</b> left</span></div><div class="tg r1 ln lpb${LP==='dir'?' lpon':''}${lb<0?' bad':''}" data-lp="dir" role="button"><span>Director loan</span><div></div><span><b>${kA(Math.abs(lb))}</b></span></div></div>`}
   const sub=`<div class="segs three" id="cft"><button type="button" class="seg${X?'':' on'}" data-cf="inc">Income</button><button type="button" class="seg${X?' on':''}" data-cf="exp">Expenses</button><button type="button" class="seg" data-cf="pro">Profit</button></div>`;
-  $('earn').innerHTML=sub+extra+table('Day',dayRows,'',heads)+table('Week',weekRows,'sc w',heads)+table('Month',monthRows,'sc m',heads)+table('Year',yearRows,'sc y',heads);
+  $('earn').innerHTML=sub+extra+table('Day',dayRows,'',heads)+(X?lpHtml():'')+table('Week',weekRows,'sc w',heads)+table('Month',monthRows,'sc m',heads)+table('Year',yearRows,'sc y',heads);
   const scr=(sel,idx)=>{const el=$('earn').querySelector(sel);if(el&&el.children.length>idx&&idx>0){const k=Math.max(0,idx-1);el.scrollTop=el.children[k].offsetTop-el.children[0].offsetTop}};
   scr('.sc.m',mIdx);scr('.sc.y',yIdx);
   renderRep();
@@ -1517,7 +1529,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='18 Nov 2026, 21:40 (Background timers pause when hidden)';
+const APPV='19 Nov 2026, 05:10 (Tap car/director loan to see transactions)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -2810,6 +2822,21 @@ document.addEventListener('click',ev=>{const t=ev.target,k=t.closest&&t.closest(
   const r=t.closest&&t.closest('#ackpop [data-aday]');if(r){const d=r.dataset.aday;$('ackpop').style.display='none';showTab('form');setMode('inc');$('date').value=d;try{setDay()}catch(e){}return}
   if(t.id==='ackm'){const y=$('ackpop').dataset.ym;$('ackpop').style.display='none';showTab('earn');try{cf='cash';render()}catch(e){}openMf(y);return}
   if(t.id==='ackx'||t.id==='ackpop')$('ackpop').style.display='none'});
+let LP=null;
+function lpHtml(){if(!LP)return '';
+  const rows=[];let tot=0,title='',foot='';
+  if(LP==='car'){title='Car loan repayments';
+    const L=entries.filter(e=>e.x&&/^car repayment/i.test(e.cat||'')).sort((a,b)=>a.d<b.d?1:a.d>b.d?-1:0);
+    L.forEach(e=>{tot+=e.x;rows.push(`<div class="lpr"><span>${dAU(e.d)}</span><span class="n">${esc(e.note||e.cat||'Car repayment')}</span><b>${fmt(e.x)}</b></div>`)});
+    foot=`Paid so far <b>${fmt(tot)}</b>`}
+  else{title='Director loan';
+    const L=entries.filter(e=>e.ln).sort((a,b)=>a.d<b.d?1:a.d>b.d?-1:0);
+    L.forEach(e=>{tot+=e.ln;rows.push(`<div class="lpr"><span>${dAU(e.d)}</span><span class="n">${e.ln<0?'Repaid to you':'From you'}${e.note?' - '+esc(e.note):''}</span><b class="${e.ln<0?'cr':'cg'}">${e.ln<0?'-':'+'}${fmt(Math.abs(e.ln))}</b></div>`)});
+    foot=`Balance <b>${fmt(Math.abs(tot))}</b> ${tot<0?'overdrawn':'owed to you'}`}
+  return `<div class="lpdiv"></div><div class="card lpc"><div class="lph"><span>${title}</span><button type="button" class="lpx" data-lp="close">Close</button></div><div class="lpl">${rows.join('')||'<div class="rn">No transactions yet</div>'}</div><div class="lpf">${foot}</div></div><div class="lpdiv"></div>`}
+document.addEventListener('click',ev=>{const b=ev.target.closest&&ev.target.closest('[data-lp]');if(!b||!$('earn')||!$('earn').contains(b))return;
+  const k=b.dataset.lp;LP=(k==='close'||LP===k)?null:k;render();
+  if(LP){const d=$('earn').querySelector('.lpc');if(d)d.scrollIntoView({block:'nearest',behavior:'smooth'})}});
 /* ===== HOME page: notifications, invoices from email, payment advice ===== */
 const BN=banners;banners=function(){return''};
 function homeBN(){let h=BN()||'';const d=new Date().getDay();
