@@ -1138,7 +1138,7 @@ function render(){
     const lb=entries.reduce((a,e)=>a+(e.ln||0),0);
     extra=`<div class="card top tgc"><div class="tg r1 lpb${LP==='car'?' lpon':''}" data-lp="car" role="button"${left<=0?'':''}><span>Car loan <b>${pc}%</b></span><div class="tgb"><i style="width:${Math.min(100,pc)}%"></i></div><span><b>${kc(left)}</b> left</span></div><div class="tg r1 ln lpb${LP==='dir'?' lpon':''}${lb<0?' bad':''}" data-lp="dir" role="button"><span>Director loan</span><div></div><span><b>${kA(Math.abs(lb))}</b></span></div></div>`}
   const sub=`<div class="segs three" id="cft"><button type="button" class="seg${X?'':' on'}" data-cf="inc">Income</button><button type="button" class="seg${X?' on':''}" data-cf="exp">Expenses</button><button type="button" class="seg" data-cf="pro">Profit</button></div>`;
-  $('earn').innerHTML=sub+extra+table('Day',dayRows,'',heads)+(X?lpHtml():'')+table('Week',weekRows,'sc w',heads)+table('Month',monthRows,'sc m',heads)+table('Year',yearRows,'sc y',heads);
+  $('earn').innerHTML=sub+extra+table('Day',dayRows,'',heads)+table('Week',weekRows,'sc w',heads)+table('Month',monthRows,'sc m',heads)+table('Year',yearRows,'sc y',heads)+(X?lpHtml():'');
   const scr=(sel,idx)=>{const el=$('earn').querySelector(sel);if(el&&el.children.length>idx&&idx>0){const k=Math.max(0,idx-1);el.scrollTop=el.children[k].offsetTop-el.children[0].offsetTop}};
   scr('.sc.m',mIdx);scr('.sc.y',yIdx);
   renderRep();
@@ -1529,7 +1529,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='19 Nov 2026, 06:00 (Director loan colours: owed = red, repaid = green)';
+const APPV='19 Nov 2026, 10:00 (Loan list under Week/Month/Year tables)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
