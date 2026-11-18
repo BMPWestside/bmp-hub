@@ -1031,6 +1031,7 @@ html body #rep .lrin label{flex:1 1 130px;display:flex;flex-direction:column;gap
 html body #rep .lrin input{height:40px;border-radius:12px;border:1px solid rgba(150,190,255,.35);background:rgba(255,255,255,.06);color:inherit;padding:0 10px;font:inherit;min-width:0}
 html body #rep .lrin .save{flex:0 0 auto;width:auto;padding:0 22px;height:40px}
 html body #rep #lrk{margin-bottom:8px}
+html body #rep #cbk.two{grid-template-columns:repeat(2,1fr)!important}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1546,7 +1547,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='19 Nov 2026, 11:00 (Reports > Loans: director loan statement, car loan report)';
+const APPV='19 Nov 2026, 10:30 (Loans buttons match Reports style)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -2466,7 +2467,7 @@ tools:'<path d="M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.5 2.5-
 Object.assign(P,{custom:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',both:'<path d="M7 4v14"/><path d="m3.5 14.5 3.5 3.5 3.5-3.5"/><path d="M17 20V6"/><path d="m13.5 9.5 3.5-3.5 3.5 3.5"/>',view:'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',single:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',multi:'<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>',dmg:'<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>',chep:'<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18M7 15h4"/>'});
 const MAP=[['.tab[data-t]','t',{home:'home',form:'add',earn:'money',rep:'rep',tools:'tools'}],
 ['.seg[data-m]','m',{}],['.seg[data-cf]','cf',{}],['.seg[data-cv]','cv',{}],['.seg[data-k]','k',{}],['.seg[data-cbk]','cbk',{inc:'inc',exp:'exp',both:'both'}],
-['.seg[data-r]','r',{quarter:'qtr'}],['.seg[data-tl]','tl',{dat:'bak'}],['.seg[data-bt]','bt',{b:'bills',c:'course',d:'doc'}],['.seg[data-mg="sub"]','v',{dm:'dmg',ch:'chep'}],['.seg[data-mg="mode"]','v',{view:'view',new:'add'}],['.seg[data-dm="mode"]','v',{new:'add'}],['.seg[data-dm="single"]','v',{'1':'single','0':'multi'}],['.seg[data-tm]','tm',{w:'week',m:'month'}]];
+['.seg[data-r]','r',{quarter:'qtr'}],['.seg[data-lpd]','lpd',{month:'month',fy:'year',all:'qtr'}],['.seg[data-lk]','lk',{dir:'loan',car:'debt'}],['.seg[data-tl]','tl',{dat:'bak'}],['.seg[data-bt]','bt',{b:'bills',c:'course',d:'doc'}],['.seg[data-mg="sub"]','v',{dm:'dmg',ch:'chep'}],['.seg[data-mg="mode"]','v',{view:'view',new:'add'}],['.seg[data-dm="mode"]','v',{new:'add'}],['.seg[data-dm="single"]','v',{'1':'single','0':'multi'}],['.seg[data-tm]','tm',{w:'week',m:'month'}]];
 const SEL=MAP.map(x=>x[0]+':not([data-ic])').join(',');
 const LAST={},BKEY=el=>{const f=el.querySelector('[data-ic],button');if(!f)return'';const d=Object.keys(f.dataset).filter(k=>k!=='ic')[0]||'';return (el.id||el.className.replace(/\b(ib|on)\b/g,'').trim())+'|'+d+'|'+el.children.length};
 function deco(){
@@ -2875,8 +2876,8 @@ function lrCar(){const T=lrCT(),rate=parseFloat(T.rate),has=T.rate!==''&&rate>=0
   const fy={};all.forEach(r=>{const y=fyOf(r.d.slice(0,7)),o=fy[y]||(fy[y]={x:0,it:0,pr:0});o.x+=r.x;o.it+=r.it||0;o.pr+=r.pr});
   return{R,T,has,open,rows,paid:sm('x'),it:sm('it'),pr:sm('pr'),close:rows.length?rows[rows.length-1].bal:open,fy}}
 function lrHtml(){const R=lrRange(),dir=LR.k==='dir';
-  const bar=`<div class="segs" id="lrk"><button type="button" class="seg${dir?' on':''}" data-lk="dir">Director loan</button><button type="button" class="seg${dir?'':' on'}" data-lk="car">Car loan</button></div>`;
-  const per=`<div class="card sec"><div class="segs">${[['month','Month'],['fy','Financial year'],['all','All']].map(([k,n])=>`<button type="button" class="seg${LR.p===k?' on':''}" data-lpd="${k}">${n}</button>`).join('')}</div><div class="nav"><button type="button" class="nb" data-lnv="-1"${LR.p==='all'?' style="visibility:hidden"':''}>&#8249;</button><div class="nt">${R.l}</div><button type="button" class="nb" data-lnv="1"${LR.p==='all'?' style="visibility:hidden"':''}>&#8250;</button></div></div>`;
+  const bar=`<div class="segs two" id="cbk"><button type="button" class="seg${dir?' on':''}" data-lk="dir">Director loan</button><button type="button" class="seg${dir?'':' on'}" data-lk="car">Car loan</button></div>`;
+  const per=`<div class="card sec"><div class="segs" style="grid-template-columns:repeat(3,1fr)">${[['month','Month'],['fy','Financial year'],['all','All']].map(([k,n])=>`<button type="button" class="seg${LR.p===k?' on':''}" data-lpd="${k}">${n}</button>`).join('')}</div><div class="nav"><button type="button" class="nb" data-lnv="-1"${LR.p==='all'?' style="visibility:hidden"':''}>&#8249;</button><div class="nt">${R.l}</div><button type="button" class="nb" data-lnv="1"${LR.p==='all'?' style="visibility:hidden"':''}>&#8250;</button></div></div>`;
   const col=(a,b)=>`<div class="col"><small>${a}</small><b>${b}</b></div>`;let body='';
   if(dir){const D=lrDir();
     body=`<div class="card sec"><div class="cols" style="grid-template-columns:repeat(4,1fr)">${col('Opening',fmt(D.open))}${col('Money in',fmt(D.inn))}${col('Money out',fmt(D.out))}${col('Closing',fmt(D.close))}</div></div>
