@@ -1015,6 +1015,23 @@ html body #earn .lpr{display:flex;gap:10px;align-items:center;padding:7px 2px;bo
 html body #earn .lpr .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.85}
 html body #earn .lpr b{white-space:nowrap}
 html body #earn .lpf{margin-top:6px;padding-top:6px;border-top:1px solid rgba(150,190,255,.3);font-size:13px;text-align:right}
+
+html body #rep .lrl{padding:10px 12px}
+html body #rep .lpr{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;padding:7px 2px;border-top:1px solid rgba(150,190,255,.15);font-size:13px}
+html body #rep .lpr .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.85}
+html body #rep .lpr b{white-space:nowrap}
+html body #rep .lpr small{flex-basis:100%;text-align:right;opacity:.65;font-size:11px;margin-top:-4px}
+html body #rep .lrh{font-weight:700;opacity:.9}
+html body #rep .lpf{margin-top:6px;padding-top:6px;border-top:1px solid rgba(150,190,255,.3);font-size:13px;text-align:right}
+html body #rep .lrt{display:grid;grid-template-columns:.9fr 1fr 1fr 1fr 1fr;gap:4px;padding:7px 0;border-top:1px solid rgba(150,190,255,.15);font-size:11.5px;text-align:right}
+html body #rep .lrt.l4{grid-template-columns:1fr 1fr 1fr 1fr}
+html body #rep .lrt span:first-child{text-align:left}
+html body #rep .lrt.lrh{font-weight:700;border-top:0;font-size:11px}
+html body #rep .lrin{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+html body #rep .lrin label{flex:1 1 130px;display:flex;flex-direction:column;gap:4px;font-size:12px}
+html body #rep .lrin input{height:40px;border-radius:12px;border:1px solid rgba(150,190,255,.35);background:rgba(255,255,255,.06);color:inherit;padding:0 10px;font:inherit;min-width:0}
+html body #rep .lrin .save{flex:0 0 auto;width:auto;padding:0 22px;height:40px}
+html body #rep #lrk{margin-bottom:8px}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1432,7 +1449,7 @@ function renderRep(){
   const R=repBuild(),P=['week','month','quarter','year'],N=['Week','Month','Quarter','Year'];
   const seg=P.map((p,i)=>`<button type="button" class="seg${p===rt?' on':''}" data-r="${p}">${N[i]}</button>`).join('');
   const av2=R.A.map(a=>`<div class="ar"><span>${a[0]}</span><b>${a[1]}</b></div>`).join('');
-  const rkt=`<div class="segs four" id="rkt"><button type="button" class="seg${R.X?'':' on'}" data-k="inc">Income</button><button type="button" class="seg${R.X?' on':''}" data-k="exp">Expenses</button><button type="button" class="seg" data-k="trend">Trend</button><button type="button" class="seg" data-k="find">Find</button><button type="button" class="seg" data-k="custom">Custom</button></div>`;
+  const rkt=`<div class="segs four" id="rkt"><button type="button" class="seg${R.X?'':' on'}" data-k="inc">Income</button><button type="button" class="seg${R.X?' on':''}" data-k="exp">Expenses</button><button type="button" class="seg" data-k="trend">Trend</button><button type="button" class="seg" data-k="find">Find</button><button type="button" class="seg" data-k="custom">Custom</button><button type="button" class="seg" data-k="loans">Loans</button></div>`;
   $('rep').innerHTML=rkt+`<div class="card sec"><div class="segs">${seg}</div>
   <div class="nav"><button type="button" class="nb" data-n="-1">&#8249;</button><div class="nt">${R.t}${R.sub?`<span class="rng">${R.sub}</span>`:''}</div><button type="button" class="nb" data-n="1">&#8250;</button></div></div>
   <div class="card sec"><div class="cols" style="grid-template-columns:repeat(${R.heads.length+1},1fr)">${R.heads.map((h,i)=>`<div class="col"><small>${h}</small><b>${fmt(R.v[i])}</b></div>`).join('')}<div class="col"><small>Total</small><b>${fmt(R.tot)}</b></div></div></div>
@@ -1530,7 +1547,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='19 Nov 2026, 10:00 (Loan list under Week/Month/Year tables)';
+const APPV='19 Nov 2026, 11:00 (Reports > Loans: director loan statement, car loan report)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -2141,7 +2158,7 @@ $('tools').addEventListener('change',ev=>{const t=ev.target;if(t.dataset.rc===un
   r[f]=(f==='amt'||f==='day'||f==='wd')?(t.value===''?'':+t.value):(f==='ask'?(t.value?1:0):t.value);if(f==='freq'&&r.freq==='w'&&(r.wd===''||r.wd==null))r.wd=2;{const nk=rcKey(r);if(nk!==ok0)ST.rcx=(ST.rcx||[]).filter(k=>k!==nk).concat(ok0)}saveX();render();if(f==='freq'||f==='ask')toolsView()});
 /* reports: trend + find */
 let tm=null,fq='',ft='all',fmn='all';
-const rkBar=()=>`<div class="segs four" id="rkt">${[['inc','Income'],['exp','Expenses'],['trend','Trend'],['find','Find'],['custom','Custom']].map(([k,n])=>`<button type="button" class="seg${rk===k?' on':''}" data-k="${k}">${n}</button>`).join('')}</div>`;
+const rkBar=()=>`<div class="segs four" id="rkt">${[['inc','Income'],['exp','Expenses'],['trend','Trend'],['find','Find'],['custom','Custom'],['loans','Loans']].map(([k,n])=>`<button type="button" class="seg${rk===k?' on':''}" data-k="${k}">${n}</button>`).join('')}</div>`;
 function trendHtml(){const cur=info(todayK()).ym,ms=[];for(let y=cur;y>=BIZ_YM&&ms.length<12;y=prevYm(y))ms.unshift(y);
   if(!tm)tm=ms.length<3?'w':'m';let P=[];
   if(tm==='m')P=ms.map(ym=>{const a=agg(e=>info(e.d,e.nm).ym===ym);return{l:MN[+ym.slice(5)-1],I:a.I,X:a.X}});
@@ -2838,6 +2855,73 @@ function lpHtml(){if(!LP)return '';
 document.addEventListener('click',ev=>{const b=ev.target.closest&&ev.target.closest('[data-lp]');if(!b||!$('earn')||!$('earn').contains(b))return;
   const k=b.dataset.lp;LP=(k==='close'||LP===k)?null:k;render();
   if(LP){const d=$('earn').querySelector('.lpc');if(d)d.scrollIntoView({block:'nearest',behavior:'smooth'})}});
+/* ===== Reports > Loans: director loan summary/statement, car loan report ===== */
+const LOAN0=28118.52,MFN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+let LR={k:'dir',p:'month',m:iso(new Date()).slice(0,7),y:fyOf(iso(new Date()).slice(0,7))};
+const lrAU=d=>dAU(d,{day:'numeric',month:'short',year:'2-digit'});
+function lrRange(){if(LR.p==='month')return{f:LR.m+'-01',t:LR.m+'-31',l:MFN[+LR.m.slice(5)-1]+' '+LR.m.slice(0,4)};
+  if(LR.p==='fy')return{f:(LR.y-1)+'-07-01',t:LR.y+'-06-30',l:'FY'+String(LR.y).slice(2)+' (1 Jul '+(LR.y-1)+' - 30 Jun '+LR.y+')'};
+  return{f:'0000-00-00',t:'9999-99-99',l:'All dates'}}
+const lrSort=f=>entries.map((e,i)=>({e,i})).filter(o=>f(o.e)).sort((a,b)=>a.e.d<b.e.d?-1:a.e.d>b.e.d?1:a.i-b.i).map(o=>o.e);
+function lrDir(){const R=lrRange();let bal=0,open=0,inn=0,out=0;const rows=[];
+  lrSort(e=>e.ln).forEach(e=>{const v=e.ln;bal+=v;if(e.d<R.f){open+=v;return}if(e.d>R.t)return;if(v>0)inn+=v;else out+=-v;rows.push({d:e.d,note:e.note||'',inn:v>0?v:0,out:v<0?-v:0,bal})});
+  return{R,open,inn,out,close:open+inn-out,rows}}
+const lrCT=()=>jget('carT',{rate:'',start:''});
+function lrCar(){const T=lrCT(),rate=parseFloat(T.rate),has=T.rate!==''&&rate>=0&&!!T.start,R=lrRange();let bal=LOAN0,last=T.start;const all=[];
+  lrSort(e=>e.x&&/^car repayment/i.test(e.cat||'')).forEach(e=>{const x=e.x;let it=null,pr=x;
+    if(has){const dd=Math.max(0,Math.round((new Date(e.d+'T00:00')-new Date(last+'T00:00'))/864e5));it=Math.min(x,Math.max(0,bal)*rate/100/365*dd);pr=x-it;last=e.d}
+    bal=Math.max(0,bal-pr);all.push({d:e.d,x,it,pr,bal,note:e.note||''})});
+  let open=LOAN0;all.forEach(r=>{if(r.d<R.f)open=r.bal});
+  const rows=all.filter(r=>r.d>=R.f&&r.d<=R.t),sm=k=>rows.reduce((a,r)=>a+(r[k]||0),0);
+  const fy={};all.forEach(r=>{const y=fyOf(r.d.slice(0,7)),o=fy[y]||(fy[y]={x:0,it:0,pr:0});o.x+=r.x;o.it+=r.it||0;o.pr+=r.pr});
+  return{R,T,has,open,rows,paid:sm('x'),it:sm('it'),pr:sm('pr'),close:rows.length?rows[rows.length-1].bal:open,fy}}
+function lrHtml(){const R=lrRange(),dir=LR.k==='dir';
+  const bar=`<div class="segs" id="lrk"><button type="button" class="seg${dir?' on':''}" data-lk="dir">Director loan</button><button type="button" class="seg${dir?'':' on'}" data-lk="car">Car loan</button></div>`;
+  const per=`<div class="card sec"><div class="segs">${[['month','Month'],['fy','Financial year'],['all','All']].map(([k,n])=>`<button type="button" class="seg${LR.p===k?' on':''}" data-lpd="${k}">${n}</button>`).join('')}</div><div class="nav"><button type="button" class="nb" data-lnv="-1"${LR.p==='all'?' style="visibility:hidden"':''}>&#8249;</button><div class="nt">${R.l}</div><button type="button" class="nb" data-lnv="1"${LR.p==='all'?' style="visibility:hidden"':''}>&#8250;</button></div></div>`;
+  const col=(a,b)=>`<div class="col"><small>${a}</small><b>${b}</b></div>`;let body='';
+  if(dir){const D=lrDir();
+    body=`<div class="card sec"><div class="cols" style="grid-template-columns:repeat(4,1fr)">${col('Opening',fmt(D.open))}${col('Money in',fmt(D.inn))}${col('Money out',fmt(D.out))}${col('Closing',fmt(D.close))}</div></div>
+    <div class="card sec lrl"><div class="pfh">Statement</div><div class="lpr lrh"><span>Open</span><span class="n">Opening balance</span><b>${fmt(D.open)}</b></div>${D.rows.map(r=>`<div class="lpr"><span>${lrAU(r.d)}</span><span class="n">${r.inn?'From you':'Repaid to you'}${r.note?' - '+esc(r.note):''}</span><b class="${r.inn?'cr':'cg'}">${r.inn?'+'+fmt(r.inn):'-'+fmt(r.out)}</b><small>${fmt(r.bal)}</small></div>`).join('')||'<div class="rn">No movements in this period</div>'}<div class="lpf">Closing balance <b>${fmt(D.close)}</b> ${D.close<0?'overdrawn':'owed to you'}</div></div>`}
+  else{const C=lrCar(),T=C.T;
+    body=`<div class="card sec"><div class="cols" style="grid-template-columns:repeat(4,1fr)">${col('Repaid',fmt(C.paid))}${col('Interest',C.has?fmt(C.it):'-')}${col('Principal',fmt(C.pr))}${col('Balance',fmt(C.close))}</div></div>
+    <div class="card sec lrl"><div class="pfh">Repayments</div><div class="lrt lrh"><span>Date</span><span>Paid</span><span>Interest</span><span>Principal</span><span>Balance</span></div>${C.rows.map(r=>`<div class="lrt"><span>${lrAU(r.d)}</span><span>${fmt(r.x)}</span><span>${r.it==null?'-':fmt(r.it)}</span><span>${fmt(r.pr)}</span><span>${fmt(r.bal)}</span></div>`).join('')||'<div class="rn">No repayments in this period</div>'}</div>
+    <div class="card sec lrl"><div class="pfh">Interest by financial year</div><div class="lrt lrh l4"><span>FY</span><span>Paid</span><span>Interest</span><span>Principal</span></div>${Object.keys(C.fy).sort().map(y=>{const o=C.fy[y];return `<div class="lrt l4"><span>FY${String(y).slice(2)}</span><span>${fmt(o.x)}</span><span>${C.has?fmt(o.it):'-'}</span><span>${fmt(o.pr)}</span></div>`}).join('')||'<div class="rn">No repayments yet</div>'}</div>
+    <div class="card sec lrl"><div class="pfh">Loan terms (for interest)</div><div class="lrin"><label>Rate % p.a.<input id="crate" type="number" step="0.01" inputmode="decimal" value="${esc(String(T.rate))}" placeholder="e.g. 7.5"></label><label>Loan start date<input id="cstart" type="date" value="${esc(T.start||'')}"></label><button type="button" class="save inc" id="csave">Save</button></div><div class="pfn">${C.has?'Interest is estimated daily from the balance at '+esc(String(T.rate))+'% p.a. Confirm against your lender statement.':'Enter the rate and the date the loan started to split each repayment into interest and principal. Opening balance A$'+LOAN0.toLocaleString('en-AU',{minimumFractionDigits:2})+'.'}</div></div>`}
+  return bar+per+body+`<div class="dl2"><button class="save inc" type="button" id="lrpdf">Download PDF</button><button class="save inc" type="button" id="lrcsv">Download CSV</button></div>`}
+function lrPdf(){const J=window.jspdf;if(!J){alert('PDF tool is still loading. Check your internet and try again.');return}
+  const d=new J.jsPDF({unit:'mm',format:'a4'});let y=60;lhDraw(d);const R=lrRange(),gen='Generated '+new Date().toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});let nm;
+  const I=[{t:'Item',x:17},{t:'Amount',x:193,al:'right'}];
+  if(LR.k==='dir'){const D=lrDir();nm='BMP-Director-Loan-'+iso(new Date())+'.pdf';
+    y=pdfTitle(d,y,'Director Loan Statement',['BMP Westside Pty Ltd',R.l,gen]);y=pdfSec(d,y,'Summary');
+    y=pdfTbl(d,y,I,[['Opening balance',fmt(D.open)],['Money in (lent to company)',fmt(D.inn)],['Money out (repaid to director)',fmt(D.out)],Object.assign(['Closing balance ('+(D.close<0?'overdrawn':'owed to director')+')',fmt(D.close)],{b:1})]);y+=3;
+    y=pdfSec(d,y,'Movements');
+    const rows=[['',{t:'Opening balance'},'','',fmt(D.open)]];D.rows.forEach(r=>rows.push([pdfDt(r.d),(r.inn?'Lent to company':'Repaid to director')+(r.note?' - '+r.note:''),r.inn?fmt(r.inn):'',r.out?fmt(r.out):'',fmt(r.bal)]));
+    const t=['','Closing balance',fmt(D.inn),fmt(D.out),fmt(D.close)];t.b=1;rows.push(t);
+    y=pdfTbl(d,y,[{t:'Date',x:17},{t:'Details',x:50,w:62},{t:'Money in',x:140,al:'right'},{t:'Money out',x:167,al:'right'},{t:'Balance',x:193,al:'right'}],rows)}
+  else{const C=lrCar();nm='BMP-Car-Loan-'+iso(new Date())+'.pdf';
+    y=pdfTitle(d,y,'Car Loan Report',['BMP Westside Pty Ltd',R.l,C.has?'Interest estimated at '+C.T.rate+'% p.a. from '+pdfDt(C.T.start):'Interest not calculated (loan rate and start date not set)',gen]);y=pdfSec(d,y,'Summary');
+    y=pdfTbl(d,y,I,[['Opening balance',fmt(C.open)],['Repayments',fmt(C.paid)],['Interest',C.has?fmt(C.it):'-'],['Principal',fmt(C.pr)],Object.assign(['Closing balance',fmt(C.close)],{b:1})]);y+=3;
+    y=pdfSec(d,y,'Repayments');const rows=C.rows.map(r=>[pdfDt(r.d),fmt(r.x),r.it==null?'-':fmt(r.it),fmt(r.pr),fmt(r.bal)]);if(!rows.length)rows.push(['No repayments','','','','']);
+    y=pdfTbl(d,y,[{t:'Date',x:17},{t:'Paid',x:85,al:'right'},{t:'Interest',x:115,al:'right'},{t:'Principal',x:155,al:'right'},{t:'Balance',x:193,al:'right'}],rows);y+=3;
+    y=pdfSec(d,y,'Interest by financial year');
+    const fr=Object.keys(C.fy).sort().map(k=>{const o=C.fy[k];return['FY'+String(k).slice(2)+' (to 30 Jun '+k+')',fmt(o.x),C.has?fmt(o.it):'-',fmt(o.pr)]});
+    y=pdfTbl(d,y,[{t:'Financial year',x:17},{t:'Paid',x:110,al:'right'},{t:'Interest',x:150,al:'right'},{t:'Principal',x:193,al:'right'}],fr.length?fr:[['None','','','']])}
+  lhFoot(d);shareFile(new File([d.output('blob')],nm,{type:'application/pdf'}),nm)}
+function lrCsv(){const q=v=>{v=String(v==null?'':v);return /[",\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v},n2=v=>(+v).toFixed(2);let rows,nm;
+  if(LR.k==='dir'){const D=lrDir();nm='BMP-Director-Loan-'+iso(new Date())+'.csv';rows=[['Date','Details','Money in','Money out','Balance'],['','Opening balance','','',n2(D.open)]];
+    D.rows.forEach(r=>rows.push([r.d,(r.inn?'Lent to company':'Repaid to director')+(r.note?' - '+r.note:''),r.inn?n2(r.inn):'',r.out?n2(r.out):'',n2(r.bal)]));rows.push(['','Closing balance',n2(D.inn),n2(D.out),n2(D.close)])}
+  else{const C=lrCar();nm='BMP-Car-Loan-'+iso(new Date())+'.csv';rows=[['Date','Repayment','Interest','Principal','Balance left']];
+    C.rows.forEach(r=>rows.push([r.d,n2(r.x),r.it==null?'':n2(r.it),n2(r.pr),n2(r.bal)]));rows.push([]);rows.push(['Financial year','Repayments','Interest','Principal']);
+    Object.keys(C.fy).sort().forEach(k=>{const o=C.fy[k];rows.push(['FY'+k,n2(o.x),C.has?n2(o.it):'',n2(o.pr)])})}
+  const csv='﻿'+rows.map(r=>r.map(q).join(',')).join('\r\n');shareFile(new File([csv],nm,{type:'text/csv'}),nm)}
+(function(){const r3=renderRep;renderRep=function(){if(rk==='loans'){$('rep').classList.add('x2');$('rep').innerHTML=rkBar()+lrHtml();try{fit()}catch(e){}return}r3()};window.renderRep=renderRep})();
+document.addEventListener('click',ev=>{const t=ev.target;if(!t.closest||!t.closest('#rep')||rk!=='loans')return;
+  const lk=t.closest('[data-lk]'),pd=t.closest('[data-lpd]'),nv=t.closest('[data-lnv]');
+  if(lk){LR.k=lk.dataset.lk;renderRep();return}
+  if(pd){LR.p=pd.dataset.lpd;renderRep();return}
+  if(nv){const n=+nv.dataset.lnv;if(LR.p==='month'){const x=new Date(+LR.m.slice(0,4),+LR.m.slice(5)-1+n,1);LR.m=iso(x).slice(0,7)}else if(LR.p==='fy')LR.y+=n;renderRep();return}
+  if(t.id==='csave'){jset('carT',{rate:$('crate').value.trim(),start:$('cstart').value});renderRep();return}
+  if(t.id==='lrpdf')lrPdf();if(t.id==='lrcsv')lrCsv()});
 /* ===== HOME page: notifications, invoices from email, payment advice ===== */
 const BN=banners;banners=function(){return''};
 function homeBN(){let h=BN()||'';const d=new Date().getDay();
