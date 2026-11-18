@@ -1064,6 +1064,10 @@ html body #ackpop .cbrow{height:auto;min-height:48px;padding:8px 14px;text-align
 </div>
 
 <script>
+/* pause background timers while the app is hidden (saves battery/CPU) */
+(function(){const si=window.setInterval.bind(window);window.setInterval=function(f,t){const a=[].slice.call(arguments,2);return si(function(){if(document.hidden)return;f.apply(null,a)},t)}})();
+</script>
+<script>
 const $=id=>document.getElementById(id);
 const fmt=n=>(n<0?'-':'')+'A$'+Math.abs(n).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});
 let entries=[];
@@ -1514,7 +1518,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='18 Nov 2026, 21:15 (Faster start: images as files, offline cache)';
+const APPV='18 Nov 2026, 21:40 (Background timers pause when hidden)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -2624,6 +2628,10 @@ document.addEventListener('click',ev=>{const h=ev.target.closest&&ev.target.clos
 
 /* offline cache: opens instantly, updates in background */
 try{if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}
+
+/* catch up when the app comes back to the front */
+(function(){let t=Date.now();document.addEventListener('visibilitychange',()=>{if(document.hidden){t=Date.now();return}
+  if(Date.now()-t<120000)return;setTimeout(()=>{for(const n of['loadInbox','loadBills','loadAdvice']){try{window[n]&&window[n]()}catch(e){}}},1500)})})();
 /* ===== auto-update: if a newer copy is online, reload once ===== */
 (function(){if(!/^https?:/.test(location.protocol))return;
   const chk=async()=>{try{const t=await (await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'})).text(),m=/const APPV='([^']+)'/.exec(t);
