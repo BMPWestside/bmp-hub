@@ -1529,7 +1529,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='19 Nov 2026, 05:10 (Tap car/director loan to see transactions)';
+const APPV='19 Nov 2026, 06:00 (Director loan colours: owed = red, repaid = green)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -2831,7 +2831,7 @@ function lpHtml(){if(!LP)return '';
     foot=`Paid so far <b>${fmt(tot)}</b>`}
   else{title='Director loan';
     const L=entries.filter(e=>e.ln).sort((a,b)=>a.d<b.d?1:a.d>b.d?-1:0);
-    L.forEach(e=>{tot+=e.ln;rows.push(`<div class="lpr"><span>${dAU(e.d)}</span><span class="n">${e.ln<0?'Repaid to you':'From you'}${e.note?' - '+esc(e.note):''}</span><b class="${e.ln<0?'cr':'cg'}">${e.ln<0?'-':'+'}${fmt(Math.abs(e.ln))}</b></div>`)});
+    L.forEach(e=>{tot+=e.ln;rows.push(`<div class="lpr"><span>${dAU(e.d)}</span><span class="n">${e.ln<0?'Repaid to you':'From you'}${e.note?' - '+esc(e.note):''}</span><b class="${e.ln<0?'cg':'cr'}">${e.ln<0?'-':'+'}${fmt(Math.abs(e.ln))}</b></div>`)});
     foot=`Balance <b>${fmt(Math.abs(tot))}</b> ${tot<0?'overdrawn':'owed to you'}`}
   return `<div class="lpdiv"></div><div class="card lpc"><div class="lph"><span>${title}</span><button type="button" class="lpx" data-lp="close">Close</button></div><div class="lpl">${rows.join('')||'<div class="rn">No transactions yet</div>'}</div><div class="lpf">${foot}</div></div><div class="lpdiv"></div>`}
 document.addEventListener('click',ev=>{const b=ev.target.closest&&ev.target.closest('[data-lp]');if(!b||!$('earn')||!$('earn').contains(b))return;
