@@ -1033,6 +1033,15 @@ html body #rep .lrin input{height:40px;border-radius:12px;border:1px solid rgba(
 html body #rep .lrin .save{flex:0 0 auto;width:auto;padding:0 22px;height:40px}
 html body #rep #lrk{margin-bottom:8px}
 html body #rep #cbk.two{grid-template-columns:repeat(2,1fr)!important}
+
+html body .card.tabs .tab[data-t="form"]:not(#_):not(#__):not(#___):not(#____),html body .tab[data-t="form"]:not(#_):not(#__):not(#___):not(#____){display:none!important}
+#fab{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:92px;z-index:40;width:60px;height:60px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;
+ border:1.5px solid rgba(120,175,255,.55);
+ background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.34),rgba(255,255,255,0) 46%),linear-gradient(160deg,rgba(40,110,230,.34),rgba(0,45,120,.16));
+ -webkit-backdrop-filter:blur(14px) saturate(170%);backdrop-filter:blur(14px) saturate(170%);
+ box-shadow:inset 0 1.5px 0 rgba(255,255,255,.6),inset 0 -10px 16px rgba(0,50,140,.28),0 10px 26px rgba(0,25,80,.55),0 0 18px rgba(40,120,255,.35);-webkit-tap-highlight-color:transparent}
+#fab svg{width:30px;height:30px;fill:none;stroke:#E4002B;stroke-width:3.6;stroke-linecap:round;filter:drop-shadow(0 0 5px rgba(228,0,43,.5))}
+#fab:active{transform:scale(.93)}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1040,13 +1049,15 @@ html body #rep #cbk.two{grid-template-columns:repeat(2,1fr)!important}
 <div id="opn" aria-hidden="true"><div class="stage"><svg class="ring" viewBox="0 0 200 200"><circle cx="100" cy="100" r="94" pathLength="100"/></svg><div class="lw"><img class="logo" alt="" src=""><span class="shine"></span></div></div>
 <div class="cap"><div class="tag"><span class="w w1">BUILD</span><i>·</i><span class="w w2">MOVE</span><i>·</i><span class="w w3">PROSPER</span></div></div>
 <div class="fid"><svg viewBox="0 0 64 64"><path d="M8 22V14a6 6 0 0 1 6-6h8M42 8h8a6 6 0 0 1 6 6v8M56 42v8a6 6 0 0 1-6 6h-8M22 56h-8a6 6 0 0 1-6-6v-8"/><g class="scan"><path d="M23 26v4M41 26v4M32 26v8h-3M24 42c5 5 11 5 16 0"/></g><path class="chk" d="M20 33l8 8 16-17"/></svg><p id="opt">Unlocking with Face ID</p></div></div>
+<button type="button" id="fab" aria-label="Add entry"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5v15M4.5 12h15"/></svg></button>
 <div class="wrap">
   <div class="topwrap"><div class="card top"><div class="side"><img class="lg" alt="BMP Westside" src="img/0a79274b.png"><span class="r vp g" id="total">A$0.00</span></div><div class="ttl">BMP<i class="rl"></i>HUB</div><div class="side"><span class="r vp rd" id="totalx">A$0.00</span><img class="lg" alt="Logo" src="img/c38bff28.png"></div></div><div class="card top top2"><span id="bLeft">--</span><span id="bWeek">Week</span></div><div id="gtg"></div></div>
 
   <div class="card tabs">
     <button class="tab on" data-t="home">Home<span class="bdg" id="hbdg" style="display:none"></span></button>
-    <button class="tab" data-t="form">Add<span class="bdg" id="bdg" style="display:none"></span></button>
-    <button class="tab" data-t="earn">Money<span class="bdg" id="ebdg" style="display:none"></span></button>
+    <button class="tab" data-t="form" id="addtab" style="display:none">Add<span class="bdg" id="bdg" style="display:none"></span></button>
+    <button class="tab" data-t="earn">Cashflow</button>
+    <button class="tab" data-t="wallet">Wallet<span class="bdg" id="ebdg" style="display:none"></span></button>
     <button class="tab" data-t="rep">Reports</button>
     <button class="tab" data-t="tools">Tools</button>
   </div>
@@ -1450,7 +1461,7 @@ function renderRep(){
   const R=repBuild(),P=['week','month','quarter','year'],N=['Week','Month','Quarter','Year'];
   const seg=P.map((p,i)=>`<button type="button" class="seg${p===rt?' on':''}" data-r="${p}">${N[i]}</button>`).join('');
   const av2=R.A.map(a=>`<div class="ar"><span>${a[0]}</span><b>${a[1]}</b></div>`).join('');
-  const rkt=`<div class="segs four" id="rkt"><button type="button" class="seg${R.X?'':' on'}" data-k="inc">Income</button><button type="button" class="seg${R.X?' on':''}" data-k="exp">Expenses</button><button type="button" class="seg" data-k="trend">Trend</button><button type="button" class="seg" data-k="find">Find</button><button type="button" class="seg" data-k="custom">Custom</button><button type="button" class="seg" data-k="loans">Loans</button></div>`;
+  const rkt=`<div class="segs four" id="rkt"><button type="button" class="seg${R.X?'':' on'}" data-k="inc">Income</button><button type="button" class="seg${R.X?' on':''}" data-k="exp">Expenses</button><button type="button" class="seg" data-k="find">Find</button><button type="button" class="seg" data-k="custom">Custom</button><button type="button" class="seg" data-k="loans">Loans</button></div>`;
   $('rep').innerHTML=rkt+`<div class="card sec"><div class="segs">${seg}</div>
   <div class="nav"><button type="button" class="nb" data-n="-1">&#8249;</button><div class="nt">${R.t}${R.sub?`<span class="rng">${R.sub}</span>`:''}</div><button type="button" class="nb" data-n="1">&#8250;</button></div></div>
   <div class="card sec"><div class="cols" style="grid-template-columns:repeat(${R.heads.length+1},1fr)">${R.heads.map((h,i)=>`<div class="col"><small>${h}</small><b>${fmt(R.v[i])}</b></div>`).join('')}<div class="col"><small>Total</small><b>${fmt(R.tot)}</b></div></div></div>
@@ -1548,7 +1559,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='19 Nov 2026, 10:45 (Loans tab icon)';
+const APPV='21 Nov 2026, 11:30 (New nav: Cashflow, Wallet, + button)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -1597,11 +1608,12 @@ EH.addEventListener('click',ev=>{const b=ev.target.closest('[data-act="pay"]');i
   entries.push({d,del:0,pu:0,nm:false,x:CFG.sup,cat:'Superannuation',note:'Weekly pay'});
   persist();render();autoSync()});
 /* ===== TOOLS tab ===== */
-let tl='mgr';
+let tl='set',WL=null,WLS='mgr';
 const inp=(id,v,ex)=>`<input id="${id}" value="${esc(v)}" ${ex||''}>`;
 const lockHtml=()=>`<div class="pfh">App lock</div>${LK&&LK.pin?`<div class="hint">Lock is ON${LK.cred?' with Face ID (your PIN is the backup)':' (PIN only)'}. Locks after 1 minute away.</div><div class="two2">${LK.cred?'<span></span>':'<button type="button" class="mini" id="b_fid">Turn on Face ID</button>'}<button type="button" class="mini" id="b_lkoff">Turn off</button></div>`:`<button type="button" class="mini" id="b_lkon">Set up Face ID lock</button><div class="hint">You will choose a 4-digit PIN as a backup, then Face ID is turned on.</div>`}`;
 function toolsView(){
-  const seg=['mgr:Accounts','set:Setup','rec:Recurring','debt:Debts','dat:Backup'].map(s=>{const[k,n]=s.split(':');return`<button type="button" class="seg${tl===k?' on':''}" data-tl="${k}">${n}</button>`}).join('');
+  if(!WL&&(tl==='mgr'||tl==='debt'))tl='set';
+  const seg=['set:Setup','rec:Recurring','dat:Backup'].map(s=>{const[k,n]=s.split(':');return`<button type="button" class="seg${tl===k?' on':''}" data-tl="${k}">${n}</button>`}).join('');
   let b='';
   if(tl==='set')b=`<div class="card tl"><label>GST registered<select id="c_gst"><option value="1"${CFG.gst?' selected':''}>Yes</option><option value="0"${CFG.gst?'':' selected'}>No</option></select></label>
 <label>Income I enter is<select id="c_inc"><option value="ex"${CFG.incGst==='ex'?' selected':''}>Excluding GST</option><option value="inc"${CFG.incGst==='inc'?' selected':''}>Including GST</option></select></label>
@@ -1627,7 +1639,7 @@ function toolsView(){
 <div class="two2"><button type="button" class="mini" id="b_fypdf">PDF</button><button type="button" class="mini" id="b_fycsv">CSV</button></div>
 <div class="hint">Bottom bar too low or cut off? Raise it: <button type="button" class="mini" data-nl="-8">Lower</button> <button type="button" class="mini" data-nl="8">Raise</button> (now <span id="nlv">${(()=>{try{return +localStorage.getItem('navlift')||0}catch(e){return 0}})()}</span>)</div>
 <div class="hint">App version: ${APPV}<br>Screen ${screen.width}x${screen.height}, view ${innerWidth}x${innerHeight}, bottom gap ${getComputedStyle(document.documentElement).getPropertyValue('--bgap')||0}</div></div>`}
-  $('tools').innerHTML=`<div class="segs five" id="tlt">${seg}</div>`+b+(tl==='dat'?binHtml():'');fit()}
+  $('tools').innerHTML=(WL?wlBar('tlt'):`<div class="segs three" id="tlt">${seg}</div>`)+b+(tl==='dat'?binHtml():'');fit()}
 $('tools').addEventListener('click',ev=>{const t=ev.target,s=t.closest('[data-tl]');if(s){tl=s.dataset.tl;toolsView();return}
   if(t.dataset.del!==undefined){REM.splice(+t.dataset.del,1);saveCfg();toolsView();render();return}
   const id=t.id;
@@ -2108,7 +2120,9 @@ function forecast(){const now=todayK(),cur=info(now).ym,t0=new Date(now+'T00:00'
     if(pg>0&&!entries.some(e=>isPayg(e)&&e.d>qe+'-28'))ev.push({d:due,t:'PAYG withholding (BAS)',a:-pg})}));
   REM.forEach(r=>{if(r.d&&r.d>=now&&r.d<=ek)ev.push({d:r.d,t:r.n,a:0})});
   ev.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0);let bal=est(),low=null;ev.forEach(x=>{bal+=x.a;x.b=bal;if(bal<0&&!low)low=x.d});return{ev,low,end:bal}}
-const cftBar=()=>{const L=[['inc','Income'],['exp','Expenses'],['pro','Profit'],['cash','Cash'],['bills','Bills']].filter(x=>!(window.BMP_VIEW&&(x[0]==='cash'||x[0]==='bills')));return `<div class="segs ${L.length===3?'three':L.length===4?'four':'five'}" id="cft">${L.map(([k,n])=>{const c=k==='bills'&&typeof blSoonCount==='function'?blSoonCount():0;return `<button type="button" class="seg${cf===k?' on':''}" data-cf="${k}">${n}${c?`<span class="bdg">${c}</span>`:''}</button>`}).join('')}</div>`};
+const wlBar=id=>{const L=[['mgr','Accounts'],['bills','Bills'],['debt','Debts']].filter(x=>!(window.BMP_VIEW&&x[0]==='bills'));const cur=cf==='bills'&&$('earn').classList.contains('on')?'bills':(WL||'mgr');
+  return `<div class="segs ${L.length===3?'three':'two'}" id="${id}">${L.map(([k,n])=>{const c=k==='bills'&&typeof blSoonCount==='function'?blSoonCount():0;return `<button type="button" class="seg${(WL||'mgr')===k?' on':''}" data-wl="${k}">${n}${c?`<span class="bdg">${c}</span>`:''}</button>`}).join('')}</div>`};
+const cftBar=()=>{if(cf==='bills')return wlBar('cft');const L=[['inc','Income'],['exp','Expenses'],['pro','Profit'],['cash','Cash'],['trend','Trend']].filter(x=>!(window.BMP_VIEW&&x[0]==='cash'));return `<div class="segs ${L.length===3?'three':L.length===4?'four':'five'}" id="cft">${L.map(([k,n])=>`<button type="button" class="seg${cf===k?' on':''}" data-cf="${k}">${n}</button>`).join('')}</div>`};
 function cashView(){const now=todayK(),cur=info(now).ym,e0=est(),ms=[];for(let y=cur;y>=BIZ_YM&&ms.length<3;y=prevYm(y))ms.push(y);
   let wait=0;for(let ym=BIZ_YM;ym<=cur;ym=nextYm(ym)){const m=MF[ym]||{};if(!m.recDate&&ym<cur)wait+=mfAmt(ym)}
   const bank=`<div class="card pf"><div class="pfh">Bank balance · estimate</div><div class="pft big"><span>Estimated now</span><b class="${e0<0?'cr':''}">${A(e0)}</b></div><div class="pft"><span>Owed by Mainfreight (finished months)</span><b>${A(wait)}</b></div><div class="pft"><span>Held for ATO (PAYG withholding)</span><b>${A(paygHeld())}</b></div><div class="bkset"><input id="bk_in" type="number" inputmode="decimal" step="0.01" placeholder="Your real balance A$"><button type="button" class="mini" id="bk_set">Set</button></div><div class="pfn">Received pay + director loans − all expenses. Type your real bank balance and tap Set to correct the estimate.</div></div>`;
@@ -2119,7 +2133,7 @@ function cashView(){const now=todayK(),cur=info(now).ym,e0=est(),ms=[];for(let y
   const fc=`<div class="card pf"><div class="pfh">Next 30 days</div>${F.low?`<div class="wn">⚠ Balance may go below A$0 on ${dAU(F.low)}</div>`:`<div class="okk">✔ Balance stays above A$0 · ends ${A(F.end)}</div>`}<div class="fcl">${sh.map(x=>`<div class="fcr"><span>${dAU(x.d)}</span><span>${esc(x.t)}</span><b class="${x.a<0?'cr':x.a>0?'cg':''}">${x.a?(x.a>0?'+':'-')+kN(Math.abs(x.a)):''}</b><small class="${x.b<0?'cr':''}">${kN(x.b)}</small></div>`).join('')||'<div class="pfn">Nothing coming up.</div>'}</div>${F.ev.length>8?`<div class="pfn">+${F.ev.length-8} more</div>`:''}</div>`;
   $('earn').innerHTML=cftBar()+banners()+bank+pay+fc}
 (function(){const r1=render;render=function(){if(window.BMP_VIEW&&(cf==='cash'||cf==='bills'))cf='inc';r1();
-  if(cf==='cash')cashView();else if(cf==='bills')$('earn').innerHTML=cftBar()+billsHtml();else{const c=$('cft');if(c)c.outerHTML=cftBar()}
+  if(cf==='cash')cashView();else if(cf==='bills')$('earn').innerHTML=cftBar()+billsHtml();else if(cf==='trend')$('earn').innerHTML=cftBar()+trendHtml();else{const c=$('cft');if(c)c.outerHTML=cftBar()}
   $('earn').classList.toggle('cash',cf==='cash');if(rk==='find'&&$('fr'))findPaint();fit()};window.render=render})();
 EH.addEventListener('click',ev=>{const t=ev.target;
   const b=t.closest('[data-act="rec"]');if(b){const r=RC[+b.dataset.i];if(r){let am=+r.amt;if(r.ask){const f=$('rca'+b.dataset.i);am=f?Math.round((+f.value||0)*100)/100:0;if(!(am>0)){if(f)f.focus();return}r.last=am;saveX()}entries.push({d:b.dataset.d,del:0,pu:0,nm:false,x:am,cat:r.cat,note:r.n||''});persist();render();autoSync()}return}
@@ -2159,7 +2173,7 @@ $('tools').addEventListener('change',ev=>{const t=ev.target;if(t.dataset.rc===un
   r[f]=(f==='amt'||f==='day'||f==='wd')?(t.value===''?'':+t.value):(f==='ask'?(t.value?1:0):t.value);if(f==='freq'&&r.freq==='w'&&(r.wd===''||r.wd==null))r.wd=2;{const nk=rcKey(r);if(nk!==ok0)ST.rcx=(ST.rcx||[]).filter(k=>k!==nk).concat(ok0)}saveX();render();if(f==='freq'||f==='ask')toolsView()});
 /* reports: trend + find */
 let tm=null,fq='',ft='all',fmn='all';
-const rkBar=()=>`<div class="segs four" id="rkt">${[['inc','Income'],['exp','Expenses'],['trend','Trend'],['find','Find'],['custom','Custom'],['loans','Loans']].map(([k,n])=>`<button type="button" class="seg${rk===k?' on':''}" data-k="${k}">${n}</button>`).join('')}</div>`;
+const rkBar=()=>`<div class="segs four" id="rkt">${[['inc','Income'],['exp','Expenses'],['find','Find'],['custom','Custom'],['loans','Loans']].map(([k,n])=>`<button type="button" class="seg${rk===k?' on':''}" data-k="${k}">${n}</button>`).join('')}</div>`;
 function trendHtml(){const cur=info(todayK()).ym,ms=[];for(let y=cur;y>=BIZ_YM&&ms.length<12;y=prevYm(y))ms.unshift(y);
   if(!tm)tm=ms.length<3?'w':'m';let P=[];
   if(tm==='m')P=ms.map(ym=>{const a=agg(e=>info(e.d,e.nm).ym===ym);return{l:MN[+ym.slice(5)-1],I:a.I,X:a.X}});
@@ -2440,7 +2454,7 @@ document.addEventListener('click',ev=>{const t=ev.target.closest&&ev.target.clos
   setInterval(loadBills,300000);setTimeout(blBadge,600);})();
 
 (function(){
-const P={inc:'<path d="M12 3v11"/><path d="m7.5 10 4.5 4.5L16.5 10"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
+const P={cashflow:'<path d="M4 8h13"/><path d="m13 4 4 4-4 4"/><path d="M20 16H7"/><path d="m11 12-4 4 4 4"/>',inc:'<path d="M12 3v11"/><path d="m7.5 10 4.5 4.5L16.5 10"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
 exp:'<path d="M12 14V3"/><path d="m7.5 7 4.5-4.5L16.5 7"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
 loan:'<path d="M3 10 12 4l9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20h18"/>',
 pro:'<path d="M3 17 9 11l4 4 8-9"/><path d="M15 6h6v6"/>',
@@ -2466,9 +2480,9 @@ money:'<path d="M3 7a2 2 0 0 1 2-2h13v3"/><path d="M3 7v11a2 2 0 0 0 2 2h14a1 1 
 rep:'<path d="M5 20V11M11 20V4M17 20v-6"/><path d="M3 20h18"/>',
 tools:'<path d="M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.5 2.5-2.4-.6-.6-2.4z"/>'};
 Object.assign(P,{custom:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',both:'<path d="M7 4v14"/><path d="m3.5 14.5 3.5 3.5 3.5-3.5"/><path d="M17 20V6"/><path d="m13.5 9.5 3.5-3.5 3.5 3.5"/>',view:'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',single:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',multi:'<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>',dmg:'<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>',chep:'<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18M7 15h4"/>'});
-const MAP=[['.tab[data-t]','t',{home:'home',form:'add',earn:'money',rep:'rep',tools:'tools'}],
+const MAP=[['.tab[data-t]','t',{home:'home',form:'add',earn:'cashflow',wallet:'money',rep:'rep',tools:'tools'}],
 ['.seg[data-m]','m',{}],['.seg[data-cf]','cf',{}],['.seg[data-cv]','cv',{}],['.seg[data-k]','k',{loans:'loan'}],['.seg[data-cbk]','cbk',{inc:'inc',exp:'exp',both:'both'}],
-['.seg[data-r]','r',{quarter:'qtr'}],['.seg[data-lpd]','lpd',{month:'month',fy:'year',all:'qtr'}],['.seg[data-lk]','lk',{dir:'loan',car:'debt'}],['.seg[data-tl]','tl',{dat:'bak'}],['.seg[data-bt]','bt',{b:'bills',c:'course',d:'doc'}],['.seg[data-mg="sub"]','v',{dm:'dmg',ch:'chep'}],['.seg[data-mg="mode"]','v',{view:'view',new:'add'}],['.seg[data-dm="mode"]','v',{new:'add'}],['.seg[data-dm="single"]','v',{'1':'single','0':'multi'}],['.seg[data-tm]','tm',{w:'week',m:'month'}]];
+['.seg[data-r]','r',{quarter:'qtr'}],['.seg[data-wl]','wl',{mgr:'mgr',bills:'bills',debt:'debt'}],['.seg[data-lpd]','lpd',{month:'month',fy:'year',all:'qtr'}],['.seg[data-lk]','lk',{dir:'loan',car:'debt'}],['.seg[data-tl]','tl',{dat:'bak'}],['.seg[data-bt]','bt',{b:'bills',c:'course',d:'doc'}],['.seg[data-mg="sub"]','v',{dm:'dmg',ch:'chep'}],['.seg[data-mg="mode"]','v',{view:'view',new:'add'}],['.seg[data-dm="mode"]','v',{new:'add'}],['.seg[data-dm="single"]','v',{'1':'single','0':'multi'}],['.seg[data-tm]','tm',{w:'week',m:'month'}]];
 const SEL=MAP.map(x=>x[0]+':not([data-ic])').join(',');
 const LAST={},BKEY=el=>{const f=el.querySelector('[data-ic],button');if(!f)return'';const d=Object.keys(f.dataset).filter(k=>k!=='ic')[0]||'';return (el.id||el.className.replace(/\b(ib|on)\b/g,'').trim())+'|'+d+'|'+el.children.length};
 function deco(){
@@ -2741,7 +2755,7 @@ function qaSave(){const q=QA[QAT];if(!q)return;const d=$('qad').value,x=Math.rou
   const qen={d,del:0,pu:0,nm:false,x,cat:q.cat,note};if(!dupOk(qen))return;
   entries.push(qen);persist();QAM='Saved '+q.t+' '+fmt(x)+' on '+dAU(d)+' \u2192 Expenses \u203a '+q.cat;
   qaClose();render();autoSync();setTimeout(()=>{QAM='';try{homeRender()}catch(e){}},6000)}
-document.addEventListener('click',ev=>{const t=ev.target;const nb=t.closest&&t.closest('[data-qn]');if(nb){const k=nb.dataset.qn;if(k==='cash'||k==='bills'){showTab('earn');cf=k;render()}else{showTab('tools');tl='mgr';mgSub='ch';toolsView()}return}const b=t.closest&&t.closest('[data-qa]');if(b){qaOpen(b.dataset.qa);return}
+document.addEventListener('click',ev=>{const t=ev.target;const nb=t.closest&&t.closest('[data-qn]');if(nb){const k=nb.dataset.qn;if(k==='cash'){showTab('earn');cf=k;render()}else if(k==='bills'){goWallet('bills')}else{mgSub='ch';goWallet('mgr')}return}const b=t.closest&&t.closest('[data-qa]');if(b){qaOpen(b.dataset.qa);return}
   if(t.id==='qas'){qaSave();return}if(t.id==='qax'||t.id==='qapop')qaClose()});
 
 /* ===== Custom report builder: by category / income type / description / month / week / day, with optional second grouping ===== */
@@ -2915,7 +2929,7 @@ function lrCsv(){const q=v=>{v=String(v==null?'':v);return /[",\r\n]/.test(v)?'"
     C.rows.forEach(r=>rows.push([r.d,n2(r.x),r.it==null?'':n2(r.it),n2(r.pr),n2(r.bal)]));rows.push([]);rows.push(['Financial year','Repayments','Interest','Principal']);
     Object.keys(C.fy).sort().forEach(k=>{const o=C.fy[k];rows.push(['FY'+k,n2(o.x),C.has?n2(o.it):'',n2(o.pr)])})}
   const csv='﻿'+rows.map(r=>r.map(q).join(',')).join('\r\n');shareFile(new File([csv],nm,{type:'text/csv'}),nm)}
-(function(){const r3=renderRep;renderRep=function(){if(rk==='loans'){$('rep').classList.add('x2');$('rep').innerHTML=rkBar()+lrHtml();try{fit()}catch(e){}return}r3()};window.renderRep=renderRep})();
+(function(){const r3=renderRep;renderRep=function(){if(rk==='trend')rk='inc';if(rk==='loans'){$('rep').classList.add('x2');$('rep').innerHTML=rkBar()+lrHtml();try{fit()}catch(e){}return}r3()};window.renderRep=renderRep})();
 document.addEventListener('click',ev=>{const t=ev.target;if(!t.closest||!t.closest('#rep')||rk!=='loans')return;
   const lk=t.closest('[data-lk]'),pd=t.closest('[data-lpd]'),nv=t.closest('[data-lnv]');
   if(lk){LR.k=lk.dataset.lk;renderRep();return}
@@ -2923,6 +2937,25 @@ document.addEventListener('click',ev=>{const t=ev.target;if(!t.closest||!t.close
   if(nv){const n=+nv.dataset.lnv;if(LR.p==='month'){const x=new Date(+LR.m.slice(0,4),+LR.m.slice(5)-1+n,1);LR.m=iso(x).slice(0,7)}else if(LR.p==='fy')LR.y+=n;renderRep();return}
   if(t.id==='csave'){jset('carT',{rate:$('crate').value.trim(),start:$('cstart').value});renderRep();return}
   if(t.id==='lrpdf')lrPdf();if(t.id==='lrcsv')lrCsv()});
+
+/* ===== Wallet tab (Accounts, Bills, Debts) + Cashflow trend + floating + button ===== */
+function goWallet(sub){WL=sub;WLS=sub;const t=document.querySelector('.tab[data-t=wallet]');
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.id===(sub==='bills'?'earn':'tools')));
+  if(sub==='bills'){cf='bills';render()}else{tl=sub;toolsView()}fit();fabVis()}
+document.querySelectorAll('.tab').forEach(b=>{
+  b.addEventListener('click',()=>{if(b.dataset.t!=='wallet')WL=null},true);
+  b.addEventListener('click',()=>{if(b.dataset.t==='wallet'){goWallet(WLS);return}
+    if(b.dataset.t==='earn'&&(cf==='bills')){cf='inc';render()}
+    if(b.dataset.t==='tools'){if(tl==='mgr'||tl==='debt')tl='set';toolsView()}fabVis()})});
+document.addEventListener('click',ev=>{const w=ev.target.closest&&ev.target.closest('[data-wl]');if(w)goWallet(w.dataset.wl)});
+$('earn').addEventListener('click',ev=>{const t=ev.target.closest('[data-tm]');if(t&&cf==='trend'){tm=t.dataset.tm;render()}});
+function fabVis(){const f=$('fab');if(f)f.style.display=$('form').classList.contains('on')?'none':'flex'}
+function fabPos(){const f=$('fab'),n=document.querySelector('.card.tabs');if(!f||!n)return;const r=n.getBoundingClientRect();
+  f.style.bottom=(r.width<innerWidth*0.7?24:Math.max(24,innerHeight-r.top+14))+'px'}
+$('fab').onclick=()=>showTab('form');
+['resize','orientationchange'].forEach(e=>addEventListener(e,fabPos));[400,1500,4000].forEach(t=>setTimeout(()=>{fabPos();fabVis()},t));
+(function(){const r=render;render=function(){r();fabPos();fabVis()};window.render=render})();
 /* ===== HOME page: notifications, invoices from email, payment advice ===== */
 const BN=banners;banners=function(){return''};
 function homeBN(){let h=BN()||'';const d=new Date().getDay();
