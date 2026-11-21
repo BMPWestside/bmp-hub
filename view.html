@@ -1562,7 +1562,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='21 Nov 2026, 19:00 (Profit table to Cash; Profit tab renamed ATO)';
+const APPV='21 Nov 2026, 19:30 (Cashflow tab order; ATO icon)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -2125,7 +2125,7 @@ function forecast(){const now=todayK(),cur=info(now).ym,t0=new Date(now+'T00:00'
   ev.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0);let bal=est(),low=null;ev.forEach(x=>{bal+=x.a;x.b=bal;if(bal<0&&!low)low=x.d});return{ev,low,end:bal}}
 const wlBar=id=>{const L=[['mgr','Accounts'],['bills','Bills'],['debt','Debts']].filter(x=>!(window.BMP_VIEW&&x[0]==='bills'));const cur=cf==='bills'&&$('earn').classList.contains('on')?'bills':(WL||'mgr');
   return `<div class="segs ${L.length===3?'three':'two'}" id="${id}">${L.map(([k,n])=>{const c=k==='bills'&&typeof blSoonCount==='function'?blSoonCount():0;return `<button type="button" class="seg${(WL||'mgr')===k?' on':''}" data-wl="${k}">${n}${c?`<span class="bdg">${c}</span>`:''}</button>`}).join('')}</div>`};
-const cftBar=()=>{if(cf==='bills')return wlBar('cft');const L=[['inc','Income'],['exp','Expenses'],['pro','ATO'],['cash','Cash'],['trend','Trend']].filter(x=>!(window.BMP_VIEW&&x[0]==='cash'));return `<div class="segs ${L.length===3?'three':L.length===4?'four':'five'}" id="cft">${L.map(([k,n])=>`<button type="button" class="seg${cf===k?' on':''}" data-cf="${k}">${n}</button>`).join('')}</div>`};
+const cftBar=()=>{if(cf==='bills')return wlBar('cft');const L=[['inc','Income'],['exp','Expenses'],['cash','Cash'],['pro','ATO'],['trend','Trend']].filter(x=>!(window.BMP_VIEW&&x[0]==='cash'));return `<div class="segs ${L.length===3?'three':L.length===4?'four':'five'}" id="cft">${L.map(([k,n])=>`<button type="button" class="seg${cf===k?' on':''}" data-cf="${k}">${n}</button>`).join('')}</div>`};
 function profitCardHtml(){
   const now=new Date(),cur=info(iso(now)),fy=fyOf(cur.ym);
   const ws=new Date(now);ws.setDate(now.getDate()-((now.getDay()+6)%7));const we=new Date(ws);we.setDate(ws.getDate()+6);
@@ -2464,7 +2464,7 @@ document.addEventListener('click',ev=>{const t=ev.target.closest&&ev.target.clos
   setInterval(loadBills,300000);setTimeout(blBadge,600);})();
 
 (function(){
-const P={cashflow:'<path d="M4 8h13"/><path d="m13 4 4 4-4 4"/><path d="M20 16H7"/><path d="m11 12-4 4 4 4"/>',inc:'<path d="M12 3v11"/><path d="m7.5 10 4.5 4.5L16.5 10"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
+const P={ato:'<path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="m9.5 17 5-5.5"/><circle cx="10" cy="12.2" r=".9"/><circle cx="14" cy="16.8" r=".9"/>',cashflow:'<path d="M4 8h13"/><path d="m13 4 4 4-4 4"/><path d="M20 16H7"/><path d="m11 12-4 4 4 4"/>',inc:'<path d="M12 3v11"/><path d="m7.5 10 4.5 4.5L16.5 10"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
 exp:'<path d="M12 14V3"/><path d="m7.5 7 4.5-4.5L16.5 7"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
 loan:'<path d="M3 10 12 4l9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20h18"/>',
 pro:'<path d="M3 17 9 11l4 4 8-9"/><path d="M15 6h6v6"/>',
@@ -2491,7 +2491,7 @@ rep:'<path d="M5 20V11M11 20V4M17 20v-6"/><path d="M3 20h18"/>',
 tools:'<path d="M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.5 2.5-2.4-.6-.6-2.4z"/>'};
 Object.assign(P,{custom:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',both:'<path d="M7 4v14"/><path d="m3.5 14.5 3.5 3.5 3.5-3.5"/><path d="M17 20V6"/><path d="m13.5 9.5 3.5-3.5 3.5 3.5"/>',view:'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',single:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',multi:'<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>',dmg:'<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>',chep:'<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18M7 15h4"/>'});
 const MAP=[['.tab[data-t]','t',{home:'home',form:'add',earn:'cashflow',wallet:'money',rep:'rep',tools:'tools'}],
-['.seg[data-m]','m',{}],['.seg[data-cf]','cf',{}],['.seg[data-cv]','cv',{}],['.seg[data-k]','k',{loans:'loan'}],['.seg[data-cbk]','cbk',{inc:'inc',exp:'exp',both:'both'}],
+['.seg[data-m]','m',{}],['.seg[data-cf]','cf',{pro:'ato'}],['.seg[data-cv]','cv',{}],['.seg[data-k]','k',{loans:'loan'}],['.seg[data-cbk]','cbk',{inc:'inc',exp:'exp',both:'both'}],
 ['.seg[data-r]','r',{quarter:'qtr'}],['.seg[data-wl]','wl',{mgr:'mgr',bills:'bills',debt:'debt'}],['.seg[data-lpd]','lpd',{month:'month',fy:'year',all:'qtr'}],['.seg[data-lk]','lk',{dir:'loan',car:'debt'}],['.seg[data-tl]','tl',{dat:'bak'}],['.seg[data-bt]','bt',{b:'bills',c:'course',d:'doc'}],['.seg[data-mg="sub"]','v',{dm:'dmg',ch:'chep'}],['.seg[data-mg="mode"]','v',{view:'view',new:'add'}],['.seg[data-dm="mode"]','v',{new:'add'}],['.seg[data-dm="single"]','v',{'1':'single','0':'multi'}],['.seg[data-tm]','tm',{w:'week',m:'month'}]];
 const SEL=MAP.map(x=>x[0]+':not([data-ic])').join(',');
 const LAST={},BKEY=el=>{const f=el.querySelector('[data-ic],button');if(!f)return'';const d=Object.keys(f.dataset).filter(k=>k!=='ic')[0]||'';return (el.id||el.className.replace(/\b(ib|on)\b/g,'').trim())+'|'+d+'|'+el.children.length};
