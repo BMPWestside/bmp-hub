@@ -1368,7 +1368,7 @@ $('f').onsubmit=ev=>{
   entries.push(en);persist();
   sel=d;const keepMode=fm;clearForm();setEdit(null);if(!was)setMode(keepMode);say('');
   render();autoSync();
-  if(was)showTab('earn');
+  showTab(was?'earn':'home');
 };
 /* ===== DAY POPUP (tap a day's Total on the Earnings tab) ===== */
 let popDay=null,popConf=null,popKind='inc';
@@ -1559,7 +1559,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='21 Nov 2026, 11:30 (New nav: Cashflow, Wallet, + button)';
+const APPV='21 Nov 2026, 13:00 (Save entry returns to Home)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
