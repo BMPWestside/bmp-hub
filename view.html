@@ -1043,6 +1043,8 @@ html body .card.tabs .tab[data-t="form"]:not(#_):not(#__):not(#___):not(#____),h
 #fab svg{width:30px;height:30px;fill:none;stroke:#E4002B;stroke-width:3.6;stroke-linecap:round;filter:drop-shadow(0 0 5px rgba(228,0,43,.5))}
 #fab:active{transform:scale(.93)}
 html.view #fab{display:none!important}
+#fab svg{transition:transform .25s ease}
+#fab.x svg{transform:rotate(45deg)}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("lk")||"null").pin)document.documentElement.classList.add("locked")}catch(e){}</script>
 </head>
@@ -1560,7 +1562,7 @@ window.addEventListener('resize',fit);window.addEventListener('orientationchange
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.open&&d.classList&&d.classList.contains('bk'))document.querySelectorAll('#rep details.bk').forEach(o=>{if(o!==d)o.open=false});fit()},true);
 /* ===== PROFIT / GST / TAX, PAY + REMINDER BANNERS, TOOLS, BACKUP, LOCK, FY PACK ===== */
 const PAY_START='2026-10-13';
-const APPV='21 Nov 2026, 13:00 (Save entry returns to Home)';
+const APPV='21 Nov 2026, 16:45 (+ becomes X to close Add)';
 const jget=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
 const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let CFG=Object.assign({gst:true,incGst:'ex',tax:25,sal:2146,sup:257.52,dt:1000,net:1641},jget('cfg',{}));if(CFG.sal===1641)CFG.sal=2146;
@@ -2951,10 +2953,12 @@ document.querySelectorAll('.tab').forEach(b=>{
     if(b.dataset.t==='tools'){if(tl==='mgr'||tl==='debt')tl='set';toolsView()}fabVis()})});
 document.addEventListener('click',ev=>{const w=ev.target.closest&&ev.target.closest('[data-wl]');if(w)goWallet(w.dataset.wl)});
 $('earn').addEventListener('click',ev=>{const t=ev.target.closest('[data-tm]');if(t&&cf==='trend'){tm=t.dataset.tm;render()}});
-function fabVis(){const f=$('fab');if(f)f.style.display=$('form').classList.contains('on')?'none':'flex'}
+let FABP={t:'home',w:null};
+function fabVis(){const f=$('fab');if(!f)return;const o=$('form').classList.contains('on');f.style.display='flex';f.classList.toggle('x',o);f.setAttribute('aria-label',o?'Close':'Add entry')}
 function fabPos(){const f=$('fab'),n=document.querySelector('.card.tabs');if(!f||!n)return;const r=n.getBoundingClientRect();
   f.style.bottom=(r.width<innerWidth*0.7?24:Math.max(24,innerHeight-r.top+14))+'px'}
-$('fab').onclick=()=>showTab('form');
+$('fab').onclick=()=>{if($('form').classList.contains('on')){if(FABP.w)goWallet(FABP.w);else showTab(FABP.t||'home');return}
+  const t=document.querySelector('.tab.on');FABP={t:t?t.dataset.t:'home',w:t&&t.dataset.t==='wallet'?WL:null};if(FABP.t==='form')FABP.t='home';showTab('form')};
 ['resize','orientationchange'].forEach(e=>addEventListener(e,fabPos));[400,1500,4000].forEach(t=>setTimeout(()=>{fabPos();fabVis()},t));
 (function(){const r=render;render=function(){r();fabPos();fabVis()};window.render=render})();
 /* ===== HOME page: notifications, invoices from email, payment advice ===== */
